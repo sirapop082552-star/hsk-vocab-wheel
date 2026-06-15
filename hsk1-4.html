@@ -144,6 +144,18 @@
   .btn-toggle-trans:hover { border-color:rgba(255,255,255,.28); transform:translateY(-1px); }
   .word-list.hide-trans .py, .word-list.hide-trans .th { opacity:0; transition:opacity .15s; }
   .word-list.hide-trans .word-item:hover .py, .word-list.hide-trans .word-item:hover .th { opacity:1; }
+  .word-item .star { cursor:pointer; font-size:1.15rem; line-height:1; color:#5c6488; flex-shrink:0; transition:transform .15s, color .15s; user-select:none; }
+  .word-item .star:hover { transform:scale(1.3); }
+  .word-item.review { border-color:rgba(255,176,32,.45); background:rgba(255,176,32,.08); }
+  .word-item.review .star { color:#ffb020; }
+  .btn-review-mode {
+    margin-top:14px; padding:11px 22px; border-radius:12px; font-size:.95rem; font-weight:700; cursor:pointer; font-family:inherit;
+    background:rgba(255,176,32,.12); color:#ffb020; border:1px solid rgba(255,176,32,.4); transition:all .18s;
+  }
+  .btn-review-mode:hover { transform:translateY(-2px); background:rgba(255,176,32,.2); }
+  .btn-review-mode.on { background:linear-gradient(135deg,#ffb020,#ff8a3d); color:#2a1800; border-color:transparent; box-shadow:0 8px 20px -8px rgba(255,176,32,.6); }
+  .btn-review { background:rgba(255,176,32,.15); color:#ffb020; border:1px solid rgba(255,176,32,.4); }
+  .btn-review:hover { transform:translateY(-2px); }
 
   /* ===== modal ===== */
   .modal-bg {
@@ -214,6 +226,7 @@
         <option value="100">100 คำ</option>
       </select>
     </div>
+    <button class="btn-review-mode" id="reviewModeBtn"></button>
     <div class="notice" id="emptyPool">⚠️ ไม่มีคำเหลือในระดับที่เลือก — เลือกระดับเพิ่ม หรือกดรีเซ็ต</div>
     <div class="notice" id="doneBanner">🏆 เก่งมาก! จำคำศัพท์ในระดับที่เลือกครบแล้ว!</div>
   </section>
@@ -241,6 +254,7 @@
       <button class="btn-reveal" id="revealBtn">👁️ ดูเฉลย</button>
       <button class="btn-learned" id="learnedBtn">✅ จำได้แล้ว เอาออก</button>
       <button class="btn-keep" id="keepBtn">🔁 เก็บไว้หมุนต่อ</button>
+      <button class="btn-review" id="reviewBtn">📌 ยังไม่รู้ เก็บทบทวน</button>
     </div>
   </div>
 </div>
@@ -1467,13 +1481,20 @@ const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 const cx = 300, cy = 300, R = 290;
 
+let review = new Set(JSON.parse(localStorage.getItem("hsk14_review")||"[]"));
+let reviewMode = localStorage.getItem("hsk14_reviewmode")==="1";
+function reviewCount() { return VOCAB.filter(v=>review.has(v[0]) && activeLevels.has(v[3])).length; }
 function poolIndexes() {
+  if (reviewMode) return VOCAB.map((_,i)=>i).filter(i=>review.has(VOCAB[i][0]) && activeLevels.has(VOCAB[i][3]));
   return VOCAB.map((_,i)=>i).filter(i=>!learned.has(VOCAB[i][0]) && activeLevels.has(VOCAB[i][3]));
 }
 function sampleSegments() {
   const pool = poolIndexes();
   const shuffled = [...pool].sort(()=>Math.random()-.5);
   current = shuffled.slice(0, Math.min(segCount, shuffled.length));
+  document.getElementById("emptyPool").textContent = reviewMode
+    ? "⭐ ยังไม่มีคำในรายการทบทวน — กดดาว ☆ ที่คำศัพท์ หรือปุ่ม 📌 ตอนหมุนได้คำ"
+    : "⚠️ ไม่มีคำเหลือในระดับที่เลือก — เลือกระดับเพิ่ม หรือกดรีเซ็ต";
   document.getElementById("emptyPool").style.display = current.length===0 ? "block" : "none";
 }
 function drawWheel() {
@@ -1605,7 +1626,20 @@ function updateUI() {
   document.getElementById("doneBanner").style.display = (total>0 && done===total) ? "block" : "none";
   renderChips();
   renderList();
+  updateReviewModeBtn();
   localStorage.setItem("hsk14_learned", JSON.stringify([...learned]));
+}
+function toggleReview(zh) {
+  review.has(zh) ? review.delete(zh) : review.add(zh);
+  localStorage.setItem("hsk14_review", JSON.stringify([...review]));
+  updateReviewModeBtn(); renderList();
+  if (reviewMode) { sampleSegments(); drawWheel(); }
+}
+function updateReviewModeBtn() {
+  const btn = document.getElementById("reviewModeBtn");
+  if (!btn) return;
+  btn.textContent = reviewMode ? "📚 ออกจากโหมดทบทวน (ดูทุกคำ)" : `🎯 ฝึกเฉพาะคำทบทวน (${reviewCount()})`;
+  btn.classList.toggle("on", reviewMode);
 }
 let hideTrans = localStorage.getItem("hsk14_hidetrans")==="1";
 function applyHideTrans() {
@@ -1622,13 +1656,16 @@ function renderList() {
   order.forEach(i=>{
     const [zh,py,th,lvl] = VOCAB[i];
     if (!activeLevels.has(lvl)) return;
+    if (reviewMode && !review.has(zh)) return;
     if (q && !(zh.includes(q)||py.toLowerCase().includes(q)||th.toLowerCase().includes(q))) return;
     const d = document.createElement("div");
-    d.className = "word-item" + (learned.has(zh)?" learned":"");
+    d.className = "word-item" + (learned.has(zh)?" learned":"") + (review.has(zh)?" review":"");
     d.innerHTML = `<span class="badge" style="background:${LEVELS[lvl].color}">${LEVELS[lvl].label}</span>`+
-                  `<span class="zh">${zh}</span><span class="py">${py}</span><span class="th">${th}</span>`;
+                  `<span class="zh">${zh}</span><span class="py">${py}</span><span class="th">${th}</span>`+
+                  `<span class="star" title="เพิ่ม/เอาออกจากรายการทบทวน">★</span>`;
     d.title = "คลิกเพื่อสลับสถานะ จำได้/ยังไม่จำ";
     d.onclick = ()=>{ learned.has(zh)?learned.delete(zh):learned.add(zh); updateUI(); sampleSegments(); drawWheel(); };
+    d.querySelector(".star").onclick = (e)=>{ e.stopPropagation(); toggleReview(zh); };
     el.appendChild(d);
   });
 }
@@ -1655,6 +1692,19 @@ document.getElementById("learnedBtn").onclick = ()=>{
 };
 document.getElementById("keepBtn").onclick = ()=>{
   closeModal(); sampleSegments(); drawWheel();
+};
+document.getElementById("reviewBtn").onclick = ()=>{
+  const zh = VOCAB[resultVocabIdx][0];
+  review.add(zh);
+  localStorage.setItem("hsk14_review", JSON.stringify([...review]));
+  updateReviewModeBtn(); renderList();
+  closeModal(); sampleSegments(); drawWheel();
+};
+document.getElementById("reviewModeBtn").onclick = ()=>{
+  if (spinning) return;
+  reviewMode = !reviewMode;
+  localStorage.setItem("hsk14_reviewmode", reviewMode ? "1" : "0");
+  updateReviewModeBtn(); renderList(); sampleSegments(); drawWheel();
 };
 document.getElementById("search").oninput = renderList;
 const segSelect = document.getElementById("segSelect");
