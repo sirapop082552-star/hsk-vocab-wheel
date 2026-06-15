@@ -137,6 +137,13 @@
   .word-item .th { color:#c7d2ee; text-align:right; flex:1; }
   .word-item.learned { opacity:.32; }
   .word-item.learned .zh { text-decoration:line-through; }
+  .btn-toggle-trans {
+    width:100%; margin-bottom:12px; padding:10px; font-size:.86rem; font-weight:600;
+    background:rgba(255,255,255,.06); color:var(--text); border:1px solid var(--card-border); border-radius:11px;
+  }
+  .btn-toggle-trans:hover { border-color:rgba(255,255,255,.28); transform:translateY(-1px); }
+  .word-list.hide-trans .py, .word-list.hide-trans .th { opacity:0; transition:opacity .15s; }
+  .word-list.hide-trans .word-item:hover .py, .word-list.hide-trans .word-item:hover .th { opacity:1; }
 
   /* ===== modal ===== */
   .modal-bg {
@@ -218,6 +225,7 @@
     </div>
     <h2>📚 คำศัพท์ทั้งหมด (<span id="totalCount"></span> คำ)</h2>
     <input class="search" id="search" placeholder="ค้นหา จีน / พินอิน / ไทย ...">
+    <button class="btn-toggle-trans" id="toggleTransBtn"></button>
     <div class="word-list" id="wordList"></div>
   </aside>
 </div>
@@ -1186,10 +1194,17 @@ function updateUI() {
   renderList();
   localStorage.setItem("vw_learned_v2", JSON.stringify([...learned]));
 }
+let hideTrans = localStorage.getItem("vw_hidetrans")==="1";
+function applyHideTrans() {
+  document.getElementById("wordList").classList.toggle("hide-trans", hideTrans);
+  document.getElementById("toggleTransBtn").textContent =
+    hideTrans ? "👁️ แสดงคำแปล + พินอิน" : "🙈 ซ่อนคำแปล + พินอิน (เห็นแค่ตัวจีน)";
+}
 function renderList() {
   const q = document.getElementById("search").value.trim().toLowerCase();
   const el = document.getElementById("wordList");
   el.innerHTML = "";
+  applyHideTrans();
   const order = VOCAB.map((_,i)=>i).sort((a,b)=>VOCAB[a][3]-VOCAB[b][3]);
   order.forEach(i=>{
     const [zh,py,th,lvl] = VOCAB[i];
@@ -1207,6 +1222,11 @@ function renderList() {
 
 document.getElementById("spinBtn").onclick = spin;
 canvas.onclick = spin;
+document.getElementById("toggleTransBtn").onclick = ()=>{
+  hideTrans = !hideTrans;
+  localStorage.setItem("vw_hidetrans", hideTrans ? "1" : "0");
+  applyHideTrans();
+};
 document.getElementById("shuffleBtn").onclick = ()=>{ if(!spinning){ sampleSegments(); drawWheel(); } };
 document.getElementById("resetBtn").onclick = ()=>{
   if (confirm("รีเซ็ตความคืบหน้าทั้งหมด เริ่มใหม่ตั้งแต่ต้น?")) {
