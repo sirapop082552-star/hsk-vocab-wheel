@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎡 วงล้อคำศัพท์จีน HSK1-6 — เรื่องสยองขวัญรางวัล 10 ล้าน</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&family=Noto+Sans+SC:wght@500;900&display=swap');
+  :root {
+    --bg0:#0b0e1d;
+    --card:rgba(255,255,255,.045);
+    --card-border:rgba(255,255,255,.09);
+    --gold:#ffd54f; --text:#e8ecf8; --muted:#8b93b8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:"Noto Sans Thai","Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;
+    background:var(--bg0); color:var(--text);
+    min-height:100vh; display:flex; flex-direction:column; align-items:center;
+    padding:30px 20px 60px; overflow-x:hidden; position:relative;
+  }
+  .bg-blob { position:fixed; border-radius:50%; filter:blur(110px); opacity:.5; pointer-events:none; z-index:-1; }
+  .b1 { width:540px; height:540px; background:#2b2070; top:-170px; left:-130px; }
+  .b2 { width:500px; height:500px; background:#0e4a5e; bottom:-170px; right:-110px; }
+
+  header { text-align:center; margin-bottom:20px; }
+  h1 {
+    font-size:2.1rem; font-weight:800; letter-spacing:.5px;
+    background:linear-gradient(90deg,#ffd54f,#ff8a65,#f06292);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .subtitle { color:var(--muted); margin-top:6px; font-size:.92rem; }
+
+  /* ===== level chips ===== */
+  .levels { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:24px; max-width:780px; }
+  .chip {
+    display:flex; align-items:center; gap:8px;
+    padding:8px 15px; border-radius:99px; cursor:pointer; font-weight:600; font-size:.86rem;
+    background:var(--card); border:1px solid var(--card-border); color:var(--muted);
+    transition:all .18s; user-select:none;
+  }
+  .chip::before {
+    content:""; width:9px; height:9px; border-radius:50%; flex-shrink:0;
+    background:var(--c,#888); box-shadow:0 0 9px var(--c,#888);
+    opacity:.35; transition:opacity .18s;
+  }
+  .chip:hover { transform:translateY(-2px); color:var(--text); }
+  .chip.on {
+    color:var(--text); border-color:var(--c,#888);
+    box-shadow:0 0 18px -6px var(--c,#888), inset 0 0 14px -10px var(--c,#888);
+  }
+  .chip.on::before { opacity:1; }
+  .chip .cnt { font-weight:400; font-size:.76rem; opacity:.75; }
+
+  /* ===== layout ===== */
+  .main { display:flex; flex-wrap:wrap; gap:26px; justify-content:center; align-items:flex-start; width:100%; max-width:1120px; }
+  .card {
+    background:var(--card); border:1px solid var(--card-border); border-radius:26px;
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    padding:28px; box-shadow:0 24px 60px -24px rgba(0,0,0,.65);
+  }
+  .wheel-card { width:min(530px,94vw); display:flex; flex-direction:column; align-items:center; }
+
+  /* ===== wheel ===== */
+  .wheel-area { position:relative; width:min(420px,82vw); margin-top:14px; }
+  .wheel-ring {
+    position:absolute; inset:-15px; border-radius:50%;
+    border:2px solid rgba(255,213,79,.35); pointer-events:none; z-index:5;
+    animation:ringPulse 2.8s ease-in-out infinite;
+  }
+  @keyframes ringPulse {
+    0%,100% { box-shadow:0 0 26px -8px rgba(255,213,79,.45), inset 0 0 22px -10px rgba(255,213,79,.4); }
+    50%     { box-shadow:0 0 42px -6px rgba(255,213,79,.75), inset 0 0 30px -8px rgba(255,213,79,.6); }
+  }
+  .pointer {
+    position:absolute; top:-13px; left:50%; transform:translateX(-50%);
+    width:0; height:0; border-left:16px solid transparent; border-right:16px solid transparent;
+    border-top:34px solid var(--gold); z-index:10;
+    filter:drop-shadow(0 4px 8px rgba(0,0,0,.55));
+  }
+  canvas {
+    width:100%; height:auto; display:block; border-radius:50%; cursor:pointer;
+    box-shadow:0 0 0 8px #1b2142, 0 0 0 10px rgba(255,213,79,.35), 0 22px 55px -12px rgba(0,0,0,.75);
+  }
+
+  /* ===== buttons ===== */
+  .controls { display:flex; gap:12px; margin-top:30px; flex-wrap:wrap; justify-content:center; }
+  button { border:none; border-radius:14px; padding:13px 26px; font-family:inherit; font-size:1rem; font-weight:700; cursor:pointer; transition:all .18s; }
+  button:disabled { opacity:.45; cursor:not-allowed; transform:none !important; }
+  .btn-spin {
+    font-size:1.15rem; padding:13px 40px; color:#1a1206;
+    background:linear-gradient(135deg,#ffd54f,#ff9f43);
+    box-shadow:0 12px 28px -10px rgba(255,170,60,.7), inset 0 1px 0 rgba(255,255,255,.55);
+  }
+  .btn-spin:hover { transform:translateY(-2px) scale(1.02); }
+  .btn-spin:active { transform:scale(.96); }
+  .btn-shuffle, .btn-reset { background:rgba(255,255,255,.07); color:var(--muted); border:1px solid var(--card-border); }
+  .btn-shuffle:hover, .btn-reset:hover { color:var(--text); border-color:rgba(255,255,255,.25); transform:translateY(-2px); }
+
+  .seg-row { margin-top:16px; color:var(--muted); font-size:.9rem; display:flex; align-items:center; gap:8px; }
+  .seg-row select {
+    padding:7px 14px; border-radius:10px; border:1px solid var(--card-border);
+    background:rgba(255,255,255,.06); color:var(--gold); font-family:inherit; font-size:.92rem; font-weight:700; cursor:pointer;
+  }
+  .seg-row select:focus { outline:none; border-color:var(--gold); }
+
+  .notice { display:none; margin-top:16px; padding:10px 18px; border-radius:12px; font-size:.92rem; text-align:center; }
+  #emptyPool { background:rgba(255,160,60,.1); color:#fbbf24; border:1px solid rgba(255,160,60,.3); }
+  #doneBanner { background:rgba(52,211,153,.1); color:#34d399; border:1px solid rgba(52,211,153,.3); }
+
+  /* ===== panel ===== */
+  .panel { width:min(470px,94vw); display:flex; flex-direction:column; max-height:700px; }
+  .stats { margin-bottom:18px; }
+  .progress-wrap { height:12px; border-radius:99px; background:rgba(255,255,255,.07); overflow:hidden; }
+  .progress-bar { height:100%; width:0%; border-radius:99px; background:linear-gradient(90deg,#34d399,#22d3ee); transition:width .4s; }
+  .progress-text { margin-top:8px; color:var(--muted); font-size:.84rem; }
+  .panel h2 { font-size:1rem; font-weight:700; color:var(--text); margin-bottom:12px; }
+  .search {
+    width:100%; padding:11px 15px; border-radius:12px; font-family:inherit; font-size:.92rem;
+    border:1px solid var(--card-border); background:rgba(255,255,255,.06); color:var(--text); margin-bottom:12px;
+  }
+  .search::placeholder { color:#5c6488; }
+  .search:focus { outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(255,213,79,.14); }
+  .word-list { overflow-y:auto; flex:1; padding-right:6px; }
+  .word-list::-webkit-scrollbar { width:8px; }
+  .word-list::-webkit-scrollbar-track { background:transparent; }
+  .word-list::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12); border-radius:99px; }
+  .word-list::-webkit-scrollbar-thumb:hover { background:rgba(255,255,255,.22); }
+  .word-item {
+    display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; margin-bottom:6px;
+    background:rgba(255,255,255,.04); border:1px solid transparent; cursor:pointer; font-size:.9rem; transition:all .15s;
+  }
+  .word-item:hover { border-color:var(--card-border); background:rgba(255,255,255,.08); transform:translateX(3px); }
+  .word-item .badge { font-size:.66rem; font-weight:800; border-radius:7px; padding:3px 7px; color:#101630; min-width:3.8em; text-align:center; flex-shrink:0; }
+  .word-item .zh { font-family:"Noto Sans SC","Microsoft YaHei",sans-serif; font-weight:900; color:var(--gold); min-width:4.6em; font-size:1.02rem; }
+  .word-item .py { color:#7dd3fc; font-size:.78rem; }
+  .word-item .th { color:#c7d2ee; text-align:right; flex:1; }
+  .word-item.learned { opacity:.32; }
+  .word-item.learned .zh { text-decoration:line-through; }
+  .btn-toggle-trans {
+    width:100%; margin-bottom:12px; padding:10px; font-size:.86rem; font-weight:600;
+    background:rgba(255,255,255,.06); color:var(--text); border:1px solid var(--card-border); border-radius:11px;
+  }
+  .btn-toggle-trans:hover { border-color:rgba(255,255,255,.28); transform:translateY(-1px); }
+  .word-list.hide-trans .py, .word-list.hide-trans .th { opacity:0; transition:opacity .15s; }
+  .word-list.hide-trans .word-item:hover .py, .word-list.hide-trans .word-item:hover .th { opacity:1; }
+  .word-item .star { cursor:pointer; font-size:1.15rem; line-height:1; color:#5c6488; flex-shrink:0; transition:transform .15s, color .15s; user-select:none; }
+  .word-item .star:hover { transform:scale(1.3); }
+  .word-item.review { border-color:rgba(255,176,32,.45); background:rgba(255,176,32,.08); }
+  .word-item.review .star { color:#ffb020; }
+  .btn-review-mode {
+    margin-top:14px; padding:11px 22px; border-radius:12px; font-size:.95rem; font-weight:700; cursor:pointer; font-family:inherit;
+    background:rgba(255,176,32,.12); color:#ffb020; border:1px solid rgba(255,176,32,.4); transition:all .18s;
+  }
+  .btn-review-mode:hover { transform:translateY(-2px); background:rgba(255,176,32,.2); }
+  .btn-review-mode.on { background:linear-gradient(135deg,#ffb020,#ff8a3d); color:#2a1800; border-color:transparent; box-shadow:0 8px 20px -8px rgba(255,176,32,.6); }
+  .btn-review { background:rgba(255,176,32,.15); color:#ffb020; border:1px solid rgba(255,176,32,.4); }
+  .btn-review:hover { transform:translateY(-2px); }
+  .save-row { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; justify-content:center; }
+  .btn-save { padding:9px 18px; border-radius:11px; font-size:.88rem; font-weight:600; cursor:pointer; font-family:inherit; background:rgba(125,211,252,.12); color:#7dd3fc; border:1px solid rgba(125,211,252,.35); transition:all .18s; }
+  .btn-save:hover { transform:translateY(-2px); background:rgba(125,211,252,.2); }
+
+  /* ===== modal ===== */
+  .modal-bg {
+    position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:100;
+    background:rgba(5,8,20,.68); backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px);
+  }
+  .modal-bg.show { display:flex; }
+  .modal {
+    background:linear-gradient(165deg,#1d2348,#10142e);
+    border:1px solid rgba(255,213,79,.45); border-radius:26px;
+    padding:38px 34px; text-align:center; width:min(430px,90vw);
+    box-shadow:0 0 90px -14px rgba(255,213,79,.3), 0 34px 70px -24px #000;
+    animation:pop .32s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes pop { from { transform:scale(.72); opacity:0; } to { transform:scale(1); opacity:1; } }
+  .modal .lvl-badge { display:inline-block; font-size:.82rem; font-weight:800; border-radius:9px; padding:4px 14px; color:#101630; margin-bottom:14px; }
+  .modal .zh-big {
+    font-family:"Noto Sans SC","Microsoft YaHei",sans-serif; font-size:3.4rem; font-weight:900;
+    color:var(--gold); margin-bottom:8px; cursor:pointer; text-shadow:0 6px 32px rgba(255,213,79,.4);
+  }
+  .modal .py-big { font-size:1.3rem; color:#7dd3fc; margin-bottom:10px; }
+  .modal .th-big { font-size:1.22rem; color:#fff; margin-bottom:26px; }
+  .modal .btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .btn-learned { background:linear-gradient(135deg,#34d399,#0ea5a4); color:#06251f; box-shadow:0 10px 24px -10px rgba(52,211,153,.6); }
+  .btn-learned:hover { transform:translateY(-2px); }
+  .btn-keep { background:rgba(255,255,255,.07); color:var(--muted); border:1px solid var(--card-border); }
+  .btn-keep:hover { color:var(--text); border-color:rgba(255,255,255,.25); }
+  .btn-reveal { background:linear-gradient(135deg,#7dd3fc,#3b82f6); color:#06243f; box-shadow:0 10px 24px -10px rgba(59,130,246,.6); }
+  .btn-reveal:hover { transform:translateY(-2px); }
+  .reveal-hint { color:#5c6488; font-size:.85rem; margin-bottom:18px; cursor:pointer; user-select:none; }
+  .hidden-part { visibility:hidden; }
+
+  @media (max-width:560px) {
+    h1 { font-size:1.5rem; }
+    .card { padding:18px; }
+  }
+</style>
+</head>
+<body>
+<div class="bg-blob b1"></div>
+<div class="bg-blob b2"></div>
+
+<header>
+  <h1>🎡 วงล้อคำศัพท์จีน</h1>
+  <div class="subtitle">765 คำจากเรื่อง «ผู้โชคดีคนที่ 1,000,000» — เลือกระดับ HSK ที่อยากฝึก แล้วหมุนเลย!</div>
+</header>
+
+<div class="levels" id="levelChips"></div>
+
+<div class="main">
+  <section class="card wheel-card">
+    <div class="wheel-area">
+      <div class="wheel-ring"></div>
+      <div class="pointer"></div>
+      <canvas id="wheel" width="600" height="600" title="คลิกวงล้อเพื่อหมุนได้เลย"></canvas>
+    </div>
+    <div class="controls">
+      <button class="btn-spin" id="spinBtn">🎰 หมุน!</button>
+      <button class="btn-shuffle" id="shuffleBtn">🔀 สับคำใหม่</button>
+      <button class="btn-reset" id="resetBtn">♻️ รีเซ็ต</button>
+    </div>
+    <div class="seg-row">
+      จำนวนคำต่อรอบ
+      <select id="segSelect">
+        <option value="10">10 คำ</option>
+        <option value="20">20 คำ</option>
+        <option value="50">50 คำ</option>
+        <option value="100">100 คำ</option>
+      </select>
+    </div>
+    <button class="btn-review-mode" id="reviewModeBtn"></button>
+    <div class="save-row">
+      <button class="btn-save" id="exportBtn">💾 สำรองข้อมูล</button>
+      <button class="btn-save" id="importBtn">📂 กู้คืนข้อมูล</button>
+      <input type="file" id="importFile" accept="application/json" style="display:none">
+    </div>
+    <div class="notice" id="emptyPool">⚠️ ไม่มีคำเหลือในระดับที่เลือก — เลือกระดับเพิ่ม หรือกดรีเซ็ต</div>
+    <div class="notice" id="doneBanner">🏆 เก่งมาก! จำคำศัพท์ในระดับที่เลือกครบแล้ว!</div>
+  </section>
+
+  <aside class="card panel">
+    <div class="stats">
+      <div class="progress-wrap"><div class="progress-bar" id="bar"></div></div>
+      <div class="progress-text" id="progressText"></div>
+    </div>
+    <h2>📚 คำศัพท์ทั้งหมด (<span id="totalCount"></span> คำ)</h2>
+    <input class="search" id="search" placeholder="ค้นหา จีน / พินอิน / ไทย ...">
+    <button class="btn-toggle-trans" id="toggleTransBtn"></button>
+    <div class="word-list" id="wordList"></div>
+  </aside>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div><span class="lvl-badge" id="mLvl"></span></div>
+    <div class="zh-big" id="mZh"></div>
+    <div class="reveal-hint" id="revealHint">👆 ลองทายความหมายก่อน แล้วแตะตรงนี้เพื่อเฉลย</div>
+    <div class="py-big hidden-part" id="mPy"></div>
+    <div class="th-big hidden-part" id="mTh"></div>
+    <div class="btns">
+      <button class="btn-reveal" id="revealBtn">👁️ ดูเฉลย</button>
+      <button class="btn-learned" id="learnedBtn">✅ จำได้แล้ว เอาออก</button>
+      <button class="btn-keep" id="keepBtn">🔁 เก็บไว้หมุนต่อ</button>
+      <button class="btn-review" id="reviewBtn">📌 ยังไม่รู้ เก็บทบทวน</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== ระดับ =====
+const LEVELS = {
+  1:{label:"HSK1", color:"#4dd0a0"},
+  2:{label:"HSK2", color:"#00bcd4"},
+  3:{label:"HSK3", color:"#5c9dfa"},
+  4:{label:"HSK4", color:"#9c6bff"},
+  5:{label:"HSK5", color:"#ffa502"},
+  6:{label:"HSK6", color:"#ff6b6b"},
+  7:{label:"สำนวน+", color:"#f06292"},
+};
+
+// ===== คำศัพท์ทั้งหมดจากเรื่อง [จีน, พินอิน, ไทย, ระดับ] (7 = สำนวน/เกิน HSK6) =====
+const VOCAB = [
+// --- HSK1 ---
+["钱","qián","เงิน",1],
+["人","rén","คน",1],
+["朋友","péngyou","เพื่อน",1],
+["电话","diànhuà","โทรศัพท์",1],
+["医生","yīshēng","หมอ",1],
+["医院","yīyuàn","โรงพยาบาล",1],
+["家","jiā","บ้าน",1],
+["车","chē","รถ",1],
+["看","kàn","ดู มอง",1],
+["听","tīng","ฟัง",1],
+["说","shuō","พูด",1],
+["想","xiǎng","คิด / อยาก",1],
+["开","kāi","เปิด / ขับ(รถ)",1],
+["谁","shéi","ใคร",1],
+["什么","shénme","อะไร",1],
+["今天","jīntiān","วันนี้",1],
+["名字","míngzi","ชื่อ",1],
+["东西","dōngxi","สิ่งของ",1],
+["衣服","yīfu","เสื้อผ้า",1],
+["回家","huí jiā","กลับบ้าน",1],
+["出租车","chūzūchē","แท็กซี่",1],
+// --- HSK2 ---
+["手机","shǒujī","มือถือ",2],
+["走","zǒu","เดิน / ไป",2],
+["跑","pǎo","วิ่ง",2],
+["门","mén","ประตู",2],
+["开门","kāi mén","เปิดประตู",2],
+["事情","shìqing","เรื่องราว",2],
+["问题","wèntí","ปัญหา / คำถาม",2],
+["知道","zhīdào","รู้",2],
+["开始","kāishǐ","เริ่ม",2],
+["等","děng","รอ",2],
+["快","kuài","เร็ว",2],
+["慢","màn","ช้า",2],
+["时间","shíjiān","เวลา",2],
+["眼睛","yǎnjing","ดวงตา",2],
+["笑","xiào","หัวเราะ / ยิ้ม",2],
+["房子","fángzi","บ้าน",2],
+["路","lù","ถนน / เส้นทาง",2],
+["晚上","wǎnshang","ตอนกลางคืน",2],
+["身体","shēntǐ","ร่างกาย",2],
+["公司","gōngsī","บริษัท",2],
+["床","chuáng","เตียง",2],
+["黑色","hēisè","สีดำ",2],
+// --- HSK3 ---
+["超市","chāoshì","ซูเปอร์มาร์เก็ต",3],
+["突然","tūrán","ทันใดนั้น",3],
+["害怕","hàipà","กลัว",3],
+["相信","xiāngxìn","เชื่อ",3],
+["安静","ānjìng","เงียบสงบ",3],
+["银行","yínháng","ธนาคาร",3],
+["地图","dìtú","แผนที่",3],
+["声音","shēngyīn","เสียง",3],
+["脸","liǎn","ใบหน้า",3],
+["附近","fùjìn","ละแวกใกล้เคียง",3],
+["离开","líkāi","จากไป",3],
+["发烧","fāshāo","มีไข้",3],
+["遇到","yùdào","พบเจอ",3],
+["司机","sījī","คนขับรถ",3],
+["帽子","màozi","หมวก",3],
+["新闻","xīnwén","ข่าว",3],
+["照片","zhàopiàn","รูปถ่าย",3],
+["头发","tóufa","เส้นผม",3],
+["世界","shìjiè","โลก",3],
+["树","shù","ต้นไม้",3],
+["灯","dēng","ไฟ / โคมไฟ",3],
+["窗户","chuānghu","หน้าต่าง",3],
+["电动车","diàndòngchē","มอเตอร์ไซค์ไฟฟ้า",3],
+// --- HSK4 ---
+["排队","páiduì","เข้าแถว / ต่อคิว",4],
+["感谢","gǎnxiè","ขอบคุณ",4],
+["恭喜","gōngxǐ","ยินดีด้วย",4],
+["工作人员","gōngzuò rényuán","พนักงาน / เจ้าหน้าที่",4],
+["用户","yònghù","ผู้ใช้ / ลูกค้า",4],
+["危险","wēixiǎn","อันตราย",4],
+["警察","jǐngchá","ตำรวจ",4],
+["联系","liánxì","ติดต่อ",4],
+["怀疑","huáiyí","สงสัย",4],
+["熟悉","shúxī","คุ้นเคย",4],
+["表情","biǎoqíng","สีหน้า",4],
+["后悔","hòuhuǐ","เสียใจภายหลัง",4],
+["犹豫","yóuyù","ลังเล",4],
+["转身","zhuǎnshēn","หันตัว / หันหลัง",4],
+["计划","jìhuà","แผนการ",4],
+["味道","wèidào","กลิ่น / รสชาติ",4],
+["位置","wèizhì","ตำแหน่ง",4],
+["软件","ruǎnjiàn","แอป / ซอฟต์แวร์",4],
+["放弃","fàngqì","ยอมทิ้ง / สละ",4],
+["提醒","tíxǐng","เตือน",4],
+["敲门","qiāo mén","เคาะประตู",4],
+["呼吸","hūxī","หายใจ",4],
+["货车","huòchē","รถบรรทุก",4],
+["轮子","lúnzi","ล้อ",4],
+["全球旅行","quánqiú lǚxíng","เที่ยวรอบโลก",4],
+["外卖","wàimài","อาหารเดลิเวอรี",4],
+["网吧","wǎngbā","ร้านเน็ต",4],
+["女友","nǚyǒu","แฟนสาว",4],
+["租房","zūfáng","เช่าบ้าน",4],
+["工具","gōngjù","เครื่องมือ",4],
+["密码","mìmǎ","รหัสผ่าน",4],
+["视频","shìpín","วิดีโอ",4],
+["信息","xìnxī","ข้อความ / ข้อมูล",4],
+["短信","duǎnxìn","ข้อความ SMS",4],
+["阳光","yángguāng","แสงแดด",4],
+["树林","shùlín","ป่าไม้",4],
+["生活","shēnghuó","ชีวิต / ใช้ชีวิต",4],
+["水桶","shuǐtǒng","ถังน้ำ",4],
+["五星级酒店","wǔxīngjí jiǔdiàn","โรงแรมห้าดาว",4],
+["心理医生","xīnlǐ yīshēng","จิตแพทย์",4],
+// --- HSK5 ---
+["结账","jiézhàng","คิดเงิน / เช็คบิล",5],
+["奖金","jiǎngjīn","เงินรางวัล",5],
+["恐惧","kǒngjù","ความหวาดกลัว",5],
+["嫉妒","jídù","อิจฉาริษยา",5],
+["不安","bù'ān","ไม่สบายใจ กระวนกระวาย",5],
+["账户","zhànghù","บัญชี(ธนาคาร)",5],
+["出租屋","chūzūwū","ห้องเช่า",5],
+["震动","zhèndòng","สั่นสะเทือน",5],
+["陌生号码","mòshēng hàomǎ","เบอร์แปลกหน้า",5],
+["删除","shānchú","ลบทิ้ง",5],
+["深夜","shēnyè","ดึกดื่น",5],
+["钉子","dīngzi","ตะปู",5],
+["脚步声","jiǎobùshēng","เสียงฝีเท้า",5],
+["门把手","mén bǎshou","ลูกบิดประตู",5],
+["楼道","lóudào","ทางเดินในตึก",5],
+["报警","bàojǐng","แจ้งตำรวจ",5],
+["制服","zhìfú","เครื่องแบบ",5],
+["可疑","kěyí","น่าสงสัย",5],
+["监控","jiānkòng","กล้องวงจรปิด",5],
+["保安","bǎo'ān","รปภ.",5],
+["拨打","bōdǎ","โทรออก",5],
+["接通","jiētōng","สายต่อติด",5],
+["沉默","chénmò","ความเงียบ / นิ่งเงียบ",5],
+["包间","bāojiān","ห้องส่วนตัว",5],
+["刺","cì","แทง / ทิ่ม",5],
+["胸口","xiōngkǒu","หน้าอก",5],
+["口罩","kǒuzhào","หน้ากากอนามัย",5],
+["特征","tèzhēng","ลักษณะเด่น / จุดสังเกต",5],
+["模糊","móhu","เลือนราง พร่ามัว",5],
+["回忆","huíyì","นึกย้อน / ความทรงจำ",5],
+["宣传","xuānchuán","โฆษณาประชาสัมพันธ์",5],
+["拍摄","pāishè","ถ่ายวิดีโอ / ถ่ายทำ",5],
+["传播","chuánbō","แพร่กระจาย",5],
+["住址","zhùzhǐ","ที่อยู่",5],
+["胆小","dǎnxiǎo","ขี้กลัว",5],
+["通讯录","tōngxùnlù","สมุดรายชื่อติดต่อ",5],
+["头像","tóuxiàng","รูปโปรไฟล์",5],
+["排除","páichú","ตัดออก / คัดออก",5],
+["断电","duàndiàn","ไฟดับ",5],
+["汗珠","hànzhū","เม็ดเหงื่อ",5],
+["喉咙","hóulóng","ลำคอ",5],
+["屏幕","píngmù","หน้าจอ",5],
+["绝望","juéwàng","สิ้นหวัง",5],
+["导航","dǎoháng","ระบบนำทาง",5],
+["定位","dìngwèi","ระบุตำแหน่ง / GPS",5],
+["体型","tǐxíng","รูปร่าง",5],
+["面具","miànjù","หน้ากาก",5],
+["后备箱","hòubèixiāng","กระโปรงท้ายรถ",5],
+["指甲","zhǐjia","เล็บ",5],
+["嘴唇","zuǐchún","ริมฝีปาก",5],
+["冷静","lěngjìng","ใจเย็น สงบสติ",5],
+["脖子","bózi","คอ",5],
+["倒数","dàoshǔ","นับถอยหลัง",5],
+["撞","zhuàng","ชน",5],
+["面包车","miànbāochē","รถตู้",5],
+["工厂","gōngchǎng","โรงงาน",5],
+["拼命","pīnmìng","สู้สุดชีวิต",5],
+["绳子","shéngzi","เชือก",5],
+["草丛","cǎocóng","พงหญ้า",5],
+["方向盘","fāngxiàngpán","พวงมาลัย",5],
+["小木屋","xiǎo mùwū","กระท่อมไม้",5],
+["转账","zhuǎnzhàng","โอนเงิน",5],
+["碎玻璃","suì bōli","เศษแก้ว",5],
+["手电筒","shǒudiàntǒng","ไฟฉาย",5],
+["病床","bìngchuáng","เตียงผู้ป่วย",5],
+["警服","jǐngfú","ชุดเครื่องแบบตำรวจ",5],
+["死亡时间","sǐwáng shíjiān","เวลาเสียชีวิต",5],
+["监控录像","jiānkòng lùxiàng","ภาพจากกล้องวงจรปิด",5],
+["收银台","shōuyíntái","เคาน์เตอร์คิดเงิน",5],
+["发件人","fājiànrén","ผู้ส่ง(ข้อความ)",5],
+["被子","bèizi","ผ้าห่ม",5],
+["业务","yèwù","ธุรกิจ / งาน",5],
+// --- HSK6 ---
+["惊恐","jīngkǒng","ตกใจกลัวสุดขีด",6],
+["喘气","chuǎnqì","หอบ หายใจแรง",6],
+["对视","duìshì","สบตากัน",6],
+["怜悯","liánmǐn","สงสาร เวทนา",6],
+["到账","dàozhàng","เงินเข้าบัญชี",6],
+["恶作剧","èzuòjù","การแกล้งอำ",6],
+["谨慎","jǐnshèn","ระมัดระวัง รอบคอบ",6],
+["感应灯","gǎnyìngdēng","ไฟเซ็นเซอร์",6],
+["熄灭","xīmiè","ดับ(ไฟ)",6],
+["屏住呼吸","bǐngzhù hūxī","กลั้นหายใจ",6],
+["寒意","hányì","ความเย็นวาบ(สันหลัง)",6],
+["猫眼","māoyǎn","ตาแมว(ช่องมองประตู)",6],
+["震撼","zhènhàn","สั่นสะเทือนใจ",6],
+["凶手","xiōngshǒu","ฆาตกร",6],
+["遭遇","zāoyù","ชะตากรรมที่เผชิญ",6],
+["感激","gǎnjī","ซาบซึ้งใจ",6],
+["致命","zhìmìng","ถึงตาย ร้ายแรงถึงชีวิต",6],
+["视线","shìxiàn","สายตา การมองเห็น",6],
+["剧痛","jùtòng","ความเจ็บปวดรุนแรง",6],
+["锁定","suǒdìng","ล็อกเป้าหมาย",6],
+["鸭舌帽","yāshémào","หมวกแก๊ป",6],
+["跟踪","gēnzōng","สะกดรอยตาม",6],
+["眼红","yǎnhóng","อิจฉาตาร้อน",6],
+["尖叫","jiānjiào","กรีดร้อง",6],
+["嫌疑人","xiányírén","ผู้ต้องสงสัย",6],
+["中介","zhōngjiè","นายหน้า",6],
+["巧合","qiǎohé","ความบังเอิญ",6],
+["送水工","sòngshuǐgōng","คนส่งน้ำ",6],
+["饮用水机","yǐnyòngshuǐjī","ตู้น้ำดื่ม",6],
+["片区","piànqū","เขตพื้นที่",6],
+["腥味","xīngwèi","กลิ่นคาว",6],
+["重叠","chóngdié","ซ้อนทับกัน",6],
+["安保","ānbǎo","การรักษาความปลอดภัย",6],
+["严密","yánmì","รัดกุม แน่นหนา",6],
+["引擎","yǐnqíng","เครื่องยนต์",6],
+["偏僻","piānpì","เปลี่ยว ห่างไกล",6],
+["废墟","fèixū","ซากปรักหักพัง",6],
+["脸皮","liǎnpí","หนังหน้า",6],
+["油门","yóumén","คันเร่ง",6],
+["反击","fǎnjī","ตอบโต้กลับ",6],
+["挣扎","zhēngzhá","ดิ้นรน",6],
+["失控","shīkòng","ควบคุมไม่อยู่",6],
+["安全气囊","ānquán qìnáng","ถุงลมนิรภัย",6],
+["昏过去","hūn guòqù","สลบไป",6],
+["副驾","fùjià","เบาะข้างคนขับ",6],
+["砍刀","kǎndāo","มีดอีโต้",6],
+["肠子","chángzi","ลำไส้",6],
+["捆住","kǔnzhù","มัดไว้",6],
+["茂盛","màoshèng","รกครึ้ม หนาแน่น",6],
+["简陋","jiǎnlòu","ซอมซ่อ",6],
+["血迹","xuèjì","รอยเลือด",6],
+["罪恶","zuì'è","บาป ความชั่ว",6],
+["拖延","tuōyán","ถ่วงเวลา",6],
+["割断","gēduàn","เฉือนให้ขาด",6],
+["急促","jícù","ถี่กระชั้น(ลมหายใจ)",6],
+["陷阱","xiànjǐng","กับดัก",6],
+["深坑","shēnkēng","หลุมลึก",6],
+["偷袭","tōuxí","ลอบโจมตี",6],
+["夜猫子","yèmāozi","นกเค้าแมว / คนนอนดึก",6],
+["苍白","cāngbái","ซีดขาว",6],
+["核实","héshí","ตรวจสอบยืนยัน",6],
+["跨省","kuàshěng","ข้ามมณฑล",6],
+["抢劫","qiǎngjié","ปล้น ชิงทรัพย์",6],
+["残忍","cánrěn","โหดร้ายทารุณ",6],
+["疑点","yídiǎn","จุดน่าสงสัย",6],
+["澄清","chéngqīng","ชี้แจงให้กระจ่าง",6],
+["余额","yú'é","ยอดเงินคงเหลือ",6],
+["审批","shěnpī","การอนุมัติ",6],
+["发放","fāfàng","จ่ายออก / มอบให้",6],
+["动机","dòngjī","แรงจูงใจ",6],
+["失踪","shīzōng","หายตัวไป",6],
+["证件照","zhèngjiànzhào","รูปถ่ายติดบัตร",6],
+["停机","tíngjī","เบอร์ถูกระงับ",6],
+["医疗记录","yīliáo jìlù","ประวัติการรักษา",6],
+["流水","liúshuǐ","รายการเดินบัญชี",6],
+// --- สำนวน / เกิน HSK6 ---
+["劫后余生","jié hòu yú shēng","รอดชีวิตจากหายนะ",7],
+["死里逃生","sǐ lǐ táo shēng","หนีตายรอดมาได้",7],
+["虚脱","xūtuō","หมดแรง อ่อนเปลี้ย",7],
+["发颤","fāchàn","สั่นเทา",7],
+["鬼使神差","guǐ shǐ shén chāi","เหมือนผีจับมือ บังเอิญประหลาด",7],
+["预谋","yùmóu","ไตร่ตรองวางแผนไว้ก่อน",7],
+["重生者","chóngshēngzhě","ผู้เกิดใหม่(ย้อนเวลา)",7],
+["爆火","bàohuǒ","ดังระเบิด ไวรัล",7],
+["热搜榜","rèsōubǎng","อันดับเทรนด์ค้นหา",7],
+["绞尽脑汁","jiǎo jìn nǎo zhī","คิดจนหัวแทบแตก",7],
+["轰鸣","hōngmíng","เสียงคำรามกึกก้อง",7],
+["惨白","cǎnbái","ซีดเผือด",7],
+["血腥味","xuèxīngwèi","กลิ่นคาวเลือด",7],
+["杂草丛","zácǎocóng","พงหญ้ารก",7],
+["血肉模糊","xuè ròu móhu","เลือดเนื้อแหลกเหลว",7],
+["剥皮","bāopí","ถลกหนัง",7],
+["皮绳","píshéng","เชือกหนัง / ยางรัดผม",7],
+["勒","lēi","รัด(คอ)",7],
+["搀扶","chānfú","พยุง",7],
+["戒备","jièbèi","ระวังตัว ตั้งการ์ด",7],
+["精疲力尽","jīng pí lì jìn","หมดเรี่ยวแรง",7],
+["狰狞","zhēngníng","(สีหน้า)โหดเหี้ยมน่ากลัว",7],
+["喷涌","pēnyǒng","พุ่งทะลัก",7],
+["踹","chuài","ถีบ",7],
+["牲口","shēngkou","สัตว์ใช้แรงงาน",7],
+["怨毒","yuàndú","อาฆาตแค้น",7],
+["血手印","xuèshǒuyìn","รอยมือเลือด",7],
+["挑拨离间","tiǎobō líjiàn","ยุแยงให้แตกคอกัน",7],
+["垫背","diànbèi","ลากไปตายด้วยกัน",7],
+["改头换面","gǎi tóu huàn miàn","เปลี่ยนโฉมเริ่มชีวิตใหม่",7],
+["困兽","kùnshòu","สัตว์จนตรอก",7],
+["狂奔","kuángbēn","วิ่งสุดชีวิต",7],
+["刑警队","xíngjǐngduì","หน่วยสืบสวนคดีอาญา",7],
+["作案","zuò'àn","ก่อคดี ลงมือก่อเหตุ",7],
+["团伙","tuánhuǒ","แก๊ง กลุ่มมิจฉาชีพ",7],
+["拆迁户","chāiqiānhù","ผู้ได้เงินเวนคืนบ้าน",7],
+["法医","fǎyī","แพทย์นิติเวช",7],
+["尸检","shījiǎn","การชันสูตรศพ",7],
+["婴儿肥","yīng'érféi","แก้มยุ้ย",7],
+["臆想","yìxiǎng","จินตนาการไปเอง ภาพหลอน",7],
+["瞳孔","tóngkǒng","รูม่านตา",7],
+["骸骨","háigǔ","โครงกระดูก",7],
+["光斑","guāngbān","หย่อมแสง",7],
+// ===== เพิ่มเติม: เก็บครบทุกคำจากเนื้อเรื่อง =====
+// --- HSK1 ---
+["我","wǒ","ฉัน",1],
+["你","nǐ","คุณ เธอ",1],
+["他","tā","เขา(ผู้ชาย)",1],
+["她","tā","เขา(ผู้หญิง)",1],
+["是","shì","เป็น คือ ใช่",1],
+["在","zài","อยู่ที่",1],
+["有","yǒu","มี",1],
+["不","bù","ไม่",1],
+["很","hěn","มาก",1],
+["都","dōu","ล้วน ทั้งหมด",1],
+["也","yě","ก็...ด้วย",1],
+["这","zhè","นี่",1],
+["那","nà","นั่น",1],
+["来","lái","มา",1],
+["去","qù","ไป",1],
+["叫","jiào","เรียก / ชื่อว่า",1],
+["玩","wán","เล่น",1],
+["点","diǎn","กด / สั่ง(อาหาร)",1],
+["飞","fēi","บิน",1],
+["米","mǐ","เมตร",1],
+["桌子","zhuōzi","โต๊ะ",1],
+["椅子","yǐzi","เก้าอี้",1],
+["店","diàn","ร้าน",1],
+["分钟","fēnzhōng","นาที",1],
+["为什么","wèishénme","ทำไม",1],
+["认识","rènshi","รู้จัก",1],
+["饭店","fàndiàn","ร้านอาหาร",1],
+["时候","shíhou","ตอน เวลา",1],
+["前面","qiánmiàn","ข้างหน้า",1],
+// --- HSK2 ---
+["您","nín","คุณ(สุภาพ)",2],
+["先","xiān","ก่อน",2],
+["女生","nǚshēng","หญิงสาว",2],
+["女孩","nǚhái","เด็กผู้หญิง",2],
+["心里","xīnli","ในใจ",2],
+["门口","ménkǒu","หน้าประตู",2],
+["跳","tiào","กระโดด / เต้น",2],
+["零","líng","ศูนย์",2],
+["告诉","gàosu","บอก",2],
+["让","ràng","ให้ / ยอมให้",2],
+["关","guān","ปิด",2],
+["可能","kěnéng","อาจจะ เป็นไปได้",2],
+["准备","zhǔnbèi","เตรียม",2],
+["小时","xiǎoshí","ชั่วโมง",2],
+["拿","ná","หยิบ เอา",2],
+["打开","dǎkāi","เปิด",2],
+["活动","huódòng","กิจกรรม แคมเปญ",2],
+["空气","kōngqì","อากาศ",2],
+["游戏","yóuxì","เกม",2],
+["因为","yīnwèi","เพราะว่า",2],
+["所以","suǒyǐ","ดังนั้น",2],
+// --- HSK3 ---
+["万","wàn","หมื่น",3],
+["骑","qí","ขี่",3],
+["爬","pá","คลาน ปีน",3],
+["嘴","zuǐ","ปาก",3],
+["牙","yá","ฟัน",3],
+["脚","jiǎo","เท้า",3],
+["耳朵","ěrduo","หู",3],
+["站","zhàn","ยืน",3],
+["拉","lā","ดึง ลาก",3],
+["掉","diào","หล่น ร่วง",3],
+["踢","tī","เตะ",3],
+["换","huàn","เปลี่ยน",3],
+["带","dài","พา นำ",3],
+["借","jiè","ยืม / อาศัย",3],
+["查","chá","ตรวจ ค้น",3],
+["放","fàng","วาง",3],
+["花","huā","ใช้(เงิน)",3],
+["机会","jīhuì","โอกาส",3],
+["办法","bànfǎ","วิธีการ",3],
+["一半","yíbàn","ครึ่งหนึ่ง",3],
+["刀","dāo","มีด",3],
+["辆","liàng","คัน (ลักษณนามรถ)",3],
+["层","céng","ชั้น",3],
+["坏","huài","เสีย พัง",3],
+["亮","liàng","สว่าง",3],
+["像","xiàng","เหมือน",3],
+["注意","zhùyì","ระวัง ใส่ใจ",3],
+["发现","fāxiàn","พบ สังเกตเห็น",3],
+["发生","fāshēng","เกิดขึ้น",3],
+["可怕","kěpà","น่ากลัว",3],
+["聪明","cōngming","ฉลาด",3],
+["舒服","shūfu","สบาย",3],
+["放心","fàngxīn","วางใจ",3],
+["方便","fāngbiàn","สะดวก",3],
+["年轻","niánqīng","หนุ่มสาว อายุน้อย",3],
+["经过","jīngguò","ความเป็นมา / ผ่าน",3],
+["笔记本","bǐjìběn","สมุดโน้ต",3],
+["箱子","xiāngzi","กล่อง ลัง",3],
+["叶子","yèzi","ใบไม้ ใบหญ้า",3],
+["不好意思","bù hǎoyìsi","ขอโทษ เกรงใจ",3],
+["愿意","yuànyì","ยินดี เต็มใจ",3],
+["鞋子","xiézi","รองเท้า",3],
+// --- HSK4 ---
+["获得","huòdé","ได้รับ",4],
+["曾经","céngjīng","เคย",4],
+["底下","dǐxia","ข้างใต้",4],
+["厘米","límǐ","เซนติเมตร",4],
+["躺","tǎng","นอนเอนตัว",4],
+["表现","biǎoxiàn","การแสดงออก",4],
+["回头","huítóu","หันกลับ",4],
+["骂","mà","ด่า",4],
+["继续","jìxù","ทำต่อไป",4],
+["差不多","chàbuduō","เกือบ ๆ ใกล้เคียง",4],
+["肚子","dùzi","ท้อง",4],
+["直接","zhíjiē","โดยตรง",4],
+["响","xiǎng","ดัง(เสียง)",4],
+["喊","hǎn","ตะโกน เรียก",4],
+["祝","zhù","อวยพร",4],
+["愉快","yúkuài","เบิกบาน สนุก",4],
+["袋子","dàizi","ถุง",4],
+["轻","qīng","เบา",4],
+["平时","píngshí","ยามปกติ",4],
+["及时","jíshí","ทันท่วงที",4],
+["提前","tíqián","ล่วงหน้า",4],
+["杀","shā","ฆ่า",4],
+["到底","dàodǐ","กันแน่ / ถึงที่สุด",4],
+["戴","dài","สวม(หมวก แว่น)",4],
+["直到","zhídào","จนกระทั่ง",4],
+["来不及","láibují","ไม่ทัน",4],
+["闻","wén","ดมกลิ่น",4],
+["肯定","kěndìng","แน่นอน",4],
+["网络","wǎngluò","อินเทอร์เน็ต",4],
+["遍","biàn","รอบ เที่ยว (ลักษณนาม)",4],
+["仔细","zǐxì","ละเอียดถี่ถ้วน",4],
+["摇头","yáotóu","ส่ายหัว",4],
+["除非","chúfēi","เว้นเสียแต่",4],
+["否则","fǒuzé","มิฉะนั้น",4],
+["认出","rènchū","จำหน้าได้",4],
+["确定","quèdìng","แน่ใจ ยืนยัน",4],
+["竟然","jìngrán","ถึงกับ...(ไม่น่าเชื่อ)",4],
+["陪","péi","อยู่เป็นเพื่อน",4],
+["按","àn","กด",4],
+["共同","gòngtóng","ร่วมกัน",4],
+["骗","piàn","หลอก",4],
+["理由","lǐyóu","เหตุผล",4],
+["停止","tíngzhǐ","หยุด",4],
+["代表","dàibiǎo","เป็นตัวแทน แทน",4],
+["师傅","shīfu","โชเฟอร์ / ช่าง (คำเรียก)",4],
+["安全","ānquán","ปลอดภัย",4],
+["暂时","zànshí","ชั่วคราว",4],
+["锁","suǒ","ล็อก",4],
+["吓","xià","ทำให้ตกใจ",4],
+["颗","kē","เม็ด ดวง (ลักษณนาม)",4],
+["闲","xián","ว่าง",4],
+["赚","zhuàn","หาเงิน",4],
+["追","zhuī","ไล่ตาม",4],
+["移动","yídòng","เคลื่อนที่",4],
+["观察","guānchá","สังเกต",4],
+["救","jiù","ช่วยชีวิต",4],
+["亲爱的","qīn'ài de","ที่รัก",4],
+["弄","nòng","ทำ จัดการ",4],
+["手指","shǒuzhǐ","นิ้วมือ",4],
+["躲","duǒ","หลบ ซ่อน",4],
+["力气","lìqi","เรี่ยวแรง",4],
+["眼泪","yǎnlèi","น้ำตา",4],
+["惊讶","jīngyà","ประหลาดใจ",4],
+["受伤","shòushāng","บาดเจ็บ",4],
+["扶","fú","ประคอง",4],
+["举","jǔ","ยกขึ้น",4],
+["倒","dǎo","ล้มลง",4],
+["丢","diū","โยน ทิ้ง",4],
+["纸巾","zhǐjīn","กระดาษทิชชู",4],
+["烟","yān","บุหรี่ ควัน",4],
+["猜","cāi","เดา",4],
+["脸色","liǎnsè","สีหน้า",4],
+["难看","nánkàn","(หน้า)บึ้งตึง / ขี้เหร่",4],
+["取","qǔ","ถอน(เงิน) เอาออก",4],
+["装","zhuāng","บรรจุ ใส่",4],
+["推","tuī","ผลัก",4],
+["中年","zhōngnián","วัยกลางคน",4],
+["专门","zhuānmén","โดยเฉพาะ",4],
+["记录","jìlù","บันทึก",4],
+["经历","jīnglì","ประสบพบเจอ",4],
+["经验","jīngyàn","ประสบการณ์",4],
+["丰富","fēngfù","มากมาย ช่ำชอง",4],
+["负责","fùzé","รับผิดชอบ",4],
+["窗帘","chuānglián","ผ้าม่าน",4],
+["调查","diàochá","สอบสวน สืบสวน",4],
+["长期","chángqī","ระยะยาว",4],
+["压力","yālì","ความเครียด ความกดดัน",4],
+["恢复","huīfù","ฟื้นตัว",4],
+["毕业","bìyè","เรียนจบ",4],
+["队长","duìzhǎng","หัวหน้าหน่วย",4],
+["工作日","gōngzuòrì","วันทำการ",4],
+["存在","cúnzài","มีอยู่จริง",4],
+["血","xuè","เลือด",4],
+["墙","qiáng","กำแพง",4],
+["全","quán","ทั้งหมด เต็ม",4],
+["群","qún","กลุ่ม ฝูง",4],
+["转头","zhuǎntóu","หันหน้า",4],
+["有病","yǒubìng","ป่วย / (ด่า)บ้าหรือเปล่า",4],
+["活着","huózhe","มีชีวิตอยู่",4],
+["至少","zhìshǎo","อย่างน้อย",4],
+// --- HSK5 ---
+["绕","rào","อ้อม วน",5],
+["围","wéi","ล้อมรอบ",5],
+["卷","juǎn","ม้วน / ถูกดูดเข้าไป",5],
+["脑袋","nǎodai","หัว",5],
+["状态","zhuàngtài","สภาพ สถานะ",5],
+["仿佛","fǎngfú","ราวกับ",5],
+["瞬间","shùnjiān","ชั่วพริบตา",5],
+["串","chuàn","พวง แถว (ลักษณนาม)",5],
+["握","wò","กำ จับ",5],
+["控制","kòngzhì","ควบคุม",5],
+["无数","wúshù","นับไม่ถ้วน",5],
+["揉","róu","ขยี้ นวด",5],
+["起身","qǐshēn","ลุกขึ้น",5],
+["原地","yuándì","ที่เดิม",5],
+["在意","zàiyì","ใส่ใจ แคร์",5],
+["落地","luòdì","ตกถึงพื้น",5],
+["逐渐","zhújiàn","ทีละน้อย",5],
+["体温","tǐwēn","อุณหภูมิร่างกาย",5],
+["自动","zìdòng","อัตโนมัติ",5],
+["明明","míngmíng","เห็นชัด ๆ ว่า",5],
+["秒","miǎo","วินาที",5],
+["头顶","tóudǐng","กลางกระหม่อม",5],
+["摸","mō","คลำ ลูบ",5],
+["编辑","biānjí","พิมพ์ / แก้ไขข้อความ",5],
+["值班","zhíbān","เข้าเวร",5],
+["冲","chōng","พุ่ง / มุ่งเป้า",5],
+["缩","suō","หด ขด",5],
+["提示","tíshì","คำเตือน คำใบ้",5],
+["闪电","shǎndiàn","ฟ้าแลบ",5],
+["害","hài","ทำร้าย",5],
+["说不定","shuōbudìng","ไม่แน่ อาจจะ",5],
+["赶紧","gǎnjǐn","รีบ ๆ",5],
+["透露","tòulù","เผยออกมา",5],
+["眼神","yǎnshén","แววตา",5],
+["平静","píngjìng","สงบ",5],
+["舍不得","shěbude","เสียดาย ใจไม่กล้า",5],
+["豪华","háohuá","หรูหรา",5],
+["死亡","sǐwáng","ความตาย เสียชีวิต",5],
+["发送","fāsòng","ส่ง(ข้อความ)",5],
+["思考","sīkǎo","คิดไตร่ตรอง",5],
+["转动","zhuàndòng","หมุน",5],
+["现场","xiànchǎng","ที่เกิดเหตุ หน้างาน",5],
+["对比","duìbǐ","เปรียบเทียบ",5],
+["跳动","tiàodòng","เต้น กระตุก",5],
+["宝宝","bǎobao","เบบี๋ ที่รัก",5],
+["回复","huífù","ตอบกลับ",5],
+["显然","xiǎnrán","ชัดเจนว่า",5],
+["符合","fúhé","สอดคล้อง ตรงกับ",5],
+["目前","mùqián","ขณะนี้",5],
+["对象","duìxiàng","เป้าหมาย / แฟน",5],
+["盯","dīng","จ้องเขม็ง",5],
+["疯狂","fēngkuáng","บ้าคลั่ง",5],
+["凑","còu","ขยับเข้าใกล้",5],
+["闪","shǎn","วาบ / หลบ",5],
+["亮光","liàngguāng","แสงสว่าง",5],
+["空白","kòngbái","ว่างเปล่า",5],
+["彼此","bǐcǐ","ซึ่งกันและกัน",5],
+["出事","chūshì","เกิดเรื่องร้าย",5],
+["心脏","xīnzàng","หัวใจ",5],
+["抬头","táitóu","เงยหน้า",5],
+["牵","qiān","จูง(มือ)",5],
+["措施","cuòshī","มาตรการ",5],
+["启动","qǐdòng","สตาร์ท เริ่มทำงาน",5],
+["拐","guǎi","เลี้ยว",5],
+["趁","chèn","ฉวยจังหวะตอนที่",5],
+["挥","huī","เหวี่ยง โบก",5],
+["套","tào","คล้อง สวม",5],
+["强烈","qiángliè","รุนแรง",5],
+["剧烈","jùliè","รุนแรง(แรงกระแทก)",5],
+["隐藏","yǐncáng","ซ่อนเร้น",5],
+["灯泡","dēngpào","หลอดไฟ",5],
+["凳子","dèngzi","ม้านั่ง",5],
+["主动","zhǔdòng","ลงมือเอง สมัครใจ",5],
+["得意","déyì","ลำพองใจ กร่าง",5],
+["显示","xiǎnshì","แสดงผล",5],
+["无论如何","wúlùn rúhé","ไม่ว่ายังไงก็ตาม",5],
+["愁","chóu","กลุ้มใจ",5],
+["钻","zuān","มุด",5],
+["尖锐","jiānruì","แหลมคม",5],
+["睁","zhēng","ลืมตา",5],
+["晕","yūn","เป็นลม เวียนหัว",5],
+["意识","yìshí","สติ จิตสำนึก",5],
+["砸","zá","ทุบ",5],
+["递","dì","ยื่นส่งให้",5],
+["停留","tíngliú","ค้างอยู่ที่",5],
+["目标","mùbiāo","เป้าหมาย",5],
+["针对","zhēnduì","มุ่งเป้าไปที่",5],
+["中奖","zhòngjiǎng","ถูกรางวัล",5],
+["群体","qúntǐ","กลุ่มคน",5],
+["实施","shíshī","ลงมือกระทำ",5],
+["极其","jíqí","อย่างยิ่งยวด",5],
+["协助","xiézhù","ให้ความร่วมมือ ช่วยเหลือ",5],
+["描述","miáoshù","บรรยาย เล่า",5],
+["医学","yīxué","การแพทย์",5],
+["心跳","xīntiào","หัวใจเต้น",5],
+["反复","fǎnfù","ซ้ำไปซ้ำมา",5],
+["画面","huàmiàn","ภาพ(ในจอ) ฉาก",5],
+["微微","wēiwēi","แผ่ว ๆ น้อย ๆ",5],
+["样本","yàngběn","ตัวอย่างตรวจ",5],
+["成员","chéngyuán","สมาชิก",5],
+["补充","bǔchōng","เสริม เพิ่มเติม",5],
+["进一步","jìnyíbù","ขั้นต่อไป มากขึ้นอีก",5],
+["发呆","fādāi","เหม่อลอย",5],
+["疼痛","téngtòng","ความเจ็บปวด",5],
+["想象","xiǎngxiàng","จินตนาการ",5],
+["挡","dǎng","บัง / รับ(มีด)แทน",5],
+["翻","fān","พลิกคว่ำ",5],
+["对手","duìshǒu","คู่ต่อสู้",5],
+["吐","tǔ","ถ่ม บ้วน",5],
+["无所谓","wúsuǒwèi","ไม่แคร์ ยังไงก็ได้",5],
+["道路","dàolù","ถนนหนทาง",5],
+["灯光","dēngguāng","แสงไฟ",5],
+["反应","fǎnyìng","ปฏิกิริยา / นึกขึ้นได้",5],
+["身份","shēnfèn","ตัวตน สถานะ",5],
+["露出","lùchū","เผยให้เห็น",5],
+["彻底","chèdǐ","อย่างสิ้นเชิง",5],
+["交出","jiāochū","ส่งมอบออกมา",5],
+["尽力","jìnlì","สุดความสามารถ",5],
+["目的地","mùdìdì","จุดหมายปลายทาง",5],
+["动手","dòngshǒu","ลงมือ",5],
+["四周","sìzhōu","รอบทิศ",5],
+["房东","fángdōng","เจ้าของห้องเช่า",5],
+["外卖员","wàimàiyuán","ไรเดอร์ส่งอาหาร",5],
+["高速","gāosù","ความเร็วสูง",5],
+["扣","kòu","ขูด เกี่ยว",5],
+["洞","dòng","รู โพรง",5],
+["伴随","bànsuí","มาพร้อมกับ",5],
+["扇","shān","ตบ(หน้า)",5],
+["根本","gēnběn","เลยสักนิด / โดยพื้นฐาน",5],
+// --- HSK6 ---
+["愣住","lèngzhù","ตะลึงค้าง",6],
+["极度","jídù","อย่างสุดขีด",6],
+["猛地","měngde","อย่างฉับพลัน",6],
+["浮现","fúxiàn","ผุดขึ้นมา(ในหัว)",6],
+["脑海","nǎohǎi","ห้วงความคิด",6],
+["咬牙","yǎoyá","กัดฟัน",6],
+["轻微","qīngwēi","แผ่วเบา เล็กน้อย",6],
+["无力","wúlì","หมดแรง",6],
+["不对劲","bú duìjìn","ทะแม่ง ๆ ผิดปกติ",6],
+["顾不上","gù bu shàng","ไม่ทันได้สนใจ",6],
+["用餐","yòngcān","รับประทานอาหาร",6],
+["松一口气","sōng yì kǒu qì","โล่งอก",6],
+["震惊","zhènjīng","ตกตะลึง",6],
+["短暂","duǎnzàn","ชั่วครู่ สั้น ๆ",6],
+["心安","xīn'ān","อุ่นใจ",6],
+["临死","línsǐ","ก่อนตาย",6],
+["失手","shīshǒu","พลาดมือ",6],
+["出手","chūshǒu","ลงมือ",6],
+["飞速","fēisù","เร็วจี๋",6],
+["场景","chǎngjǐng","ฉาก เหตุการณ์",6],
+["眼皮","yǎnpí","เปลือกตา",6],
+["性子","xìngzi","นิสัยใจคอ",6],
+["迟迟","chíchí","ชักช้า อืดอาด",6],
+["疑惑","yíhuò","ฉงนสงสัย",6],
+["瞪","dèng","ถลึงตา เบิกตาโต",6],
+["扑","pū","พุ่งตัวเข้าใส่",6],
+["砍","kǎn","ฟัน(ด้วยมีด)",6],
+["温热","wēnrè","อุ่น ๆ",6],
+["捂","wǔ","เอามือกุม ปิด",6],
+["额头","étóu","หน้าผาก",6],
+["缓过来","huǎn guòlái","ค่อย ๆ ฟื้นคืนสติ",6],
+["莫名","mòmíng","ประหลาดบอกไม่ถูก",6],
+["颤抖","chàndǒu","สั่นเทิ้ม",6],
+["伸","shēn","ยื่น เหยียด",6],
+["重合","chónghé","ทับซ้อนกันสนิท",6],
+["后视镜","hòushìjìng","กระจกมองหลัง",6],
+["缓缓","huǎnhuǎn","ช้า ๆ",6],
+["驾驶座","jiàshǐzuò","เบาะคนขับ",6],
+["眼珠","yǎnzhū","ลูกตา",6],
+["眯","mī","หรี่ตา",6],
+["甩","shuǎi","สะบัด เหวี่ยง",6],
+["行驶","xíngshǐ","(รถ)แล่น",6],
+["环绕","huánrào","ล้อมรอบ",6],
+["思索","sīsuǒ","ครุ่นคิด",6],
+["座椅","zuòyǐ","เบาะนั่ง",6],
+["扯","chě","กระชาก ดึง",6],
+["巴掌","bāzhang","ฝ่ามือ / ตบ",6],
+["擦拭","cāshì","เช็ดถู",6],
+["伤痕","shānghén","รอยแผล",6],
+["疯子","fēngzi","คนบ้า",6],
+["解锁","jiěsuǒ","ปลดล็อก",6],
+["巨响","jùxiǎng","เสียงดังสนั่น",6],
+["卸","xiè","ถอด / ตัด(แขน)ทิ้ง",6],
+["掩盖","yǎngài","ปกปิด",6],
+["劈","pī","ฟันผ่า",6],
+["防备","fángbèi","ระวังป้องกันตัว",6],
+["溅","jiàn","กระเซ็น",6],
+["拨开","bōkāi","แหวก(หญ้า)ออก",6],
+["锋利","fēnglì","คมกริบ",6],
+["逼近","bījìn","ประชิดเข้ามา",6],
+["与此同时","yǔ cǐ tóngshí","ในเวลาเดียวกันนั้น",6],
+["嘴角","zuǐjiǎo","มุมปาก",6],
+["晃动","huàngdòng","แกว่งไกว",6],
+["老手","lǎoshǒu","มือเก๋า",6],
+["截图","jiétú","ภาพแคปหน้าจอ",6],
+["主办方","zhǔbànfāng","ผู้จัดงาน",6],
+["流程","liúchéng","ขั้นตอน กระบวนการ",6],
+["从头到尾","cóng tóu dào wěi","ตั้งแต่ต้นจนจบ",6],
+["面孔","miànkǒng","ใบหน้า",6],
+["师范大学","shīfàn dàxué","มหาวิทยาลัยครุศาสตร์",6],
+["搜查","sōuchá","ตรวจค้น",6],
+["收缩","shōusuō","หดตัว",6],
+["侧身","cèshēn","เอียงตัวหลบ",6],
+["吼","hǒu","คำราม ตะคอก",6],
+["抵","dǐ","ยัน ต้าน",6],
+["弹出","tánchū","เด้งออกมา",6],
+["碰撞","pèngzhuàng","การชนกระแทก",6],
+["安定","āndìng","สงบ มั่นคง",6],
+["闪烁","shǎnshuò","กะพริบ วิบวับ",6],
+["破旧","pòjiù","เก่าโทรม",6],
+["轻易","qīngyì","ง่าย ๆ สุ่มสี่สุ่มห้า",6],
+["后退","hòutuì","ถอยหลัง",6],
+["堆","duī","กอง สุม",6],
+["踏","tà","ก้าวเหยียบ",6],
+["心碎","xīnsuì","ใจสลาย",6],
+["废物","fèiwù","ไอ้ไร้ค่า / ของเสีย",6],
+["深吸一口气","shēn xī yì kǒu qì","สูดหายใจลึก",6],
+["收紧","shōujǐn","รัดให้แน่นขึ้น",6],
+["摇摆","yáobǎi","ส่ายโคลงเคลง",6],
+["划过","huáguò","พาดผ่าน",6],
+["恶意","èyì","เจตนาร้าย",6],
+["脱离","tuōlí","หลุดพ้น",6],
+["讲述","jiǎngshù","เล่าเรื่อง",6],
+["调取","diàoqǔ","เรียกดู(ข้อมูล/กล้อง)",6],
+["互动","hùdòng","ปฏิสัมพันธ์",6],
+// --- สำนวน / เกิน HSK6 ---
+["又惊又喜","yòu jīng yòu xǐ","ทั้งตกใจทั้งดีใจ",7],
+["一丝一毫","yì sī yì háo","แม้แต่นิดเดียว",7],
+["擦肩而过","cā jiān ér guò","คลาดกันอย่างเฉียดฉิว",7],
+["毫不犹豫","háo bù yóuyù","ไม่ลังเลแม้แต่น้อย",7],
+["没头没脑","méi tóu méi nǎo","ไม่มีปี่มีขลุ่ย",7],
+["硬生生","yìngshēngshēng","อย่างดื้อ ๆ ทื่อ ๆ",7],
+["度秒如年","dù miǎo rú nián","หนึ่งวินาทียาวนานราวหนึ่งปี",7],
+["狐疑","húyí","คลางแคลงใจ",7],
+["窜","cuàn","พุ่งพรวด",7],
+["咯噔","gēdēng","(ใจ)วูบ",7],
+["七拐八扭","qī guǎi bā niǔ","เลี้ยวลดเลาะวกวน",7],
+["灯火通明","dēnghuǒ tōngmíng","ไฟสว่างไสว",7],
+["上一世","shàng yí shì","ชาติที่แล้ว",7],
+["重生","chóngshēng","เกิดใหม่ ย้อนเวลา",7],
+["浑然不觉","húnrán bù jué","ไม่รู้สึกตัวเลยสักนิด",7],
+["密密麻麻","mìmi mámá","ถี่ยิบ แน่นขนัด",7],
+["不知所措","bù zhī suǒ cuò","ทำอะไรไม่ถูก",7],
+["蹬","dēng","ถีบ(ขา)",7],
+["邪门","xiémén","ประหลาดผิดปกติ",7],
+["烟雾缭绕","yānwù liáorào","ควันลอยอ้อยอิ่ง",7],
+["面无表情","miàn wú biǎoqíng","หน้าตาย ไร้สีหน้า",7],
+["嵌","qiàn","ฝังจม",7],
+["唾沫","tuòmo","น้ำลาย",7],
+["惨叫","cǎnjiào","ร้องโหยหวน",7],
+["呼啸","hūxiào","(ลม)หวีดหวิว",7],
+["榨干","zhàgān","รีดจนหมดเกลี้ยง",7],
+["竖起耳朵","shùqǐ ěrduo","เงี่ยหูฟัง",7],
+["呻吟","shēnyín","ครวญคราง / เสียงเอี๊ยดอ๊าด",7],
+["松懈","sōngxiè","หย่อนยาน เผลอการ์ดตก",7],
+["头晕眼花","tóu yūn yǎn huā","หัวหมุนตาลาย",7],
+["些许","xiēxǔ","เล็กน้อย",7],
+["不敢置信","bù gǎn zhìxìn","ไม่กล้าเชื่อ",7],
+["弥漫","mímàn","อบอวล ฟุ้งกระจาย",7],
+["刺鼻","cìbí","ฉุนแสบจมูก",7],
+["阴霾","yīnmái","มืดหม่น อึมครึม",7],
+["荒弃","huāngqì","ถูกทิ้งร้าง",7],
+["脱身","tuōshēn","เอาตัวรอดออกมา",7],
+["响动","xiǎngdòng","เสียงเคลื่อนไหว",7],
+["使眼色","shǐ yǎnsè","ขยิบตาส่งสัญญาณ",7],
+["刀刃","dāorèn","คมมีด",7],
+["恶鬼","èguǐ","ปีศาจร้าย",7],
+["翻涌","fānyǒng","ปั่นป่วนคุกรุ่น",7],
+["自始至终","zì shǐ zhì zhōng","ตั้งแต่ต้นจนจบ",7],
+["清秀","qīngxiù","หน้าตาหมดจดงดงาม",7],
+["名下","míngxià","ในชื่อของ",7],
+["款项","kuǎnxiàng","ยอดเงิน(ทางการ)",7],
+["底细","dǐxì","ภูมิหลัง เบื้องลึก",7],
+["呼救","hūjiù","ร้องขอความช่วยเหลือ",7],
+["消散","xiāosàn","สลายหายไป",7],
+["抓现行","zhuā xiànxíng","จับได้คาหนังคาเขา",7],
+["常理","chánglǐ","สามัญสำนึก หลักทั่วไป",7],
+["跑滴滴","pǎo dīdī","ขับรถรับจ้าง(แอป)",7],
+["咧嘴","liězuǐ","แสยะยิ้ม ยิงฟัน",7],
+];
+
+// ===== สถานะเกม =====
+let segCount = parseInt(localStorage.getItem("vw_segcount")||"100");
+const COLORS = ["#ff6b6b","#ffa502","#ffd54f","#00c896","#00bcd4","#5c7cfa","#9c6bff","#f06292","#4dd0a0","#ff8a65"];
+let learned = new Set(JSON.parse(localStorage.getItem("vw_learned_v2")||"[]")); // เก็บเป็นตัวคำจีน
+let activeLevels = new Set(JSON.parse(localStorage.getItem("vw_levels")||"[1,2,3,4,5,6,7]"));
+let current = [];
+let angle = 0;
+let spinning = false;
+
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+const cx = 300, cy = 300, R = 290;
+
+let review = new Set(JSON.parse(localStorage.getItem("vw_review")||"[]"));
+let reviewMode = localStorage.getItem("vw_reviewmode")==="1";
+function reviewCount() { return VOCAB.filter(v=>review.has(v[0]) && activeLevels.has(v[3])).length; }
+function poolIndexes() {
+  if (reviewMode) return VOCAB.map((_,i)=>i).filter(i=>review.has(VOCAB[i][0]) && activeLevels.has(VOCAB[i][3]));
+  return VOCAB.map((_,i)=>i).filter(i=>!learned.has(VOCAB[i][0]) && activeLevels.has(VOCAB[i][3]));
+}
+function sampleSegments() {
+  const pool = poolIndexes();
+  const shuffled = [...pool].sort(()=>Math.random()-.5);
+  current = shuffled.slice(0, Math.min(segCount, shuffled.length));
+  document.getElementById("emptyPool").textContent = reviewMode
+    ? "⭐ ยังไม่มีคำในรายการทบทวน — กดดาว ☆ ที่คำศัพท์ หรือปุ่ม 📌 ตอนหมุนได้คำ"
+    : "⚠️ ไม่มีคำเหลือในระดับที่เลือก — เลือกระดับเพิ่ม หรือกดรีเซ็ต";
+  document.getElementById("emptyPool").style.display = current.length===0 ? "block" : "none";
+}
+function drawWheel() {
+  ctx.clearRect(0,0,600,600);
+  const n = current.length;
+  if (n === 0) {
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,2*Math.PI);
+    ctx.fillStyle="#222a44"; ctx.fill();
+    ctx.fillStyle="#667"; ctx.font="28px sans-serif"; ctx.textAlign="center";
+    ctx.fillText("ไม่มีคำศัพท์", cx, cy);
+    return;
+  }
+  const seg = 2*Math.PI/n;
+  for (let i=0;i<n;i++) {
+    const a0 = angle + i*seg, a1 = a0 + seg;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,R,a0,a1);
+    ctx.closePath();
+    ctx.fillStyle = COLORS[i%COLORS.length];
+    ctx.fill();
+    ctx.strokeStyle = "rgba(0,0,0,.25)";
+    ctx.lineWidth = n > 40 ? 0.5 : 2;
+    ctx.stroke();
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate(a0 + seg/2);
+    ctx.textAlign = "right";
+    ctx.fillStyle = "#1a1a2e";
+    const w = VOCAB[current[i]][0];
+    // ขนาดตัวอักษรปรับตามจำนวนช่อง ไม่ให้ล้นช่อง
+    let fs = Math.min(34, Math.max(9, Math.floor(2*Math.PI*(R-70)/n*0.62)));
+    if (w.length > 4) fs = Math.floor(fs*0.72);
+    else if (w.length > 2) fs = Math.floor(fs*0.88);
+    ctx.font = "bold " + fs + "px 'Microsoft YaHei', sans-serif";
+    ctx.fillText(w, R-10, fs*0.35);
+    ctx.restore();
+  }
+  ctx.beginPath(); ctx.arc(cx,cy,42,0,2*Math.PI);
+  ctx.fillStyle="#222a44"; ctx.fill();
+  ctx.strokeStyle="#ffd54f"; ctx.lineWidth=4; ctx.stroke();
+  ctx.fillStyle="#ffd54f"; ctx.font="26px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText("中文", cx, cy);
+  ctx.textBaseline="alphabetic";
+}
+function spin() {
+  if (spinning || current.length===0) return;
+  spinning = true;
+  document.getElementById("spinBtn").disabled = true;
+  document.getElementById("shuffleBtn").disabled = true;
+  const extra = (5 + Math.random()*4) * 2*Math.PI + Math.random()*2*Math.PI;
+  const start = angle;
+  const dur = 4200, t0 = performance.now();
+  function frame(t) {
+    const p = Math.min((t-t0)/dur, 1);
+    const ease = 1 - Math.pow(1-p, 4);
+    angle = start + extra*ease;
+    drawWheel();
+    if (p < 1) requestAnimationFrame(frame);
+    else {
+      spinning = false;
+      document.getElementById("spinBtn").disabled = false;
+      document.getElementById("shuffleBtn").disabled = false;
+      showResult(landedIndex());
+    }
+  }
+  requestAnimationFrame(frame);
+}
+function landedIndex() {
+  const n = current.length, seg = 2*Math.PI/n;
+  const pointerAngle = -Math.PI/2;
+  let rel = (pointerAngle - angle) % (2*Math.PI);
+  if (rel < 0) rel += 2*Math.PI;
+  return Math.floor(rel/seg) % n;
+}
+let resultVocabIdx = -1;
+function showResult(segIdx) {
+  resultVocabIdx = current[segIdx];
+  const [zh,py,th,lvl] = VOCAB[resultVocabIdx];
+  document.getElementById("mZh").textContent = zh;
+  document.getElementById("mPy").textContent = py;
+  document.getElementById("mTh").textContent = th;
+  const badge = document.getElementById("mLvl");
+  badge.textContent = LEVELS[lvl].label;
+  badge.style.background = LEVELS[lvl].color;
+  document.getElementById("mPy").classList.add("hidden-part");
+  document.getElementById("mTh").classList.add("hidden-part");
+  document.getElementById("revealHint").style.display = "block";
+  document.getElementById("revealBtn").style.display = "";
+  document.getElementById("modalBg").classList.add("show");
+}
+function reveal() {
+  document.getElementById("mPy").classList.remove("hidden-part");
+  document.getElementById("mTh").classList.remove("hidden-part");
+  document.getElementById("revealHint").style.display = "none";
+  document.getElementById("revealBtn").style.display = "none";
+}
+function closeModal() {
+  document.getElementById("modalBg").classList.remove("show");
+}
+function renderChips() {
+  const wrap = document.getElementById("levelChips");
+  wrap.innerHTML = "";
+  for (const lvl of [1,2,3,4,5,6,7]) {
+    const total = VOCAB.filter(v=>v[3]===lvl).length;
+    const done = VOCAB.filter(v=>v[3]===lvl && learned.has(v[0])).length;
+    const c = document.createElement("div");
+    c.className = "chip" + (activeLevels.has(lvl)?" on":"");
+    c.style.setProperty("--c", LEVELS[lvl].color);
+    c.innerHTML = `${LEVELS[lvl].label} <span class="cnt">${done}/${total}</span>`;
+    c.onclick = ()=>{
+      if (spinning) return;
+      activeLevels.has(lvl) ? activeLevels.delete(lvl) : activeLevels.add(lvl);
+      localStorage.setItem("vw_levels", JSON.stringify([...activeLevels]));
+      updateUI(); sampleSegments(); drawWheel();
+    };
+    wrap.appendChild(c);
+  }
+}
+function updateUI() {
+  const active = VOCAB.filter(v=>activeLevels.has(v[3]));
+  const total = active.length;
+  const done = active.filter(v=>learned.has(v[0])).length;
+  document.getElementById("bar").style.width = total? (done/total*100)+"%" : "0%";
+  document.getElementById("progressText").textContent =
+    total ? `ระดับที่เลือก: จำได้แล้ว ${done} / ${total} คำ — เหลืออีก ${total-done} คำ`
+          : "ยังไม่ได้เลือกระดับ — แตะป้าย HSK ด้านบนเพื่อเลือก";
+  document.getElementById("totalCount").textContent = VOCAB.length;
+  document.getElementById("doneBanner").style.display = (total>0 && done===total) ? "block" : "none";
+  renderChips();
+  renderList();
+  updateReviewModeBtn();
+  localStorage.setItem("vw_learned_v2", JSON.stringify([...learned]));
+}
+function toggleReview(zh) {
+  review.has(zh) ? review.delete(zh) : review.add(zh);
+  localStorage.setItem("vw_review", JSON.stringify([...review]));
+  updateReviewModeBtn(); renderList();
+  if (reviewMode) { sampleSegments(); drawWheel(); }
+}
+function updateReviewModeBtn() {
+  const btn = document.getElementById("reviewModeBtn");
+  if (!btn) return;
+  btn.textContent = reviewMode ? "📚 ออกจากโหมดทบทวน (ดูทุกคำ)" : `🎯 ฝึกเฉพาะคำทบทวน (${reviewCount()})`;
+  btn.classList.toggle("on", reviewMode);
+}
+let hideTrans = localStorage.getItem("vw_hidetrans")==="1";
+function applyHideTrans() {
+  document.getElementById("wordList").classList.toggle("hide-trans", hideTrans);
+  document.getElementById("toggleTransBtn").textContent =
+    hideTrans ? "👁️ แสดงคำแปล + พินอิน" : "🙈 ซ่อนคำแปล + พินอิน (เห็นแค่ตัวจีน)";
+}
+function renderList() {
+  const q = document.getElementById("search").value.trim().toLowerCase();
+  const el = document.getElementById("wordList");
+  el.innerHTML = "";
+  applyHideTrans();
+  const order = VOCAB.map((_,i)=>i).sort((a,b)=>VOCAB[a][3]-VOCAB[b][3]);
+  order.forEach(i=>{
+    const [zh,py,th,lvl] = VOCAB[i];
+    if (!activeLevels.has(lvl)) return;
+    if (reviewMode && !review.has(zh)) return;
+    if (q && !(zh.includes(q)||py.toLowerCase().includes(q)||th.toLowerCase().includes(q))) return;
+    const d = document.createElement("div");
+    d.className = "word-item" + (learned.has(zh)?" learned":"") + (review.has(zh)?" review":"");
+    d.innerHTML = `<span class="badge" style="background:${LEVELS[lvl].color}">${LEVELS[lvl].label}</span>`+
+                  `<span class="zh">${zh}</span><span class="py">${py}</span><span class="th">${th}</span>`+
+                  `<span class="star" title="เพิ่ม/เอาออกจากรายการทบทวน">★</span>`;
+    d.title = "คลิกเพื่อสลับสถานะ จำได้/ยังไม่จำ";
+    d.onclick = ()=>{ learned.has(zh)?learned.delete(zh):learned.add(zh); updateUI(); sampleSegments(); drawWheel(); };
+    d.querySelector(".star").onclick = (e)=>{ e.stopPropagation(); toggleReview(zh); };
+    el.appendChild(d);
+  });
+}
+
+document.getElementById("spinBtn").onclick = spin;
+canvas.onclick = spin;
+document.getElementById("toggleTransBtn").onclick = ()=>{
+  hideTrans = !hideTrans;
+  localStorage.setItem("vw_hidetrans", hideTrans ? "1" : "0");
+  applyHideTrans();
+};
+document.getElementById("shuffleBtn").onclick = ()=>{ if(!spinning){ sampleSegments(); drawWheel(); } };
+document.getElementById("resetBtn").onclick = ()=>{
+  if (confirm("รีเซ็ตความคืบหน้าทั้งหมด เริ่มใหม่ตั้งแต่ต้น?")) {
+    learned.clear(); updateUI(); sampleSegments(); drawWheel();
+  }
+};
+document.getElementById("revealHint").onclick = reveal;
+document.getElementById("revealBtn").onclick = reveal;
+document.getElementById("mZh").onclick = reveal;
+document.getElementById("learnedBtn").onclick = ()=>{
+  learned.add(VOCAB[resultVocabIdx][0]);
+  closeModal(); updateUI(); sampleSegments(); drawWheel();
+};
+document.getElementById("keepBtn").onclick = ()=>{
+  closeModal(); sampleSegments(); drawWheel();
+};
+document.getElementById("reviewBtn").onclick = ()=>{
+  const zh = VOCAB[resultVocabIdx][0];
+  review.add(zh);
+  localStorage.setItem("vw_review", JSON.stringify([...review]));
+  updateReviewModeBtn(); renderList();
+  closeModal(); sampleSegments(); drawWheel();
+};
+document.getElementById("reviewModeBtn").onclick = ()=>{
+  if (spinning) return;
+  reviewMode = !reviewMode;
+  localStorage.setItem("vw_reviewmode", reviewMode ? "1" : "0");
+  updateReviewModeBtn(); renderList(); sampleSegments(); drawWheel();
+};
+function exportData() {
+  const data = {};
+  for (let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k && k.indexOf("vw_")===0) data[k]=localStorage.getItem(k); }
+  const payload = { app:"vocab-wheel", exported:new Date().toISOString(), data };
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "vocab-wheel-backup-" + new Date().toISOString().slice(0,10) + ".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+}
+function importData(file) {
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    try {
+      const obj = JSON.parse(e.target.result);
+      const data = (obj && obj.data) ? obj.data : obj;
+      if (!data || typeof data !== "object") throw new Error("bad");
+      let n=0;
+      Object.keys(data).forEach(k=>{ if(k.indexOf("vw_")===0){ localStorage.setItem(k, data[k]); n++; } });
+      if (n===0) { alert("ไฟล์นี้ไม่มีข้อมูลของเกมนี้"); return; }
+      alert("กู้คืนข้อมูลสำเร็จ ("+n+" รายการ) — กำลังโหลดใหม่");
+      location.reload();
+    } catch(err) { alert("ไฟล์สำรองไม่ถูกต้อง"); }
+  };
+  reader.readAsText(file);
+}
+document.getElementById("exportBtn").onclick = exportData;
+document.getElementById("importBtn").onclick = ()=>document.getElementById("importFile").click();
+document.getElementById("importFile").onchange = (e)=>{ if(e.target.files && e.target.files[0]) importData(e.target.files[0]); e.target.value=""; };
+document.getElementById("search").oninput = renderList;
+const segSelect = document.getElementById("segSelect");
+segSelect.value = String(segCount);
+if (segSelect.value !== String(segCount)) { segCount = 100; segSelect.value = "100"; }
+segSelect.onchange = ()=>{
+  if (spinning) { segSelect.value = String(segCount); return; }
+  segCount = parseInt(segSelect.value);
+  localStorage.setItem("vw_segcount", String(segCount));
+  sampleSegments(); drawWheel();
+};
+
+sampleSegments();
+drawWheel();
+updateUI();
+</script>
+</body>
+</html>
