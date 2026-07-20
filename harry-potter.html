@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚡ แฮร์รี่ พอตเตอร์ กับศิลาอาถรรพ์ — 3D Presentation</title>
+<title>⚡ Harry Potter and the Philosopher's Stone — Group Presentation</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap');
   :root {
@@ -75,6 +75,19 @@
   .eyebrow::after { content:""; height:1px; flex:0 0 74px; background:linear-gradient(90deg,var(--gold),transparent); }
   .chapter { font-family:var(--serif); font-style:italic; font-weight:700; color:var(--muted);
     font-size:.86rem; letter-spacing:.05em; margin-bottom:16px; }
+  .speaker { display:inline-flex; align-items:center; gap:8px; margin-bottom:14px;
+    padding:6px 14px; border-radius:99px; font-size:.76rem; font-weight:600; letter-spacing:.05em;
+    color:#ffe9a8; background:rgba(255,213,79,.1); border:1px solid rgba(255,213,79,.35); }
+  .by { margin-top:10px; color:var(--muted); font-size:.78rem; font-style:italic; }
+  .vocab { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:0 28px; }
+  .vocab .vi { padding:9px 0; border-bottom:1px dashed rgba(255,255,255,.09); font-size:.89rem; color:#ccd3ee; line-height:1.7; }
+  .vocab .vi b { color:var(--gold); font-weight:700; }
+  .score-line { display:flex; align-items:center; gap:20px; flex-wrap:wrap; margin-bottom:18px; }
+  .score-num { font-family:var(--serif); font-weight:900; font-size:clamp(2.4rem,5vw,3.6rem);
+    color:var(--gold); text-shadow:0 0 26px rgba(255,213,79,.5); }
+  .stars-row { position:relative; display:inline-block; font-size:1.9rem; letter-spacing:6px; color:rgba(255,255,255,.16); }
+  .stars-row .fill { position:absolute; inset:0; overflow:hidden; color:var(--gold); white-space:nowrap;
+    text-shadow:0 0 18px rgba(255,213,79,.5); }
   h2 { font-size:clamp(1.7rem, 3.6vw, 2.6rem); font-weight:800; line-height:1.25; margin-bottom:18px;
     background:linear-gradient(90deg,#fff2c9,var(--gold) 75%);
     -webkit-background-clip:text; background-clip:text; color:transparent;
@@ -220,107 +233,84 @@
     <span class="s">The Philosopher's Stone</span>
   </a>
   <div class="chips" id="chips">
-    <a class="chip" href="#top">หน้าแรก</a>
-    <a class="chip" href="#info">ข้อมูลหนัง</a>
-    <a class="chip" href="#syn">เรื่องย่อ</a>
-    <a class="chip" href="#chars">ตัวละคร</a>
-    <a class="chip" href="#houses">บ้านทั้งสี่</a>
-    <a class="chip" href="#scenes">ฉากสำคัญ</a>
-    <a class="chip" href="#themes">แก่นเรื่อง</a>
-    <a class="chip" href="#stats">ความสำเร็จ</a>
-    <a class="chip" href="#trivia">เกร็ด</a>
+    <a class="chip" href="#top">Home</a>
+    <a class="chip" href="#history">History</a>
+    <a class="chip" href="#story">The Story</a>
+    <a class="chip" href="#scenes">Scenes</a>
+    <a class="chip" href="#characters">Characters</a>
+    <a class="chip" href="#lessons">Lessons</a>
+    <a class="chip" href="#rating">Rating</a>
   </div>
 </nav>
 
-<!-- ============ HERO ============ -->
+<!-- ============ 0 OPENING / HERO ============ -->
 <section class="hero" id="top" data-cam="70,38,100|0,22,0">
-  <div class="kicker">Movie Presentation · Warner Bros. 2001</div>
+  <div class="kicker">A Group Movie Presentation · Warner Bros. 2001</div>
   <h1>
-    <span class="word"><span style="--dl:.05s">แฮร์รี่</span></span>
-    <span class="word"><span style="--dl:.2s">พอตเตอร์</span></span><br>
-    <span class="word"><span style="--dl:.38s">กับศิลาอาถรรพ์</span></span>
+    <span class="word"><span style="--dl:.05s">Harry&nbsp;Potter</span></span><br>
+    <span class="word"><span style="--dl:.22s">and&nbsp;the</span></span>
+    <span class="word"><span style="--dl:.4s">Philosopher's&nbsp;Stone</span></span>
   </h1>
-  <div class="en-title">Harry Potter and the Philosopher's Stone</div>
-  <p class="sub">จุดเริ่มต้นของตำนานพ่อมดน้อยที่ครองใจผู้ชมทั่วโลกมากว่าสองทศวรรษ</p>
+  <div class="en-title">Where the magic of a 20-year legend began</div>
+  <p class="sub">Good morning/afternoon everyone — today our group will take you<br>on a journey into the wizarding world of Harry Potter.</p>
+  <div class="speaker" style="margin-top:20px;">🎤 Part 0 · Opening &amp; Closing — 1 speaker</div>
   <div class="scroll-cue">SCROLL ↓</div>
 </section>
 
-<!-- ============ 01 INFO ============ -->
-<section id="info" data-cam="36,22,54|0,18,0">
+<!-- ============ 1 HISTORY ============ -->
+<section id="history" data-cam="36,22,54|0,18,0">
   <div class="shell left">
     <div class="panel wide reveal">
-      <div class="eyebrow">About the film</div>
-      <div class="chapter">Chapter 01 — ข้อมูลทั่วไปของภาพยนตร์</div>
+      <div class="eyebrow">History of the film</div>
+      <div class="chapter">Part 01 — Where it all began</div>
+      <div class="speaker">🎤 1 speaker</div>
       <div class="info-grid">
         <div class="poster" id="posterTilt">
-          <img src="img/poster.jpg" alt="โปสเตอร์ภาพยนตร์ Harry Potter and the Philosopher's Stone">
+          <img src="img/poster.jpg" alt="Official movie poster of Harry Potter and the Philosopher's Stone">
           <div class="glint"></div>
         </div>
-        <div class="facts">
-          <div class="fact"><span class="k">ชื่อไทย</span><span class="v">แฮร์รี่ พอตเตอร์ กับศิลาอาถรรพ์</span></div>
-          <div class="fact"><span class="k">ชื่ออังกฤษ</span><span class="v">Harry Potter and the Philosopher's Stone (สหรัฐฯ ใช้ชื่อ Sorcerer's Stone)</span></div>
-          <div class="fact"><span class="k">เข้าฉาย</span><span class="v">พฤศจิกายน ค.ศ. 2001 (พ.ศ. 2544)</span></div>
-          <div class="fact"><span class="k">ผู้กำกับ</span><span class="v">คริส โคลัมบัส (Chris Columbus)</span></div>
-          <div class="fact"><span class="k">ดัดแปลงจาก</span><span class="v">นิยายเล่มแรกของ เจ. เค. โรว์ลิง ตีพิมพ์ปี 1997</span></div>
-          <div class="fact"><span class="k">ความยาว</span><span class="v">ประมาณ 152 นาที</span></div>
-          <div class="fact"><span class="k">แนว</span><span class="v">แฟนตาซี / ผจญภัย / ครอบครัว</span></div>
+        <div>
+          <h2>From a small novel to a global legend</h2>
+          <p class="body" style="margin-bottom:14px;">In 1997, <strong>J.K. Rowling</strong> published her first novel — an idea she famously began writing on a delayed train. Warner Bros. bought the film rights, and director <strong>Chris Columbus</strong> turned it into the movie that opened the whole saga.</p>
+          <div class="facts">
+            <div class="fact"><span class="k">Based on</span><span class="v">the 1997 novel by J.K. Rowling</span></div>
+            <div class="fact"><span class="k">Director</span><span class="v">Chris Columbus</span></div>
+            <div class="fact"><span class="k">Released</span><span class="v">November 2001 (Warner Bros. Pictures)</span></div>
+            <div class="fact"><span class="k">Runtime</span><span class="v">about 152 minutes</span></div>
+            <div class="fact"><span class="k">Casting</span><span class="v">thousands of children auditioned — Rowling insisted the main cast must be British</span></div>
+            <div class="fact"><span class="k">Fun fact</span><span class="v">in the U.S. it was renamed “Sorcerer's Stone”, so some scenes were filmed twice</span></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ 02 SYNOPSIS ============ -->
-<section id="syn" data-cam="6,9,98|0,10,30">
+<!-- ============ 2 STORY PART I ============ -->
+<section id="story" data-cam="6,9,98|0,10,30">
   <div class="shell right">
     <div class="panel reveal">
-      <div class="eyebrow">Synopsis</div>
-      <div class="chapter">Chapter 02 — เรื่องย่อ</div>
-      <h2>เด็กชายผู้รอดชีวิต</h2>
-      <p class="body"><strong>แฮร์รี่ พอตเตอร์</strong> เด็กกำพร้าที่ถูกเลี้ยงดูอย่างไร้ความรักโดยครอบครัวเดอร์สลีย์ ค้นพบในวันเกิดอายุ 11 ปีว่าแท้จริงแล้วเขาคือ <strong>พ่อมด</strong> และเป็นตำนานของโลกเวทมนตร์ในฐานะ "เด็กชายผู้รอดชีวิต" จากคำสาปของจอมมารโวลเดอมอร์</p>
-      <p class="body">เขาเดินทางสู่ <strong>โรงเรียนคาถาพ่อมดแม่มดฮอกวอตส์</strong> ได้พบเพื่อนแท้อย่างรอนและเฮอร์ไมโอนี่ และค้นพบความลับของ <strong>ศิลาอาถรรพ์</strong> — หินวิเศษที่มอบชีวิตอมตะ ซึ่งจอมมารไร้ร่างกำลังตามล่าเพื่อกลับคืนสู่อำนาจ</p>
-      <p class="body">สามสหายจึงต้องฝ่าด่านพิทักษ์สุดอันตราย เพื่อปกป้องศิลา…ก่อนที่ทุกอย่างจะสายเกินไป</p>
+      <div class="eyebrow">The story</div>
+      <div class="chapter">Part 02 — Plot summary (Ⅰ of Ⅱ)</div>
+      <div class="speaker">🎤 Speaker 1 of 2</div>
+      <h2>The Boy Who Lived</h2>
+      <p class="body"><strong>Harry Potter</strong> is an orphan raised by his cruel aunt and uncle, the Dursleys, who make him sleep in a cupboard under the stairs. On his 11th birthday, a giant named <strong>Hagrid</strong> arrives with a letter — and a secret: <em>“You're a wizard, Harry.”</em></p>
+      <p class="body">Harry discovers he is famous in the wizarding world as “The Boy Who Lived” — the only person to survive the curse of the dark lord <strong>Voldemort</strong>. He buys his wand in Diagon Alley, runs through the wall at <strong>Platform 9¾</strong>, and rides the Hogwarts Express to his new school, where he becomes best friends with <strong>Ron Weasley</strong> and <strong>Hermione Granger</strong>.</p>
     </div>
   </div>
 </section>
 
-<!-- ============ 03 CHARACTERS ============ -->
-<section id="chars" data-cam="-46,18,44|0,16,0">
-  <div class="shell center">
-    <div class="panel wide reveal">
-      <div class="eyebrow">Characters</div>
-      <div class="chapter">Chapter 03 — ตัวละคร</div>
-      <h2>สามผู้กล้าแห่งกริฟฟินดอร์ และผองเพื่อน</h2>
-      <div class="grid g3 stagger" style="margin-bottom:14px;">
-        <div class="cardlet reveal"><span class="ico">🧙‍♂️</span><h3>แฮร์รี่ พอตเตอร์</h3><div class="en">Daniel Radcliffe</div><p>เด็กชายผู้รอดชีวิต เจ้าของแผลเป็นรูปสายฟ้า กล้าหาญ มีน้ำใจ พร้อมเสียสละเพื่อคนที่เขารัก</p></div>
-        <div class="cardlet reveal"><span class="ico">🐀</span><h3>รอน วีสลีย์</h3><div class="en">Rupert Grint</div><p>เพื่อนแท้คนแรกของแฮร์รี่ อารมณ์ขัน ซื่อสัตย์ และเก่งหมากรุกพ่อมดที่สุดในรุ่น</p></div>
-        <div class="cardlet reveal"><span class="ico">📚</span><h3>เฮอร์ไมโอนี่ เกรนเจอร์</h3><div class="en">Emma Watson</div><p>แม่มดสาวหัวใสจากครอบครัวมักเกิ้ล ความรู้ของเธอช่วยชีวิตเพื่อนไว้หลายครั้ง</p></div>
-      </div>
-      <div class="grid g3 stagger">
-        <div class="cardlet reveal"><span class="ico">🦉</span><h3>อัลบัส ดัมเบิลดอร์</h3><p>อาจารย์ใหญ่ผู้ยิ่งใหญ่ที่สุดแห่งยุค คอยชี้ทางแฮร์รี่อย่างอบอุ่นและลึกซึ้ง</p></div>
-        <div class="cardlet reveal"><span class="ico">🐈</span><h3>มิเนอร์วา มักกอนนากัล</h3><p>หัวหน้าบ้านกริฟฟินดอร์ เข้มงวดแต่ยุติธรรม แปลงร่างเป็นแมวได้</p></div>
-        <div class="cardlet reveal"><span class="ico">🧪</span><h3>เซเวอรัส สเนป</h3><p>อาจารย์ปรุงยาผู้ลึกลับ ดูเป็นวายร้าย แต่ความจริงซับซ้อนกว่าที่เห็น</p></div>
-        <div class="cardlet reveal"><span class="ico">🌂</span><h3>รูเบอัส แฮกริด</h3><p>ร่างยักษ์ใจดี ผู้พาแฮร์รี่ก้าวเข้าสู่โลกเวทมนตร์เป็นคนแรก</p></div>
-        <div class="cardlet reveal"><span class="ico">🐍</span><h3>เดรโก มัลฟอย</h3><p>คู่ปรับจากสลิธีริน หยิ่งในชาติกำเนิด คอยหาเรื่องตลอดปี</p></div>
-        <div class="cardlet reveal"><span class="ico">💀</span><h3>ลอร์ดโวลเดอมอร์</h3><p>จอมมารผู้สังหารพ่อแม่ของแฮร์รี่ สิงร่างควีเรลล์เพื่อชิงศิลา</p></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ 04 HOUSES ============ -->
-<section id="houses" data-cam="-26,11,-66|0,13,-14">
-  <div class="shell center">
-    <div class="panel wide reveal">
-      <div class="eyebrow">The four houses</div>
-      <div class="chapter">Chapter 04 — บ้านทั้งสี่แห่งฮอกวอตส์</div>
-      <h2>หมวกคัดสรรจะอ่านใจ แล้วเลือกบ้านให้เธอ</h2>
-      <div class="grid g4 stagger">
-        <div class="cardlet house reveal" style="--hc:#e05555;"><span class="crest">🦁</span><h3>กริฟฟินดอร์</h3><p>ความกล้าหาญ ความมุ่งมั่น น้ำใจนักสู้</p></div>
-        <div class="cardlet house reveal" style="--hc:#4fc36b;"><span class="crest">🐍</span><h3>สลิธีริน</h3><p>ความทะเยอทะยาน ไหวพริบ ความเจ้าเล่ห์</p></div>
-        <div class="cardlet house reveal" style="--hc:#5b8dde;"><span class="crest">🦅</span><h3>เรเวนคลอ</h3><p>สติปัญญา ความรอบรู้ ความคิดสร้างสรรค์</p></div>
-        <div class="cardlet house reveal" style="--hc:#e8c15a;"><span class="crest">🦡</span><h3>ฮัฟเฟิลพัฟ</h3><p>ความขยัน ซื่อสัตย์ ยุติธรรม อดทน</p></div>
-      </div>
+<!-- ============ 2 STORY PART II ============ -->
+<section data-cam="-46,18,44|0,16,0">
+  <div class="shell left">
+    <div class="panel reveal">
+      <div class="eyebrow">The story</div>
+      <div class="chapter">Part 02 — Plot summary (Ⅱ of Ⅱ)</div>
+      <div class="speaker">🎤 Speaker 2 of 2</div>
+      <h2>The secret of the Stone</h2>
+      <p class="body">At Hogwarts, the three friends discover that something precious is hidden beneath the school: the <strong>Philosopher's Stone</strong>, a magical stone that can give eternal life. They believe someone is trying to steal it for Voldemort, who survives as a spirit without a body.</p>
+      <p class="body">To protect the Stone they pass deadly trials — the Devil's Snare, a room of flying keys, and a <strong>giant chess game</strong> where Ron sacrifices himself so his friends can go on. In the final chamber, Harry faces Professor <strong>Quirrell</strong>, possessed by Voldemort himself.</p>
+      <p class="body">Harry wins — not with a spell, but because his mother's love still protects him. The Stone is destroyed, and Voldemort's shadow escapes… for now.</p>
     </div>
   </div>
 </section>
@@ -328,88 +318,118 @@
 <!-- ============ PHOTO BANNER ============ -->
 <section class="photo-banner" data-cam="0,95,25|0,0,0">
   <div class="pb-inner">
-    <div class="bwrap" id="pbPx"><img src="img/hogwarts.jpg" alt="ปราสาทฮอกวอตส์ยามค่ำคืน นักเรียนปีหนึ่งนั่งเรือข้ามทะเลสาบ"></div>
+    <div class="bwrap" id="pbPx"><img src="img/hogwarts.jpg" alt="Hogwarts castle at night, first-years crossing the Black Lake by boat"></div>
     <div class="shade"></div>
     <div class="pb-cap reveal">
-      <h3>โรงเรียนคาถาพ่อมดแม่มดฮอกวอตส์</h3>
-      <p>คืนแรกของนักเรียนปีหนึ่ง — นั่งเรือข้ามทะเลสาบดำ สู่ปราสาทที่จะกลายเป็น "บ้าน" ตลอดเจ็ดปี</p>
+      <h3>Hogwarts School of Witchcraft and Wizardry</h3>
+      <p>On their first night, first-year students cross the Black Lake by boat — towards the castle that will be their home for seven years.</p>
     </div>
   </div>
 </section>
 
-<!-- ============ 05 TIMELINE ============ -->
+<!-- ============ 3 FAVOURITE SCENES ============ -->
 <section id="scenes" data-cam="-102,24,50|-46,3,-10">
-  <div class="shell left">
-    <div class="panel reveal">
-      <div class="eyebrow">Key moments</div>
-      <div class="chapter">Chapter 05 — เหตุการณ์สำคัญ</div>
-      <h2>เส้นทางสู่ศิลาอาถรรพ์</h2>
-      <div class="tl">
-        <div class="tl-line"><i id="tlFill"></i></div>
-        <div class="tl-item reveal"><h3>จดหมายจากฮอกวอตส์ 📬</h3><p>จดหมายนับพันฉบับถาโถมใส่บ้านเดอร์สลีย์ จนแฮกริดต้องมาตามตัวเอง</p></div>
-        <div class="tl-item reveal"><h3>ชานชาลาที่ 9¾ 🚂</h3><p>ซื้อไม้กายสิทธิ์ รับนกฮูกเฮ็ดวิก แล้วทะลุกำแพงขึ้นรถไฟด่วนสายฮอกวอตส์</p></div>
-        <div class="tl-item reveal"><h3>โทรลล์ในห้องน้ำ 🧌</h3><p>สามสหายร่วมปราบโทรลล์ นาทีที่เปลี่ยนคนแปลกหน้าเป็นเพื่อนแท้</p></div>
-        <div class="tl-item reveal"><h3>ควิดดิชนัดแรก 🧹</h3><p>ซีกเกอร์อายุน้อยที่สุดในรอบศตวรรษ คว้าลูกสนิชด้วยปาก!</p></div>
-        <div class="tl-item reveal"><h3>กระจกแห่งแอริแซด 🪞</h3><p>กระจกสะท้อนความปรารถนาลึกสุดใจ — แฮร์รี่ได้เห็นพ่อแม่เป็นครั้งแรก</p></div>
-        <div class="tl-item reveal"><h3>ด่านพิทักษ์ศิลา ♟️</h3><p>ต้นกับดักปีศาจ กุญแจบิน และหมากรุกยักษ์ที่รอนยอมเสียสละ</p></div>
-        <div class="tl-item reveal"><h3>เผชิญหน้าจอมมาร 💥</h3><p>เอาชนะควีเรลล์และโวลเดอมอร์ได้ ด้วยพลังความรักของแม่</p></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ 06 THEMES ============ -->
-<section id="themes" data-cam="72,14,14|46,8,-18">
-  <div class="shell right">
-    <div class="panel reveal">
-      <div class="eyebrow">Themes</div>
-      <div class="chapter">Chapter 06 — แก่นเรื่อง</div>
-      <h2>สิ่งที่หนังอยากบอก</h2>
-      <div class="grid g2 stagger">
-        <div class="cardlet reveal"><span class="ico">🤝</span><h3>มิตรภาพ</h3><p>ชัยชนะในด่านสุดท้าย เกิดจากความสามารถของเพื่อนทุกคนรวมกัน</p></div>
-        <div class="cardlet reveal"><span class="ico">🦁</span><h3>ความกล้าหาญ</h3><p>ความกล้าคือการทำสิ่งที่ถูกต้องทั้งที่กลัว แม้ต้องขัดใจเพื่อน</p></div>
-        <div class="cardlet reveal"><span class="ico">❤️</span><h3>พลังแห่งความรัก</h3><p>ความรักของแม่คือเวทมนตร์ทรงพลังที่สุด ที่จอมมารไม่อาจแตะต้อง</p></div>
-        <div class="cardlet reveal"><span class="ico">🧭</span><h3>ทางเลือกกำหนดตัวตน</h3><p>สิ่งที่เรา "เลือก" ต่างหาก ที่บอกว่าเราเป็นใครจริง ๆ</p></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ 07 STATS ============ -->
-<section id="stats" data-cam="4,120,70|0,0,-6">
   <div class="shell center">
     <div class="panel wide reveal">
-      <div class="eyebrow">Achievements</div>
-      <div class="chapter">Chapter 07 — ความสำเร็จของภาพยนตร์</div>
-      <h2>ปรากฏการณ์ระดับโลก</h2>
-      <div class="grid g3 stagger" style="margin-bottom:18px;">
-        <div class="cardlet stat reveal"><div class="num"><span class="count" data-to="1000" data-prefix="$" data-suffix="+">$1,000+</span></div><div class="lbl">ล้านดอลลาร์สหรัฐ · รายได้รวมทั่วโลก</div></div>
-        <div class="cardlet stat reveal"><div class="num">อันดับ <span class="count" data-to="2">2</span></div><div class="lbl">หนังทำเงินสูงสุดของโลกในปี 2001</div></div>
-        <div class="cardlet stat reveal"><div class="num"><span class="count" data-to="3">3</span> สาขา</div><div class="lbl">เข้าชิงออสการ์ (เพลงประกอบ · กำกับศิลป์ · เครื่องแต่งกาย)</div></div>
+      <div class="eyebrow">Favourite scenes</div>
+      <div class="chapter">Part 03 — Our favourite scene, one from each of us</div>
+      <div class="speaker">🎤 Everyone speaks · write your name on your card</div>
+      <h2>The moments we never forget</h2>
+      <div class="grid g3 stagger">
+        <div class="cardlet reveal"><span class="ico">📬</span><h3>The Letters from No One</h3><p>Hundreds of letters burst through the chimney — the moment the magic finally reaches Harry, no matter how hard the Dursleys try to stop it.</p><div class="by">— Member 1 · (name)</div></div>
+        <div class="cardlet reveal"><span class="ico">🚂</span><h3>Platform 9¾</h3><p>Running straight into a brick wall… and coming out into a whole new world. The scarlet Hogwarts Express is pure movie magic.</p><div class="by">— Member 2 · (name)</div></div>
+        <div class="cardlet reveal"><span class="ico">🎩</span><h3>The Sorting Ceremony</h3><p>“GRYFFINDOR!” — the talking hat reads every student's heart, and the Great Hall with its floating candles takes our breath away.</p><div class="by">— Member 3 · (name)</div></div>
+        <div class="cardlet reveal"><span class="ico">🧌</span><h3>The Troll in the Bathroom</h3><p>The fight that turned three strangers into best friends — scary, funny, and heart-warming at the same time.</p><div class="by">— Member 4 · (name)</div></div>
+        <div class="cardlet reveal"><span class="ico">🧹</span><h3>The First Quidditch Match</h3><p>The youngest Seeker in a century almost swallows the Golden Snitch — the most exciting sport that doesn't exist!</p><div class="by">— Member 5 · (name)</div></div>
+        <div class="cardlet reveal"><span class="ico">♟️</span><h3>The Giant Chess Game</h3><p>Ron rides a knight in a life-size deadly chess match and sacrifices himself — the bravest move in the whole film.</p><div class="by">— Member 6 · (name)</div></div>
       </div>
-      <ul class="bullets">
-        <li>เปิดตัวแฟรนไชส์ 8 ภาค รายได้รวมกว่า 7,700 ล้านดอลลาร์</li>
-        <li>ดนตรีโดย <strong>จอห์น วิลเลียมส์</strong> — "Hedwig's Theme" กลายเป็นเพลงจำของแฟรนไชส์</li>
-        <li>ปั้นนักแสดงเด็กทั้งสามเป็นดาราระดับโลก เติบโตไปพร้อมผู้ชมตลอด 10 ปี</li>
-      </ul>
     </div>
   </div>
 </section>
 
-<!-- ============ 08 TRIVIA ============ -->
-<section id="trivia" data-cam="20,30,34|0,24,0">
-  <div class="shell left">
-    <div class="panel reveal" style="width:min(560px,100%);">
-      <div class="eyebrow">Behind the scenes</div>
-      <div class="chapter">Chapter 08 — เกร็ดน่ารู้เบื้องหลัง</div>
-      <h2>ก่อนจะเป็นตำนาน</h2>
+<!-- ============ 4 FAVOURITE CHARACTERS ============ -->
+<section id="characters" data-cam="72,14,14|46,8,-18">
+  <div class="shell center">
+    <div class="panel wide reveal">
+      <div class="eyebrow">Favourite characters</div>
+      <div class="chapter">Part 04 — Our favourite character, one from each of us</div>
+      <div class="speaker">🎤 Everyone speaks · write your name on your card</div>
+      <h2>The people who make the magic real</h2>
+      <div class="grid g3 stagger">
+        <div class="cardlet reveal"><span class="ico">🧙‍♂️</span><h3>Harry Potter</h3><div class="en">Daniel Radcliffe</div><p>Brave, kind and humble — he never asked to be famous, but he always chooses to protect his friends.</p><div class="by">— Member 1 · (name)</div></div>
+        <div class="cardlet reveal"><span class="ico">📚</span><h3>Hermione Granger</h3><div class="en">Emma Watson</div><p>The brightest witch of her age — proof that books, cleverness and loyalty can save your friends' lives.</p><div class="by">— Member 2 · (name)</div></div>
+        <div class="cardlet reveal"><span class="ico">🐀</span><h3>Ron Weasley</h3><div class="en">Rupert Grint</div><p>The funny, honest, true friend — he has no money and no fame, but he gives Harry a family.</p><div class="by">— Member 3 · (name)</div></div>
+        <div class="cardlet reveal"><span class="ico">🦉</span><h3>Albus Dumbledore</h3><div class="en">Richard Harris</div><p>The wise, gentle headmaster whose every sentence sounds like a life lesson.</p><div class="by">— Member 4 · (name)</div></div>
+        <div class="cardlet reveal"><span class="ico">🌂</span><h3>Rubeus Hagrid</h3><div class="en">Robbie Coltrane</div><p>The gentle giant with the biggest heart — the first person ever to be kind to Harry.</p><div class="by">— Member 5 · (name)</div></div>
+        <div class="cardlet reveal"><span class="ico">🧪</span><h3>Severus Snape</h3><div class="en">Alan Rickman</div><p>The mysterious potions master everyone suspects — but the truth about him is the best twist of the film.</p><div class="by">— Member 6 · (name)</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5 LESSONS ============ -->
+<section id="lessons" data-cam="-26,11,-66|0,13,-14">
+  <div class="shell center">
+    <div class="panel wide reveal">
+      <div class="eyebrow">What we learned</div>
+      <div class="chapter">Part 05 — Lessons, quotes, and new words</div>
+      <div class="speaker">🎤 1 speaker</div>
+      <h2>What this film teaches us</h2>
+      <div class="grid g2 stagger" style="margin-bottom:22px;">
+        <div class="cardlet reveal"><span class="ico">🤝</span><h3>Friendship wins</h3><p>Harry never passes the final trials alone — every victory comes from the different talents of his friends combined.</p></div>
+        <div class="cardlet reveal"><span class="ico">🦁</span><h3>Real courage</h3><p>Courage is not the absence of fear — it is doing the right thing while you are afraid, even standing up to your friends.</p></div>
+        <div class="cardlet reveal"><span class="ico">❤️</span><h3>Love is the strongest magic</h3><p>A mother's sacrifice protects Harry better than any spell — love is the one power evil cannot touch.</p></div>
+        <div class="cardlet reveal"><span class="ico">🧭</span><h3>Our choices define us</h3><p>The Sorting Hat almost puts Harry in Slytherin — but what we <em>choose</em> shows who we truly are.</p></div>
+      </div>
+      <div class="grid g2" style="gap:22px;">
+        <div>
+          <h3 style="color:#ffe9a8; font-size:1rem; margin-bottom:8px;">⭐ Quotes we love</h3>
+          <ul class="bullets">
+            <li>“It does not do to dwell on dreams and forget to live.” <strong>— Dumbledore</strong></li>
+            <li>“It takes a great deal of bravery to stand up to our enemies, but just as much to stand up to our friends.” <strong>— Dumbledore</strong></li>
+            <li>“You're a wizard, Harry.” <strong>— Hagrid</strong></li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="color:#ffe9a8; font-size:1rem; margin-bottom:8px;">📖 New words &amp; phrases</h3>
+          <div class="vocab">
+            <div class="vi"><b>orphan</b> — a child whose parents have died</div>
+            <div class="vi"><b>wand</b> — a magic stick used to cast spells</div>
+            <div class="vi"><b>spell / curse</b> — magic words (good / evil)</div>
+            <div class="vi"><b>potion</b> — a magical drink</div>
+            <div class="vi"><b>scar</b> — a mark left on skin by a wound</div>
+            <div class="vi"><b>invisible</b> — impossible to see</div>
+            <div class="vi"><b>sacrifice</b> — giving up something for others</div>
+            <div class="vi"><b>“stand up to (someone)”</b> — to bravely face or resist someone</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6 RATING ============ -->
+<section id="rating" data-cam="4,120,70|0,0,-6">
+  <div class="shell center">
+    <div class="panel wide reveal">
+      <div class="eyebrow">Our rating</div>
+      <div class="chapter">Part 06 — Score &amp; recommendation</div>
+      <div class="speaker">🎤 1 speaker</div>
+      <h2>Would we recommend it?</h2>
+      <div class="score-line">
+        <span class="score-num"><span class="count" data-to="9">9</span>/10</span>
+        <span class="stars-row">★★★★★<span class="fill" style="width:90%;">★★★★★</span></span>
+      </div>
+      <div class="grid g3 stagger" style="margin-bottom:18px;">
+        <div class="cardlet stat reveal"><div class="num">$1,000M+</div><div class="lbl">worldwide box office — the #2 film of 2001</div></div>
+        <div class="cardlet stat reveal"><div class="num">3</div><div class="lbl">Academy Award nominations (score · art direction · costume)</div></div>
+        <div class="cardlet stat reveal"><div class="num">8 films</div><div class="lbl">the saga it launched, earning $7,700M+ together</div></div>
+      </div>
       <ul class="bullets">
-        <li>โรว์ลิงยืนยันว่านักแสดงหลักต้องเป็น <strong>ชาวอังกฤษ</strong> ถ่ายทำในสหราชอาณาจักร</li>
-        <li>เด็กหลายพันคนออดิชันบทแฮร์รี่ ก่อนพบ แดเนียล แรดคลิฟฟ์ วัย 11 ปี</li>
-        <li>ห้องโถงใหญ่ใช้เทียนลอยจริงหลายร้อยเล่ม ก่อนเปลี่ยนเป็น CG เพื่อความปลอดภัย</li>
-        <li>ชานชาลาที่ 9¾ ถ่ายที่สถานีคิงส์ครอส — ปัจจุบันมีจุดถ่ายรูปจริง</li>
-        <li>ชื่อถูกเปลี่ยนเป็น "Sorcerer's Stone" ในสหรัฐฯ จึงต้องถ่ายบางฉากสองเวอร์ชัน</li>
-        <li>งูที่คุยกับแฮร์รี่ คือการบอกใบ้ "พาร์เซลทัง" ที่สำคัญมากในภาคต่อ</li>
+        <li>A faithful, magical adaptation — book fans and new viewers both love it</li>
+        <li>John Williams' <strong>“Hedwig's Theme”</strong> — music you recognise in two seconds</li>
+        <li>Clear, simple English dialogue — <strong>perfect for language learners</strong></li>
+        <li>Fun for every age — the ideal first step into the wizarding world</li>
       </ul>
     </div>
   </div>
@@ -418,20 +438,21 @@
 <!-- ============ QUOTE ============ -->
 <section data-cam="6,26,66|-60,55,-90">
   <div class="quote-shell reveal">
-    <blockquote><span class="qm">“</span>การหมกมุ่นอยู่กับความฝัน จนลืมมีชีวิตอยู่กับปัจจุบัน<br>ไม่ใช่สิ่งที่ควรทำ<span class="qm">”</span></blockquote>
-    <div class="quote-by">— อัลบัส ดัมเบิลดอร์ · กล่าวถึงกระจกแห่งแอริแซด</div>
+    <blockquote><span class="qm">“</span>It does not do to dwell on dreams<br>and forget to live.<span class="qm">”</span></blockquote>
+    <div class="quote-by">— Albus Dumbledore · on the Mirror of Erised</div>
   </div>
 </section>
 
-<!-- ============ OUTRO ============ -->
+<!-- ============ 0 CLOSING ============ -->
 <section class="outro" data-cam="86,54,124|0,22,0">
-  <div class="eyebrow reveal" style="justify-content:center;">Fin — Thank you</div>
-  <h2 class="reveal">ขอบคุณครับ/ค่ะ ✨</h2>
-  <p class="sub reveal">"It does not do to dwell on dreams and forget to live."<br>มีคำถามอะไร ถามได้เลย</p>
-  <a href="#top" class="back-top reveal">⬆ กลับขึ้นด้านบน</a>
+  <div class="eyebrow reveal" style="justify-content:center;">Fin — Closing</div>
+  <h2 class="reveal">Thank You for Listening ✨</h2>
+  <p class="sub reveal">That was our journey through <em>Harry Potter and the Philosopher's Stone</em>.<br>Does anyone have any questions?</p>
+  <div class="speaker reveal" style="margin-top:18px;">🎤 Part 0 · Closing — same speaker as the opening</div>
+  <a href="#top" class="back-top reveal">⬆ Back to top</a>
 </section>
 
-<footer>Harry Potter &amp; The Philosopher's Stone · 3D Movie Presentation</footer>
+<footer>Harry Potter &amp; The Philosopher's Stone · A Group Presentation in English</footer>
 
 <script src="vendor/three.min.js"></script>
 <script>
