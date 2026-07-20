@@ -3,555 +3,884 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚡ แฮร์รี่ พอตเตอร์ กับศิลาอาถรรพ์ — Presentation</title>
+<title>⚡ แฮร์รี่ พอตเตอร์ กับศิลาอาถรรพ์ — 3D Presentation</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap');
   :root {
-    --bg0:#08091a;
-    --bg1:#10132e;
-    --card:rgba(255,255,255,.05);
-    --card-border:rgba(255,213,79,.16);
+    --bg0:#0a0e26;
+    --panel:rgba(10,13,32,.78);
+    --panel-border:rgba(255,213,79,.20);
     --gold:#ffd54f;
     --gold-dim:#c9a13b;
     --text:#eef1fb;
-    --muted:#98a1c8;
+    --muted:#9aa3c9;
+    --serif:"Playfair Display",Georgia,serif;
+    --sans:"Noto Sans Thai","Leelawadee UI","Thonburi","Segoe UI",sans-serif;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
-  body {
-    font-family:"Noto Sans Thai","Segoe UI",sans-serif;
-    background:var(--bg0); color:var(--text);
-    overflow-x:hidden;
-  }
+  body { font-family:var(--sans); background:var(--bg0); color:var(--text); overflow-x:hidden; }
   ::selection { background:rgba(255,213,79,.35); }
 
-  /* ================= fixed layers ================= */
-  .stars { position:fixed; inset:0; pointer-events:none; z-index:0; }
+  /* ===== fixed layers ===== */
+  #world { position:fixed; inset:0; z-index:1; display:block; }
+  .stars { position:fixed; inset:0; z-index:0; pointer-events:none; }
   .star { position:absolute; border-radius:50%; background:#fff; animation:twinkle var(--d,3s) ease-in-out infinite; }
-  @keyframes twinkle { 0%,100%{opacity:.12; transform:scale(.7)} 50%{opacity:.8; transform:scale(1.2)} }
+  @keyframes twinkle { 0%,100%{opacity:.1} 50%{opacity:.7} }
+  .vignette { position:fixed; inset:0; z-index:2; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(4,6,18,.55) 100%); }
 
-  .bg-blob { position:fixed; border-radius:50%; filter:blur(130px); opacity:.38; pointer-events:none; z-index:0; }
-  .b1 { width:600px; height:600px; background:#37246e; top:-200px; left:-160px; }
-  .b2 { width:540px; height:540px; background:#5a3a0e; bottom:-200px; right:-140px; }
-
-  .progress { position:fixed; top:0; left:0; height:3px; width:0; z-index:50;
+  .progress { position:fixed; top:0; left:0; height:3px; width:0; z-index:60;
     background:linear-gradient(90deg,var(--gold),#ff8a65); box-shadow:0 0 14px rgba(255,213,79,.7); }
 
-  .side-text {
-    position:fixed; left:18px; top:50%; z-index:40;
-    transform:translateY(-50%) rotate(180deg); writing-mode:vertical-rl;
-    font-size:.68rem; letter-spacing:.42em; color:rgba(255,255,255,.28);
-    text-transform:uppercase; pointer-events:none; white-space:nowrap;
+  /* ===== top nav ===== */
+  .topnav {
+    position:fixed; top:0; left:0; right:0; z-index:55;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:14px 26px;
+    background:linear-gradient(180deg, rgba(6,8,20,.82), transparent);
   }
-  .side-text.right { left:auto; right:18px; transform:translateY(-50%); }
-  @media (max-width:760px){ .side-text{ display:none; } }
-
-  /* golden snitch */
-  #snitch { position:fixed; z-index:45; width:26px; height:26px; pointer-events:none; will-change:transform; filter:drop-shadow(0 0 10px rgba(255,213,79,.8)); }
-  #snitch .ball { position:absolute; inset:4px; border-radius:50%;
-    background:radial-gradient(circle at 34% 30%, #fff3c4, #ffd54f 45%, #8a6a1c); }
-  #snitch .wing { position:absolute; top:7px; width:16px; height:9px; border-radius:100% 0 60% 40%;
-    background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.25));
-    transform-origin:right center; animation:flapL .18s ease-in-out infinite alternate; }
-  #snitch .wing.r { left:auto; right:-12px; left:auto; transform-origin:left center; border-radius:0 100% 40% 60%; animation-name:flapR; }
-  #snitch .wing.l { left:-12px; }
-  @keyframes flapL { from{transform:rotate(18deg)} to{transform:rotate(-32deg)} }
-  @keyframes flapR { from{transform:rotate(-18deg) scaleX(-1)} to{transform:rotate(32deg) scaleX(-1)} }
-
-  /* sparkle cursor trail */
-  .spark { position:fixed; z-index:60; pointer-events:none; color:var(--gold); font-size:11px; animation:sparkfade .8s ease-out forwards; }
-  @keyframes sparkfade { from{opacity:1; transform:translateY(0) scale(1)} to{opacity:0; transform:translateY(-26px) scale(.3)} }
-
-  /* ================= shared ================= */
-  section { position:relative; z-index:2; padding:15vh 7vw; max-width:1200px; margin:0 auto; }
-  .sec-tag {
-    display:flex; align-items:center; gap:14px; margin-bottom:14px;
-    color:var(--gold); font-size:.8rem; letter-spacing:.3em; text-transform:uppercase; font-weight:600;
+  .brand { display:flex; align-items:baseline; gap:10px; text-decoration:none; }
+  .brand .bolt { color:var(--gold); font-size:1.1rem; }
+  .brand .t { font-family:var(--serif); font-weight:900; font-size:1.02rem; color:#ffe9a8; letter-spacing:.04em; white-space:nowrap; }
+  .brand .s { color:var(--muted); font-size:.7rem; letter-spacing:.24em; text-transform:uppercase; white-space:nowrap; }
+  .chips { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+  .chip {
+    padding:7px 15px; border-radius:99px; text-decoration:none;
+    font-size:.78rem; font-weight:600; color:var(--muted); white-space:nowrap;
+    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+    backdrop-filter:blur(10px); transition:all .22s;
   }
-  .sec-tag::after { content:""; height:1px; width:90px; background:linear-gradient(90deg,var(--gold),transparent); }
-  .sec-num { font-family:"Playfair Display",serif; font-style:italic; opacity:.9; }
-  h2 {
-    font-size:clamp(1.9rem, 4.6vw, 3.4rem); font-weight:800; line-height:1.2; margin-bottom:34px;
-    background:linear-gradient(90deg,#fff2c9,var(--gold) 70%);
+  .chip:hover { color:var(--text); border-color:rgba(255,213,79,.5); transform:translateY(-1px); }
+  .chip.on { color:#131020; background:var(--gold); border-color:var(--gold); box-shadow:0 4px 18px -6px rgba(255,213,79,.7); }
+  @media (max-width:1000px){ .chips{ display:none; } }
+
+  /* ===== sections & cards ===== */
+  section { position:relative; z-index:3; min-height:108vh; display:flex; align-items:center; padding:14vh 6vw; }
+  .shell { width:100%; max-width:1180px; margin:0 auto; display:flex; }
+  .shell.left  { justify-content:flex-start; }
+  .shell.right { justify-content:flex-end; }
+  .shell.center{ justify-content:center; }
+
+  .panel {
+    width:min(480px, 100%);
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:22px;
+    padding:34px 36px; backdrop-filter:blur(16px);
+    box-shadow:0 34px 80px -34px rgba(0,0,0,.85);
+  }
+  .panel.wide { width:100%; max-width:1180px; }
+
+  .eyebrow { display:flex; align-items:center; gap:12px; margin-bottom:6px;
+    color:var(--gold); font-size:.72rem; letter-spacing:.32em; text-transform:uppercase; font-weight:600; }
+  .eyebrow::after { content:""; height:1px; flex:0 0 74px; background:linear-gradient(90deg,var(--gold),transparent); }
+  .chapter { font-family:var(--serif); font-style:italic; font-weight:700; color:var(--muted);
+    font-size:.86rem; letter-spacing:.05em; margin-bottom:16px; }
+  h2 { font-size:clamp(1.7rem, 3.6vw, 2.6rem); font-weight:800; line-height:1.25; margin-bottom:18px;
+    background:linear-gradient(90deg,#fff2c9,var(--gold) 75%);
     -webkit-background-clip:text; background-clip:text; color:transparent;
-  }
-  .ghost {
-    position:absolute; top:6vh; right:2vw; z-index:-1;
-    font-family:"Playfair Display",serif; font-weight:900; font-size:clamp(4rem,14vw,11rem);
-    color:transparent; -webkit-text-stroke:1px rgba(255,213,79,.12); letter-spacing:.02em;
-    user-select:none; white-space:nowrap;
-  }
+    text-wrap:balance; }
+  .panel p.body { color:#ccd3ee; font-size:.96rem; line-height:1.95; max-width:62ch; }
+  .panel p.body + p.body { margin-top:14px; }
+  .panel p.body strong { color:var(--gold); font-weight:700; }
 
-  /* reveal-on-scroll (hidden state only when JS is running, so content
-     stays visible in viewers that block scripts) */
+  /* reveal (hidden only when JS runs) */
   .reveal { will-change:transform,opacity;
-    transition:opacity .85s cubic-bezier(.2,.7,.2,1), transform .85s cubic-bezier(.2,.7,.2,1); }
-  .js .reveal:not(.in) { opacity:0; transform:translateY(52px) rotate(var(--r,0deg)) scale(.97); }
+    transition:opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+  .js .reveal:not(.in) { opacity:0; transform:translateY(46px) scale(.98); }
+  .stagger > * { transition-delay:var(--sd,0ms); }
 
-  /* parallax items */
-  .px { will-change:transform; }
-  .floaty { position:absolute; z-index:1; pointer-events:none; user-select:none;
-    animation:bob var(--d,6s) ease-in-out infinite; }
-  @keyframes bob { 0%,100%{transform:translateY(0) rotate(var(--rot,0deg))} 50%{transform:translateY(-20px) rotate(calc(var(--rot,0deg) + 6deg))} }
-
-  .card {
-    background:var(--card); border:1px solid var(--card-border); border-radius:18px;
-    padding:24px 26px; backdrop-filter:blur(6px);
-    transition:box-shadow .25s, border-color .25s;
-  }
-  .tilt { transform-style:preserve-3d; transition:transform .18s ease-out, box-shadow .25s; }
-  .tilt:hover { box-shadow:0 24px 50px -22px rgba(255,213,79,.4); border-color:rgba(255,213,79,.45); }
-  .tilt > * { transform:translateZ(28px); }
-
-  .grid { display:grid; gap:18px; }
-  .g2 { grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); }
-  .g3 { grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
-  .g4 { grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
-
-  /* ================= hero ================= */
-  .hero { min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; max-width:none; padding:0 6vw; }
-  .hero .kicker { color:var(--gold); letter-spacing:.45em; font-size:clamp(.65rem,1.4vw,.85rem); text-transform:uppercase; font-weight:600; margin-bottom:22px; overflow:hidden; }
-  .hero h1 {
-    font-size:clamp(2.6rem, 8vw, 6.2rem); font-weight:800; line-height:1.12;
-    filter:drop-shadow(0 6px 30px rgba(255,213,79,.28));
-  }
+  /* ===== hero ===== */
+  .hero { min-height:100vh; flex-direction:column; justify-content:center; text-align:center; }
+  .hero .kicker { color:var(--gold); letter-spacing:.45em; font-size:clamp(.62rem,1.3vw,.8rem);
+    text-transform:uppercase; font-weight:600; margin-bottom:20px; text-shadow:0 2px 18px rgba(0,0,0,.8); }
+  .hero h1 { font-size:clamp(2.5rem, 7.6vw, 5.8rem); font-weight:800; line-height:1.14;
+    filter:drop-shadow(0 8px 34px rgba(4,6,16,.9)) drop-shadow(0 0 26px rgba(255,213,79,.22)); }
   .hero h1 .word { display:inline-block; overflow:hidden; vertical-align:bottom; padding-bottom:.08em; }
-  .hero h1 .word span {
-    display:inline-block; transform:translateY(110%);
-    animation:riseup 1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:var(--dl,0s);
-    background:linear-gradient(180deg,#fff6d8 10%, var(--gold) 55%, #8a6a1c 100%);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-  }
+  .hero h1 .word span { display:inline-block;
+    background:linear-gradient(180deg,#fff6d8 12%, var(--gold) 56%, #97741f 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .js .hero h1 .word span { transform:translateY(110%); animation:riseup 1.1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:var(--dl,0s); }
   @keyframes riseup { to{ transform:translateY(0);} }
-  .hero .sub { color:var(--muted); margin-top:26px; font-size:clamp(.9rem,1.8vw,1.15rem); line-height:2; opacity:0; animation:fadein 1s ease .9s forwards; }
+  .hero .sub { margin-top:24px; color:#c3cae6; font-size:clamp(.9rem,1.7vw,1.1rem); line-height:2;
+    text-shadow:0 2px 16px rgba(0,0,0,.9); }
+  .js .hero .sub { opacity:0; animation:fadein 1.2s ease 1s forwards; }
   @keyframes fadein { to{opacity:1} }
-  .scroll-cue { position:absolute; bottom:34px; left:50%; transform:translateX(-50%); color:var(--muted); font-size:.75rem; letter-spacing:.25em; animation:cue 2s ease-in-out infinite; }
-  @keyframes cue { 0%,100%{transform:translate(-50%,0); opacity:.5} 50%{transform:translate(-50%,10px); opacity:1} }
+  .hero .en-title { font-family:var(--serif); font-style:italic; color:var(--muted); margin-top:10px; font-size:clamp(.85rem,1.6vw,1.05rem); }
+  .scroll-cue { position:absolute; bottom:30px; left:50%; transform:translateX(-50%);
+    color:#aeb6da; font-size:.72rem; letter-spacing:.3em; animation:cue 2.2s ease-in-out infinite;
+    text-shadow:0 2px 12px rgba(0,0,0,.9); }
+  @keyframes cue { 0%,100%{transform:translate(-50%,0); opacity:.55} 50%{transform:translate(-50%,10px); opacity:1} }
 
-  /* ================= marquee ================= */
-  .marquee { position:relative; z-index:2; border-top:1px solid var(--card-border); border-bottom:1px solid var(--card-border);
-    padding:16px 0; overflow:hidden; background:rgba(255,213,79,.04); transform:rotate(-1.2deg) scale(1.02); }
-  .marquee .track { display:flex; gap:48px; width:max-content; animation:mq 26s linear infinite; }
-  .marquee span { font-family:"Playfair Display",serif; font-style:italic; font-weight:700;
-    font-size:clamp(1rem,2.4vw,1.5rem); color:rgba(255,229,143,.85); white-space:nowrap; letter-spacing:.06em; }
-  @keyframes mq { to{ transform:translateX(-50%);} }
-
-  /* ================= info ================= */
-  .info-wrap { display:grid; grid-template-columns:1fr 1.2fr; gap:44px; align-items:center; }
-  @media (max-width:860px){ .info-wrap{ grid-template-columns:1fr; } }
-  .poster {
-    aspect-ratio:1013/1500; max-width:340px; margin:0 auto; width:100%;
-    border-radius:20px; position:relative; overflow:hidden;
-    border:1px solid rgba(255,213,79,.35);
-    box-shadow:0 30px 70px -30px rgba(0,0,0,.9);
-  }
-  .poster img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
-  .poster .glint { position:absolute; inset:-60%; z-index:2; background:linear-gradient(115deg,transparent 42%,rgba(255,246,214,.2) 50%,transparent 58%); animation:glint 4.5s ease-in-out infinite; pointer-events:none; }
+  /* ===== info / poster ===== */
+  .info-grid { display:grid; grid-template-columns:300px 1fr; gap:30px; align-items:center; }
+  @media (max-width:880px){ .info-grid{ grid-template-columns:1fr; } }
+  .poster { aspect-ratio:1013/1500; border-radius:16px; position:relative; overflow:hidden;
+    border:1px solid rgba(255,213,79,.4); box-shadow:0 26px 60px -26px rgba(0,0,0,.95);
+    transform-style:preserve-3d; transition:transform .18s ease-out; }
+  .poster img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .poster .glint { position:absolute; inset:-60%; background:linear-gradient(115deg,transparent 42%,rgba(255,246,214,.2) 50%,transparent 58%); animation:glint 4.5s ease-in-out infinite; pointer-events:none; }
   @keyframes glint { 0%,100%{transform:translateX(-45%)} 55%,70%{transform:translateX(45%)} }
+  .facts { display:flex; flex-direction:column; }
+  .fact { display:flex; gap:14px; padding:10px 0; border-bottom:1px dashed rgba(255,255,255,.1); align-items:baseline; }
+  .fact:last-child { border-bottom:none; }
+  .fact .k { color:var(--gold); font-weight:700; min-width:118px; font-size:.86rem; flex-shrink:0; }
+  .fact .v { color:#d7ddf4; font-size:.92rem; line-height:1.7; }
 
-  /* ================= full-bleed banner ================= */
-  .banner { position:relative; z-index:2; height:74vh; min-height:420px; overflow:hidden; max-width:none; padding:0; margin:0; }
-  .banner .bwrap { position:absolute; inset:-14% 0; }
-  .banner .bwrap img { width:100%; height:100%; object-fit:cover; display:block; }
-  .banner .shade { position:absolute; inset:0; z-index:1;
-    background:linear-gradient(180deg, var(--bg0) 0%, transparent 26%, transparent 62%, var(--bg0) 100%); }
-  .banner .cap { position:absolute; z-index:2; bottom:9%; left:0; right:0; text-align:center; padding:0 8vw; }
-  .banner .cap h3 { font-size:clamp(1.4rem,3.4vw,2.4rem); font-weight:800; color:#ffe9a8;
-    text-shadow:0 2px 24px rgba(0,0,0,.85); margin-bottom:8px; }
-  .banner .cap p { color:#c9d1ee; font-size:clamp(.85rem,1.6vw,1rem); text-shadow:0 2px 14px rgba(0,0,0,.9); line-height:1.8; }
-  .info-row { display:flex; gap:12px; padding:11px 0; border-bottom:1px dashed rgba(255,255,255,.1); align-items:baseline; }
-  .info-row:last-child { border-bottom:none; }
-  .info-row .k { color:var(--gold); font-weight:700; min-width:130px; font-size:.9rem; flex-shrink:0; }
-  .info-row .v { color:#d7ddf4; font-size:.94rem; line-height:1.7; }
+  /* ===== cards grids ===== */
+  .grid { display:grid; gap:14px; }
+  .g3 { grid-template-columns:repeat(auto-fit,minmax(225px,1fr)); }
+  .g4 { grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); }
+  .g2 { grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+  .cardlet { background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.1);
+    border-radius:15px; padding:18px 19px; transition:transform .22s, border-color .22s, box-shadow .22s; }
+  .cardlet:hover { transform:translateY(-4px); border-color:rgba(255,213,79,.45);
+    box-shadow:0 16px 36px -18px rgba(255,213,79,.35); }
+  .cardlet .ico { font-size:1.8rem; display:block; margin-bottom:8px; }
+  .cardlet h3 { color:var(--gold); font-size:.98rem; margin-bottom:3px; font-weight:700; }
+  .cardlet .en { color:var(--muted); font-size:.72rem; letter-spacing:.08em; margin-bottom:7px; font-weight:600; text-transform:uppercase; }
+  .cardlet p { color:#c6cde9; font-size:.85rem; line-height:1.75; }
 
-  /* ================= synopsis ================= */
-  .syn p { font-size:clamp(1.05rem, 2vw, 1.35rem); line-height:2.1; color:#cdd4ee; max-width:850px; margin-bottom:30px; }
-  .syn strong { color:var(--gold); font-weight:700; }
+  .house { border-top:3px solid var(--hc,#888); text-align:center; }
+  .house .crest { font-size:2.2rem; display:block; margin-bottom:8px; transition:transform .3s; }
+  .house:hover .crest { transform:scale(1.22) rotate(-6deg); }
+  .house h3 { color:var(--hc); }
 
-  /* ================= characters ================= */
-  .char-card { text-align:center; }
-  .char-card .icon { font-size:3rem; display:block; margin-bottom:12px; animation:bob var(--d,5s) ease-in-out infinite; }
-  .char-card h3 { color:var(--gold); font-size:1.1rem; margin-bottom:4px; font-weight:700; }
-  .char-card .en { color:var(--muted); font-size:.78rem; letter-spacing:.06em; margin-bottom:10px; font-weight:600; }
-  .char-card p { color:#cdd4ee; font-size:.9rem; line-height:1.8; }
-  .mini h3 { color:var(--gold); font-size:1rem; margin-bottom:6px; }
-  .mini .icon { font-size:1.9rem; display:block; margin-bottom:8px; }
-  .mini p { color:#c3cae6; font-size:.86rem; line-height:1.75; }
+  /* ===== photo banner ===== */
+  .photo-banner { min-height:92vh; padding:0; display:block; }
+  .pb-inner { position:relative; height:92vh; overflow:hidden; }
+  .pb-inner .bwrap { position:absolute; inset:-13% 0; }
+  .pb-inner img { width:100%; height:100%; object-fit:cover; display:block; }
+  .pb-inner .shade { position:absolute; inset:0; background:linear-gradient(180deg, var(--bg0) 0%, transparent 26%, transparent 60%, var(--bg0) 100%); }
+  .pb-cap { position:absolute; bottom:10%; left:0; right:0; text-align:center; padding:0 8vw; }
+  .pb-cap h3 { font-size:clamp(1.4rem,3.2vw,2.3rem); font-weight:800; color:#ffe9a8; text-shadow:0 2px 26px rgba(0,0,0,.9); margin-bottom:8px; }
+  .pb-cap p { color:#c9d1ee; font-size:clamp(.85rem,1.6vw,1rem); text-shadow:0 2px 16px rgba(0,0,0,.95); line-height:1.8; }
 
-  /* ================= houses ================= */
-  .house { border-top:4px solid var(--hc,#888); text-align:center; cursor:default; position:relative; overflow:hidden; }
-  .house::after { content:""; position:absolute; inset:0; background:radial-gradient(circle at 50% 0%, var(--hc), transparent 70%); opacity:0; transition:opacity .3s; pointer-events:none; }
-  .house:hover::after { opacity:.14; }
-  .house .crest { font-size:2.6rem; display:block; margin-bottom:10px; transition:transform .3s; }
-  .house:hover .crest { transform:scale(1.25) rotate(-6deg); }
-  .house h3 { color:var(--hc); margin-bottom:6px; }
-  .house .trait { color:#cdd4ee; font-size:.86rem; line-height:1.7; }
-
-  /* ================= timeline ================= */
-  .tl { position:relative; max-width:820px; padding-left:44px; }
-  .tl-line { position:absolute; left:18px; top:0; bottom:0; width:2px; background:rgba(255,255,255,.09); }
-  .tl-line i { position:absolute; left:0; top:0; width:100%; height:100%; background:linear-gradient(180deg,var(--gold),#ff8a65);
+  /* ===== timeline ===== */
+  .tl { position:relative; padding-left:36px; margin-top:6px; }
+  .tl-line { position:absolute; left:12px; top:6px; bottom:6px; width:2px; background:rgba(255,255,255,.1); }
+  .tl-line i { position:absolute; inset:0; background:linear-gradient(180deg,var(--gold),#ff8a65);
     transform-origin:top; box-shadow:0 0 10px rgba(255,213,79,.6); }
   .js .tl-line i { transform:scaleY(0); }
-  .tl-item { position:relative; padding:16px 0 16px 16px; }
-  .tl-item::before { content:""; position:absolute; left:-33px; top:26px; width:12px; height:12px; border-radius:50%;
-    background:var(--bg0); border:2px solid var(--gold); box-shadow:0 0 10px rgba(255,213,79,.55); }
-  .tl-item h3 { color:#ffe9a8; font-size:1.05rem; margin-bottom:4px; }
-  .tl-item p { color:var(--muted); font-size:.9rem; line-height:1.8; max-width:640px; }
+  .tl-item { position:relative; padding:11px 0; }
+  .tl-item::before { content:""; position:absolute; left:-30px; top:19px; width:10px; height:10px; border-radius:50%;
+    background:var(--bg0); border:2px solid var(--gold); box-shadow:0 0 9px rgba(255,213,79,.6); }
+  .tl-item h3 { color:#ffe9a8; font-size:.98rem; margin-bottom:2px; }
+  .tl-item p { color:var(--muted); font-size:.86rem; line-height:1.75; max-width:60ch; }
 
-  /* ================= stats ================= */
+  /* ===== stats ===== */
   .stat { text-align:center; }
-  .stat .num { font-family:"Playfair Display",serif; font-size:clamp(2rem,4.4vw,3.2rem); font-weight:900;
-    color:var(--gold); text-shadow:0 0 30px rgba(255,213,79,.45); font-variant-numeric:tabular-nums; }
-  .stat .lbl { color:var(--muted); font-size:.86rem; margin-top:8px; line-height:1.6; }
+  .stat .num { font-family:var(--serif); font-size:clamp(1.9rem,4vw,2.9rem); font-weight:900;
+    color:var(--gold); text-shadow:0 0 28px rgba(255,213,79,.45); font-variant-numeric:tabular-nums; }
+  .stat .lbl { color:var(--muted); font-size:.84rem; margin-top:7px; line-height:1.6; }
 
-  ul.bullets { list-style:none; max-width:840px; }
-  ul.bullets li { padding:13px 0 13px 36px; position:relative; color:#d7ddf4; line-height:1.85; font-size:.97rem;
-    border-bottom:1px dashed rgba(255,255,255,.08); }
+  ul.bullets { list-style:none; }
+  ul.bullets li { padding:11px 0 11px 30px; position:relative; color:#d0d6ef; line-height:1.85; font-size:.92rem;
+    border-bottom:1px dashed rgba(255,255,255,.09); }
   ul.bullets li:last-child { border-bottom:none; }
-  ul.bullets li::before { content:"✦"; position:absolute; left:8px; color:var(--gold); }
+  ul.bullets li::before { content:"✦"; position:absolute; left:4px; color:var(--gold); }
   ul.bullets strong { color:var(--gold); }
 
-  /* ================= quote ================= */
-  .quote-sec { text-align:center; max-width:900px; }
-  blockquote { font-family:"Playfair Display","Noto Sans Thai",serif; font-size:clamp(1.4rem,3.4vw,2.4rem); font-weight:700;
-    line-height:1.8; color:#f2e9c8; position:relative; padding:0 24px; }
-  blockquote::before { content:"“"; position:absolute; left:-14px; top:-40px; font-size:5rem; color:rgba(255,213,79,.25); }
-  .quote-by { color:var(--muted); margin-top:28px; font-size:.92rem; letter-spacing:.08em; }
+  /* ===== quote & outro ===== */
+  .quote-shell { text-align:center; max-width:860px; margin:0 auto; }
+  blockquote { font-family:var(--serif); font-size:clamp(1.4rem,3.2vw,2.3rem); font-weight:700;
+    line-height:1.8; color:#f5edd0; text-shadow:0 4px 30px rgba(0,0,0,.95); text-wrap:balance; }
+  blockquote .qm { color:rgba(255,213,79,.5); font-size:1.4em; }
+  .quote-by { color:#aab2d6; margin-top:24px; font-size:.9rem; letter-spacing:.08em; text-shadow:0 2px 14px rgba(0,0,0,.9); }
 
-  /* ================= outro ================= */
-  .outro { min-height:90vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
-  .outro h2 { font-size:clamp(2.4rem,6.5vw,4.6rem); }
-  .outro .sub { color:var(--muted); line-height:2; }
-  .back-top { margin-top:36px; display:inline-block; padding:13px 34px; border-radius:99px;
-    border:1px solid var(--card-border); color:var(--gold); text-decoration:none; font-weight:600; font-size:.9rem;
-    background:var(--card); transition:all .25s; }
-  .back-top:hover { background:rgba(255,213,79,.14); transform:translateY(-3px); box-shadow:0 14px 30px -14px rgba(255,213,79,.5); }
+  .outro { flex-direction:column; justify-content:center; text-align:center; }
+  .outro h2 { font-size:clamp(2.3rem,6vw,4.2rem); filter:drop-shadow(0 6px 30px rgba(4,6,16,.9)); }
+  .outro .sub { color:#c3cae6; line-height:2; text-shadow:0 2px 16px rgba(0,0,0,.9); }
+  .back-top { margin-top:34px; display:inline-block; padding:13px 36px; border-radius:99px;
+    border:1px solid var(--panel-border); color:var(--gold); text-decoration:none; font-weight:600; font-size:.9rem;
+    background:var(--panel); backdrop-filter:blur(10px); transition:all .25s; }
+  .back-top:hover { background:rgba(255,213,79,.16); transform:translateY(-3px); box-shadow:0 14px 34px -14px rgba(255,213,79,.5); }
 
-  footer { position:relative; z-index:2; text-align:center; color:rgba(255,255,255,.25); font-size:.75rem; padding:26px 0 34px; letter-spacing:.15em; }
+  footer { position:relative; z-index:3; text-align:center; color:rgba(255,255,255,.3); font-size:.72rem;
+    padding:24px 0 32px; letter-spacing:.18em; text-transform:uppercase; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior:auto; }
+    .js .hero h1 .word span { animation-duration:.01s; }
+    .scroll-cue { animation:none; }
+  }
 </style>
 </head>
 <body>
 <script>document.documentElement.classList.add('js');</script>
 
 <div class="stars" id="stars"></div>
-<div class="bg-blob b1 px" data-speed="-0.06"></div>
-<div class="bg-blob b2 px" data-speed="0.05"></div>
+<canvas id="world"></canvas>
+<div class="vignette"></div>
 <div class="progress" id="progress"></div>
-<div class="side-text">Hogwarts School of Witchcraft &amp; Wizardry</div>
-<div class="side-text right">Harry Potter · The Philosopher's Stone · 2001</div>
 
-<div id="snitch"><span class="wing l"></span><span class="ball"></span><span class="wing r"></span></div>
+<nav class="topnav">
+  <a class="brand" href="#top">
+    <span class="bolt">⚡</span>
+    <span class="t">Harry Potter</span>
+    <span class="s">The Philosopher's Stone</span>
+  </a>
+  <div class="chips" id="chips">
+    <a class="chip" href="#top">หน้าแรก</a>
+    <a class="chip" href="#info">ข้อมูลหนัง</a>
+    <a class="chip" href="#syn">เรื่องย่อ</a>
+    <a class="chip" href="#chars">ตัวละคร</a>
+    <a class="chip" href="#houses">บ้านทั้งสี่</a>
+    <a class="chip" href="#scenes">ฉากสำคัญ</a>
+    <a class="chip" href="#themes">แก่นเรื่อง</a>
+    <a class="chip" href="#stats">ความสำเร็จ</a>
+    <a class="chip" href="#trivia">เกร็ด</a>
+  </div>
+</nav>
 
 <!-- ============ HERO ============ -->
-<section class="hero">
-  <div class="floaty px" data-speed="0.22" style="top:16%; left:10%; font-size:2.6rem; --d:7s; --rot:-14deg;">✉️</div>
-  <div class="floaty px" data-speed="0.3"  style="top:24%; right:12%; font-size:2rem; --d:5.5s; --rot:10deg;">✉️</div>
-  <div class="floaty px" data-speed="0.16" style="bottom:22%; left:16%; font-size:2.2rem; --d:6.5s; --rot:8deg;">🧹</div>
-  <div class="floaty px" data-speed="0.26" style="bottom:26%; right:16%; font-size:2.1rem; --d:6s; --rot:-8deg;">🧪</div>
-  <div class="floaty px" data-speed="0.36" style="top:52%; left:6%; font-size:1.7rem; --d:8s; --rot:16deg;">🕯️</div>
-  <div class="floaty px" data-speed="0.4"  style="top:60%; right:7%; font-size:1.8rem; --d:7.5s; --rot:-12deg;">🦉</div>
-
+<section class="hero" id="top" data-cam="70,38,100|0,22,0">
   <div class="kicker">Movie Presentation · Warner Bros. 2001</div>
   <h1>
     <span class="word"><span style="--dl:.05s">แฮร์รี่</span></span>
-    <span class="word"><span style="--dl:.18s">พอตเตอร์</span></span><br>
-    <span class="word"><span style="--dl:.34s">กับศิลาอาถรรพ์</span></span>
+    <span class="word"><span style="--dl:.2s">พอตเตอร์</span></span><br>
+    <span class="word"><span style="--dl:.38s">กับศิลาอาถรรพ์</span></span>
   </h1>
-  <p class="sub">Harry Potter and the Philosopher's Stone<br>จุดเริ่มต้นของตำนานพ่อมดน้อยที่ครองใจผู้ชมทั่วโลกมากว่าสองทศวรรษ</p>
+  <div class="en-title">Harry Potter and the Philosopher's Stone</div>
+  <p class="sub">จุดเริ่มต้นของตำนานพ่อมดน้อยที่ครองใจผู้ชมทั่วโลกมากว่าสองทศวรรษ</p>
   <div class="scroll-cue">SCROLL ↓</div>
 </section>
 
-<!-- ============ MARQUEE ============ -->
-<div class="marquee"><div class="track"><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span></div></div>
-
 <!-- ============ 01 INFO ============ -->
-<section>
-  <div class="ghost px" data-speed="0.1">FILM</div>
-  <div class="sec-tag reveal"><span class="sec-num">#01</span> About the film</div>
-  <h2 class="reveal">ข้อมูลทั่วไปของภาพยนตร์</h2>
-  <div class="info-wrap">
-    <div class="reveal" style="--r:-3deg;">
-      <div class="poster tilt px" data-speed="0.06">
-        <img src="img/poster.jpg" alt="โปสเตอร์ภาพยนตร์ Harry Potter and the Philosopher's Stone">
-        <div class="glint"></div>
+<section id="info" data-cam="36,22,54|0,18,0">
+  <div class="shell left">
+    <div class="panel wide reveal">
+      <div class="eyebrow">About the film</div>
+      <div class="chapter">Chapter 01 — ข้อมูลทั่วไปของภาพยนตร์</div>
+      <div class="info-grid">
+        <div class="poster" id="posterTilt">
+          <img src="img/poster.jpg" alt="โปสเตอร์ภาพยนตร์ Harry Potter and the Philosopher's Stone">
+          <div class="glint"></div>
+        </div>
+        <div class="facts">
+          <div class="fact"><span class="k">ชื่อไทย</span><span class="v">แฮร์รี่ พอตเตอร์ กับศิลาอาถรรพ์</span></div>
+          <div class="fact"><span class="k">ชื่ออังกฤษ</span><span class="v">Harry Potter and the Philosopher's Stone (สหรัฐฯ ใช้ชื่อ Sorcerer's Stone)</span></div>
+          <div class="fact"><span class="k">เข้าฉาย</span><span class="v">พฤศจิกายน ค.ศ. 2001 (พ.ศ. 2544)</span></div>
+          <div class="fact"><span class="k">ผู้กำกับ</span><span class="v">คริส โคลัมบัส (Chris Columbus)</span></div>
+          <div class="fact"><span class="k">ดัดแปลงจาก</span><span class="v">นิยายเล่มแรกของ เจ. เค. โรว์ลิง ตีพิมพ์ปี 1997</span></div>
+          <div class="fact"><span class="k">ความยาว</span><span class="v">ประมาณ 152 นาที</span></div>
+          <div class="fact"><span class="k">แนว</span><span class="v">แฟนตาซี / ผจญภัย / ครอบครัว</span></div>
+        </div>
       </div>
-    </div>
-    <div class="card reveal" style="--r:2deg;">
-      <div class="info-row"><span class="k">ชื่อไทย</span><span class="v">แฮร์รี่ พอตเตอร์ กับศิลาอาถรรพ์</span></div>
-      <div class="info-row"><span class="k">ชื่ออังกฤษ</span><span class="v">Harry Potter and the Philosopher's Stone (สหรัฐฯ ใช้ชื่อ Sorcerer's Stone)</span></div>
-      <div class="info-row"><span class="k">เข้าฉาย</span><span class="v">พฤศจิกายน ค.ศ. 2001 (พ.ศ. 2544)</span></div>
-      <div class="info-row"><span class="k">ผู้กำกับ</span><span class="v">คริส โคลัมบัส (Chris Columbus)</span></div>
-      <div class="info-row"><span class="k">ดัดแปลงจาก</span><span class="v">นิยายเล่มแรกของ เจ. เค. โรว์ลิง ตีพิมพ์ปี 1997</span></div>
-      <div class="info-row"><span class="k">ความยาว</span><span class="v">ประมาณ 152 นาที</span></div>
-      <div class="info-row"><span class="k">แนว</span><span class="v">แฟนตาซี / ผจญภัย / ครอบครัว</span></div>
     </div>
   </div>
 </section>
 
 <!-- ============ 02 SYNOPSIS ============ -->
-<section class="syn">
-  <div class="ghost px" data-speed="0.12">STORY</div>
-  <div class="floaty px" data-speed="0.3" style="top:12%; right:6%; font-size:2.4rem; --d:7s; --rot:12deg;">🪄</div>
-  <div class="sec-tag reveal"><span class="sec-num">#02</span> Synopsis</div>
-  <h2 class="reveal">เรื่องย่อ</h2>
-  <p class="reveal"><strong>แฮร์รี่ พอตเตอร์</strong> เด็กกำพร้าที่ถูกเลี้ยงดูอย่างไร้ความรักโดยครอบครัวเดอร์สลีย์ ค้นพบในวันเกิดอายุ 11 ปีว่าแท้จริงแล้วเขาคือ <strong>พ่อมด</strong> และเป็นตำนานของโลกเวทมนตร์ในฐานะ "เด็กชายผู้รอดชีวิต" จากคำสาปของจอมมารโวลเดอมอร์</p>
-  <p class="reveal">เขาเดินทางสู่ <strong>โรงเรียนคาถาพ่อมดแม่มดฮอกวอตส์</strong> ได้พบเพื่อนแท้อย่างรอนและเฮอร์ไมโอนี่ ได้เรียนรู้เวทมนตร์ เล่นกีฬาควิดดิช และค้นพบความลับของ <strong>ศิลาอาถรรพ์</strong> — หินวิเศษที่มอบชีวิตอมตะ ซึ่งจอมมารไร้ร่างกำลังตามล่าเพื่อกลับคืนสู่อำนาจ</p>
-  <p class="reveal">สามสหายจึงต้องฝ่าด่านพิทักษ์สุดอันตราย เพื่อปกป้องศิลา…ก่อนที่ทุกอย่างจะสายเกินไป</p>
+<section id="syn" data-cam="6,9,98|0,10,30">
+  <div class="shell right">
+    <div class="panel reveal">
+      <div class="eyebrow">Synopsis</div>
+      <div class="chapter">Chapter 02 — เรื่องย่อ</div>
+      <h2>เด็กชายผู้รอดชีวิต</h2>
+      <p class="body"><strong>แฮร์รี่ พอตเตอร์</strong> เด็กกำพร้าที่ถูกเลี้ยงดูอย่างไร้ความรักโดยครอบครัวเดอร์สลีย์ ค้นพบในวันเกิดอายุ 11 ปีว่าแท้จริงแล้วเขาคือ <strong>พ่อมด</strong> และเป็นตำนานของโลกเวทมนตร์ในฐานะ "เด็กชายผู้รอดชีวิต" จากคำสาปของจอมมารโวลเดอมอร์</p>
+      <p class="body">เขาเดินทางสู่ <strong>โรงเรียนคาถาพ่อมดแม่มดฮอกวอตส์</strong> ได้พบเพื่อนแท้อย่างรอนและเฮอร์ไมโอนี่ และค้นพบความลับของ <strong>ศิลาอาถรรพ์</strong> — หินวิเศษที่มอบชีวิตอมตะ ซึ่งจอมมารไร้ร่างกำลังตามล่าเพื่อกลับคืนสู่อำนาจ</p>
+      <p class="body">สามสหายจึงต้องฝ่าด่านพิทักษ์สุดอันตราย เพื่อปกป้องศิลา…ก่อนที่ทุกอย่างจะสายเกินไป</p>
+    </div>
+  </div>
 </section>
 
 <!-- ============ 03 CHARACTERS ============ -->
-<section>
-  <div class="ghost px" data-speed="0.1">CAST</div>
-  <div class="sec-tag reveal"><span class="sec-num">#03</span> Characters</div>
-  <h2 class="reveal">สามผู้กล้าแห่งกริฟฟินดอร์</h2>
-  <div class="grid g3 stagger">
-    <div class="card char-card tilt reveal" style="--r:-2deg;"><span class="icon" style="--d:5s;">🧙‍♂️</span><h3>แฮร์รี่ พอตเตอร์</h3><div class="en">DANIEL RADCLIFFE</div><p>เด็กชายผู้รอดชีวิต เจ้าของแผลเป็นรูปสายฟ้า กล้าหาญ มีน้ำใจ และพร้อมเสียสละเพื่อคนที่เขารัก</p></div>
-    <div class="card char-card tilt reveal"><span class="icon" style="--d:6s;">🐀</span><h3>รอน วีสลีย์</h3><div class="en">RUPERT GRINT</div><p>เพื่อนแท้คนแรกของแฮร์รี่ จากครอบครัวพ่อมดแท้ อารมณ์ขัน ซื่อสัตย์ และเก่งหมากรุกพ่อมดที่สุดในรุ่น</p></div>
-    <div class="card char-card tilt reveal" style="--r:2deg;"><span class="icon" style="--d:5.5s;">📚</span><h3>เฮอร์ไมโอนี่ เกรนเจอร์</h3><div class="en">EMMA WATSON</div><p>แม่มดสาวหัวใสจากครอบครัวมักเกิ้ล ฉลาดที่สุดในรุ่น ความรู้ของเธอช่วยชีวิตเพื่อนไว้หลายครั้ง</p></div>
-  </div>
-  <div style="height:34px;"></div>
-  <div class="grid g3 stagger">
-    <div class="card mini tilt reveal"><span class="icon">🦉</span><h3>อัลบัส ดัมเบิลดอร์</h3><p>อาจารย์ใหญ่ฮอกวอตส์ พ่อมดผู้ยิ่งใหญ่ที่สุดแห่งยุค ผู้คอยชี้ทางให้แฮร์รี่อย่างอบอุ่นและลึกซึ้ง</p></div>
-    <div class="card mini tilt reveal"><span class="icon">🐈</span><h3>มิเนอร์วา มักกอนนากัล</h3><p>รองอาจารย์ใหญ่ หัวหน้าบ้านกริฟฟินดอร์ เข้มงวดแต่ยุติธรรม แปลงร่างเป็นแมวได้</p></div>
-    <div class="card mini tilt reveal"><span class="icon">🧪</span><h3>เซเวอรัส สเนป</h3><p>อาจารย์ปรุงยาผู้ลึกลับ ดูเป็นวายร้ายตลอดเรื่อง แต่ความจริงซับซ้อนกว่าที่เห็น</p></div>
-    <div class="card mini tilt reveal"><span class="icon">🌂</span><h3>รูเบอัส แฮกริด</h3><p>ผู้รักษากุญแจแห่งฮอกวอตส์ ร่างยักษ์ใจดี ผู้พาแฮร์รี่เข้าสู่โลกเวทมนตร์เป็นคนแรก</p></div>
-    <div class="card mini tilt reveal"><span class="icon">🐍</span><h3>เดรโก มัลฟอย</h3><p>คู่ปรับจากบ้านสลิธีริน หยิ่งในชาติกำเนิด คอยหาเรื่องแฮร์รี่และผองเพื่อนตลอดปี</p></div>
-    <div class="card mini tilt reveal"><span class="icon">💀</span><h3>ลอร์ดโวลเดอมอร์</h3><p>จอมมารผู้สังหารพ่อแม่ของแฮร์รี่ สิงร่างศาสตราจารย์ควีเรลล์เพื่อชิงศิลาอาถรรพ์</p></div>
+<section id="chars" data-cam="-46,18,44|0,16,0">
+  <div class="shell center">
+    <div class="panel wide reveal">
+      <div class="eyebrow">Characters</div>
+      <div class="chapter">Chapter 03 — ตัวละคร</div>
+      <h2>สามผู้กล้าแห่งกริฟฟินดอร์ และผองเพื่อน</h2>
+      <div class="grid g3 stagger" style="margin-bottom:14px;">
+        <div class="cardlet reveal"><span class="ico">🧙‍♂️</span><h3>แฮร์รี่ พอตเตอร์</h3><div class="en">Daniel Radcliffe</div><p>เด็กชายผู้รอดชีวิต เจ้าของแผลเป็นรูปสายฟ้า กล้าหาญ มีน้ำใจ พร้อมเสียสละเพื่อคนที่เขารัก</p></div>
+        <div class="cardlet reveal"><span class="ico">🐀</span><h3>รอน วีสลีย์</h3><div class="en">Rupert Grint</div><p>เพื่อนแท้คนแรกของแฮร์รี่ อารมณ์ขัน ซื่อสัตย์ และเก่งหมากรุกพ่อมดที่สุดในรุ่น</p></div>
+        <div class="cardlet reveal"><span class="ico">📚</span><h3>เฮอร์ไมโอนี่ เกรนเจอร์</h3><div class="en">Emma Watson</div><p>แม่มดสาวหัวใสจากครอบครัวมักเกิ้ล ความรู้ของเธอช่วยชีวิตเพื่อนไว้หลายครั้ง</p></div>
+      </div>
+      <div class="grid g3 stagger">
+        <div class="cardlet reveal"><span class="ico">🦉</span><h3>อัลบัส ดัมเบิลดอร์</h3><p>อาจารย์ใหญ่ผู้ยิ่งใหญ่ที่สุดแห่งยุค คอยชี้ทางแฮร์รี่อย่างอบอุ่นและลึกซึ้ง</p></div>
+        <div class="cardlet reveal"><span class="ico">🐈</span><h3>มิเนอร์วา มักกอนนากัล</h3><p>หัวหน้าบ้านกริฟฟินดอร์ เข้มงวดแต่ยุติธรรม แปลงร่างเป็นแมวได้</p></div>
+        <div class="cardlet reveal"><span class="ico">🧪</span><h3>เซเวอรัส สเนป</h3><p>อาจารย์ปรุงยาผู้ลึกลับ ดูเป็นวายร้าย แต่ความจริงซับซ้อนกว่าที่เห็น</p></div>
+        <div class="cardlet reveal"><span class="ico">🌂</span><h3>รูเบอัส แฮกริด</h3><p>ร่างยักษ์ใจดี ผู้พาแฮร์รี่ก้าวเข้าสู่โลกเวทมนตร์เป็นคนแรก</p></div>
+        <div class="cardlet reveal"><span class="ico">🐍</span><h3>เดรโก มัลฟอย</h3><p>คู่ปรับจากสลิธีริน หยิ่งในชาติกำเนิด คอยหาเรื่องตลอดปี</p></div>
+        <div class="cardlet reveal"><span class="ico">💀</span><h3>ลอร์ดโวลเดอมอร์</h3><p>จอมมารผู้สังหารพ่อแม่ของแฮร์รี่ สิงร่างควีเรลล์เพื่อชิงศิลา</p></div>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- ============ 04 HOUSES ============ -->
-<section>
-  <div class="ghost px" data-speed="0.12">HOUSES</div>
-  <div class="floaty px" data-speed="0.28" style="top:10%; right:8%; font-size:2.6rem; --d:6s; --rot:-10deg;">🎩</div>
-  <div class="sec-tag reveal"><span class="sec-num">#04</span> The four houses</div>
-  <h2 class="reveal">บ้านทั้งสี่แห่งฮอกวอตส์</h2>
-  <p class="reveal" style="color:var(--muted); margin:-16px 0 28px; line-height:1.9;">หมวกคัดสรร (Sorting Hat) จะอ่านใจนักเรียนใหม่ แล้วเลือกบ้านที่เหมาะสมที่สุดให้</p>
-  <div class="grid g4 stagger">
-    <div class="card house reveal" style="--hc:#e05555; --r:-2deg;"><span class="crest">🦁</span><h3>กริฟฟินดอร์</h3><p class="trait">ความกล้าหาญ<br>ความมุ่งมั่น น้ำใจนักสู้</p></div>
-    <div class="card house reveal" style="--hc:#4fc36b;"><span class="crest">🐍</span><h3>สลิธีริน</h3><p class="trait">ความทะเยอทะยาน<br>ไหวพริบ ความเจ้าเล่ห์</p></div>
-    <div class="card house reveal" style="--hc:#5b8dde;"><span class="crest">🦅</span><h3>เรเวนคลอ</h3><p class="trait">สติปัญญา<br>ความรอบรู้ ความคิดสร้างสรรค์</p></div>
-    <div class="card house reveal" style="--hc:#e8c15a; --r:2deg;"><span class="crest">🦡</span><h3>ฮัฟเฟิลพัฟ</h3><p class="trait">ความขยัน ซื่อสัตย์<br>ความยุติธรรม ความอดทน</p></div>
+<section id="houses" data-cam="-26,11,-66|0,13,-14">
+  <div class="shell center">
+    <div class="panel wide reveal">
+      <div class="eyebrow">The four houses</div>
+      <div class="chapter">Chapter 04 — บ้านทั้งสี่แห่งฮอกวอตส์</div>
+      <h2>หมวกคัดสรรจะอ่านใจ แล้วเลือกบ้านให้เธอ</h2>
+      <div class="grid g4 stagger">
+        <div class="cardlet house reveal" style="--hc:#e05555;"><span class="crest">🦁</span><h3>กริฟฟินดอร์</h3><p>ความกล้าหาญ ความมุ่งมั่น น้ำใจนักสู้</p></div>
+        <div class="cardlet house reveal" style="--hc:#4fc36b;"><span class="crest">🐍</span><h3>สลิธีริน</h3><p>ความทะเยอทะยาน ไหวพริบ ความเจ้าเล่ห์</p></div>
+        <div class="cardlet house reveal" style="--hc:#5b8dde;"><span class="crest">🦅</span><h3>เรเวนคลอ</h3><p>สติปัญญา ความรอบรู้ ความคิดสร้างสรรค์</p></div>
+        <div class="cardlet house reveal" style="--hc:#e8c15a;"><span class="crest">🦡</span><h3>ฮัฟเฟิลพัฟ</h3><p>ความขยัน ซื่อสัตย์ ยุติธรรม อดทน</p></div>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- ============ HOGWARTS BANNER ============ -->
-<section class="banner">
-  <div class="bwrap px" data-speed="0.1"><img src="img/hogwarts.jpg" alt="ปราสาทฮอกวอตส์ยามค่ำคืน นักเรียนปีหนึ่งนั่งเรือข้ามทะเลสาบ"></div>
-  <div class="shade"></div>
-  <div class="cap reveal">
-    <h3>โรงเรียนคาถาพ่อมดแม่มดฮอกวอตส์</h3>
-    <p>คืนแรกของนักเรียนปีหนึ่ง — นั่งเรือข้ามทะเลสาบดำ สู่ปราสาทที่จะกลายเป็น "บ้าน" ตลอดเจ็ดปี</p>
+<!-- ============ PHOTO BANNER ============ -->
+<section class="photo-banner" data-cam="0,95,25|0,0,0">
+  <div class="pb-inner">
+    <div class="bwrap" id="pbPx"><img src="img/hogwarts.jpg" alt="ปราสาทฮอกวอตส์ยามค่ำคืน นักเรียนปีหนึ่งนั่งเรือข้ามทะเลสาบ"></div>
+    <div class="shade"></div>
+    <div class="pb-cap reveal">
+      <h3>โรงเรียนคาถาพ่อมดแม่มดฮอกวอตส์</h3>
+      <p>คืนแรกของนักเรียนปีหนึ่ง — นั่งเรือข้ามทะเลสาบดำ สู่ปราสาทที่จะกลายเป็น "บ้าน" ตลอดเจ็ดปี</p>
+    </div>
   </div>
 </section>
-
-<div class="marquee"><div class="track"><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span></div></div>
 
 <!-- ============ 05 TIMELINE ============ -->
-<section>
-  <div class="ghost px" data-speed="0.1">SCENES</div>
-  <div class="sec-tag reveal"><span class="sec-num">#05</span> Key moments</div>
-  <h2 class="reveal">เหตุการณ์สำคัญในเรื่อง</h2>
-  <div class="tl">
-    <div class="tl-line"><i id="tlFill"></i></div>
-    <div class="tl-item reveal"><h3>จดหมายจากฮอกวอตส์ 📬</h3><p>จดหมายนับพันฉบับถาโถมใส่บ้านเดอร์สลีย์ จนแฮกริดต้องมาตามตัวแฮร์รี่ด้วยตัวเอง</p></div>
-    <div class="tl-item reveal"><h3>ตรอกไดแอกอน &amp; ชานชาลาที่ 9¾ 🚂</h3><p>แฮร์รี่ซื้อไม้กายสิทธิ์คู่ใจ รับนกฮูกเฮ็ดวิก แล้วทะลุกำแพงขึ้นรถไฟด่วนสายฮอกวอตส์</p></div>
-    <div class="tl-item reveal"><h3>โทรลล์ในห้องน้ำ 🧌</h3><p>สามสหายร่วมมือกันปราบโทรลล์ยักษ์ นาทีที่เปลี่ยนคนแปลกหน้าให้กลายเป็นเพื่อนแท้</p></div>
-    <div class="tl-item reveal"><h3>แมตช์ควิดดิชนัดแรก 🧹</h3><p>ซีกเกอร์อายุน้อยที่สุดในรอบศตวรรษ คว้าลูกสนิชด้วยปาก!</p></div>
-    <div class="tl-item reveal"><h3>กระจกแห่งแอริแซด 🪞</h3><p>กระจกที่สะท้อน "ความปรารถนาลึกที่สุดในใจ" — แฮร์รี่ได้เห็นพ่อแม่เป็นครั้งแรก</p></div>
-    <div class="tl-item reveal"><h3>ด่านพิทักษ์ศิลาอาถรรพ์ ♟️</h3><p>ต้นกับดักปีศาจ กุญแจบิน และหมากรุกพ่อมดยักษ์ที่รอนยอมเสียสละตัวเองให้เพื่อนไปต่อ</p></div>
-    <div class="tl-item reveal"><h3>เผชิญหน้าจอมมาร 💥</h3><p>ผู้ร้ายตัวจริงคือควีเรลล์ที่มีโวลเดอมอร์สิงอยู่ — แฮร์รี่เอาชนะได้ด้วยพลังแห่งความรักของแม่</p></div>
+<section id="scenes" data-cam="-102,24,50|-46,3,-10">
+  <div class="shell left">
+    <div class="panel reveal">
+      <div class="eyebrow">Key moments</div>
+      <div class="chapter">Chapter 05 — เหตุการณ์สำคัญ</div>
+      <h2>เส้นทางสู่ศิลาอาถรรพ์</h2>
+      <div class="tl">
+        <div class="tl-line"><i id="tlFill"></i></div>
+        <div class="tl-item reveal"><h3>จดหมายจากฮอกวอตส์ 📬</h3><p>จดหมายนับพันฉบับถาโถมใส่บ้านเดอร์สลีย์ จนแฮกริดต้องมาตามตัวเอง</p></div>
+        <div class="tl-item reveal"><h3>ชานชาลาที่ 9¾ 🚂</h3><p>ซื้อไม้กายสิทธิ์ รับนกฮูกเฮ็ดวิก แล้วทะลุกำแพงขึ้นรถไฟด่วนสายฮอกวอตส์</p></div>
+        <div class="tl-item reveal"><h3>โทรลล์ในห้องน้ำ 🧌</h3><p>สามสหายร่วมปราบโทรลล์ นาทีที่เปลี่ยนคนแปลกหน้าเป็นเพื่อนแท้</p></div>
+        <div class="tl-item reveal"><h3>ควิดดิชนัดแรก 🧹</h3><p>ซีกเกอร์อายุน้อยที่สุดในรอบศตวรรษ คว้าลูกสนิชด้วยปาก!</p></div>
+        <div class="tl-item reveal"><h3>กระจกแห่งแอริแซด 🪞</h3><p>กระจกสะท้อนความปรารถนาลึกสุดใจ — แฮร์รี่ได้เห็นพ่อแม่เป็นครั้งแรก</p></div>
+        <div class="tl-item reveal"><h3>ด่านพิทักษ์ศิลา ♟️</h3><p>ต้นกับดักปีศาจ กุญแจบิน และหมากรุกยักษ์ที่รอนยอมเสียสละ</p></div>
+        <div class="tl-item reveal"><h3>เผชิญหน้าจอมมาร 💥</h3><p>เอาชนะควีเรลล์และโวลเดอมอร์ได้ ด้วยพลังความรักของแม่</p></div>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- ============ 06 THEMES ============ -->
-<section>
-  <div class="ghost px" data-speed="0.12">THEMES</div>
-  <div class="sec-tag reveal"><span class="sec-num">#06</span> Themes</div>
-  <h2 class="reveal">แก่นเรื่องที่หนังอยากบอก</h2>
-  <div class="grid g2 stagger">
-    <div class="card tilt reveal" style="--r:-2deg;"><span style="font-size:2.2rem; display:block; margin-bottom:10px;">🤝</span><h3 style="color:var(--gold); margin-bottom:8px;">มิตรภาพ</h3><p style="color:#cdd4ee; font-size:.93rem; line-height:1.85;">แฮร์รี่ไม่มีทางผ่านด่านสุดท้ายได้เพียงลำพัง — ชัยชนะเกิดจากความสามารถของเพื่อนทุกคนรวมกัน</p></div>
-    <div class="card tilt reveal"><span style="font-size:2.2rem; display:block; margin-bottom:10px;">🦁</span><h3 style="color:var(--gold); margin-bottom:8px;">ความกล้าหาญ</h3><p style="color:#cdd4ee; font-size:.93rem; line-height:1.85;">ความกล้าไม่ใช่การไม่กลัว แต่คือการลงมือทำสิ่งที่ถูกต้องทั้งที่กลัว แม้ต้องขัดใจเพื่อนก็ตาม</p></div>
-    <div class="card tilt reveal"><span style="font-size:2.2rem; display:block; margin-bottom:10px;">❤️</span><h3 style="color:var(--gold); margin-bottom:8px;">พลังแห่งความรัก</h3><p style="color:#cdd4ee; font-size:.93rem; line-height:1.85;">ความรักของแม่ที่ยอมสละชีวิตปกป้องลูก คือเวทมนตร์ที่ทรงพลังที่สุด ที่แม้จอมมารก็ไม่อาจแตะต้อง</p></div>
-    <div class="card tilt reveal" style="--r:2deg;"><span style="font-size:2.2rem; display:block; margin-bottom:10px;">🧭</span><h3 style="color:var(--gold); margin-bottom:8px;">ทางเลือกกำหนดตัวตน</h3><p style="color:#cdd4ee; font-size:.93rem; line-height:1.85;">หมวกคัดสรรเกือบส่งแฮร์รี่ไปสลิธีริน แต่สิ่งที่เขา "เลือก" ต่างหากที่บอกว่าเขาเป็นใครจริง ๆ</p></div>
+<section id="themes" data-cam="72,14,14|46,8,-18">
+  <div class="shell right">
+    <div class="panel reveal">
+      <div class="eyebrow">Themes</div>
+      <div class="chapter">Chapter 06 — แก่นเรื่อง</div>
+      <h2>สิ่งที่หนังอยากบอก</h2>
+      <div class="grid g2 stagger">
+        <div class="cardlet reveal"><span class="ico">🤝</span><h3>มิตรภาพ</h3><p>ชัยชนะในด่านสุดท้าย เกิดจากความสามารถของเพื่อนทุกคนรวมกัน</p></div>
+        <div class="cardlet reveal"><span class="ico">🦁</span><h3>ความกล้าหาญ</h3><p>ความกล้าคือการทำสิ่งที่ถูกต้องทั้งที่กลัว แม้ต้องขัดใจเพื่อน</p></div>
+        <div class="cardlet reveal"><span class="ico">❤️</span><h3>พลังแห่งความรัก</h3><p>ความรักของแม่คือเวทมนตร์ทรงพลังที่สุด ที่จอมมารไม่อาจแตะต้อง</p></div>
+        <div class="cardlet reveal"><span class="ico">🧭</span><h3>ทางเลือกกำหนดตัวตน</h3><p>สิ่งที่เรา "เลือก" ต่างหาก ที่บอกว่าเราเป็นใครจริง ๆ</p></div>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- ============ 07 SUCCESS ============ -->
-<section>
-  <div class="ghost px" data-speed="0.1">BOX OFFICE</div>
-  <div class="sec-tag reveal"><span class="sec-num">#07</span> Achievements</div>
-  <h2 class="reveal">ความสำเร็จของภาพยนตร์</h2>
-  <div class="grid g3 stagger" style="margin-bottom:28px;">
-    <div class="card stat reveal"><div class="num"><span class="count" data-to="1000" data-prefix="$" data-suffix="+">$1,000+</span></div><div class="lbl">ล้านดอลลาร์สหรัฐ<br>รายได้รวมทั่วโลก</div></div>
-    <div class="card stat reveal"><div class="num">อันดับ <span class="count" data-to="2">2</span></div><div class="lbl">หนังทำเงินสูงสุด<br>ของโลกในปี 2001</div></div>
-    <div class="card stat reveal"><div class="num"><span class="count" data-to="3">3</span> สาขา</div><div class="lbl">เข้าชิงรางวัลออสการ์<br>(เพลงประกอบ · กำกับศิลป์ · เครื่องแต่งกาย)</div></div>
+<!-- ============ 07 STATS ============ -->
+<section id="stats" data-cam="4,120,70|0,0,-6">
+  <div class="shell center">
+    <div class="panel wide reveal">
+      <div class="eyebrow">Achievements</div>
+      <div class="chapter">Chapter 07 — ความสำเร็จของภาพยนตร์</div>
+      <h2>ปรากฏการณ์ระดับโลก</h2>
+      <div class="grid g3 stagger" style="margin-bottom:18px;">
+        <div class="cardlet stat reveal"><div class="num"><span class="count" data-to="1000" data-prefix="$" data-suffix="+">$1,000+</span></div><div class="lbl">ล้านดอลลาร์สหรัฐ · รายได้รวมทั่วโลก</div></div>
+        <div class="cardlet stat reveal"><div class="num">อันดับ <span class="count" data-to="2">2</span></div><div class="lbl">หนังทำเงินสูงสุดของโลกในปี 2001</div></div>
+        <div class="cardlet stat reveal"><div class="num"><span class="count" data-to="3">3</span> สาขา</div><div class="lbl">เข้าชิงออสการ์ (เพลงประกอบ · กำกับศิลป์ · เครื่องแต่งกาย)</div></div>
+      </div>
+      <ul class="bullets">
+        <li>เปิดตัวแฟรนไชส์ 8 ภาค รายได้รวมกว่า 7,700 ล้านดอลลาร์</li>
+        <li>ดนตรีโดย <strong>จอห์น วิลเลียมส์</strong> — "Hedwig's Theme" กลายเป็นเพลงจำของแฟรนไชส์</li>
+        <li>ปั้นนักแสดงเด็กทั้งสามเป็นดาราระดับโลก เติบโตไปพร้อมผู้ชมตลอด 10 ปี</li>
+      </ul>
+    </div>
   </div>
-  <ul class="bullets card reveal">
-    <li>เปิดตัวแฟรนไชส์ภาพยนตร์ 8 ภาค ที่ทำรายได้รวมกันกว่า 7,700 ล้านดอลลาร์</li>
-    <li>ดนตรีประกอบโดย <strong>จอห์น วิลเลียมส์</strong> — ท่วงทำนอง "Hedwig's Theme" กลายเป็นเพลงจำของแฟรนไชส์</li>
-    <li>ปั้นนักแสดงเด็กทั้งสามให้กลายเป็นดาราระดับโลก และเติบโตไปพร้อมผู้ชมตลอด 10 ปี</li>
-  </ul>
 </section>
 
 <!-- ============ 08 TRIVIA ============ -->
-<section>
-  <div class="ghost px" data-speed="0.12">TRIVIA</div>
-  <div class="floaty px" data-speed="0.3" style="top:14%; right:5%; font-size:2.2rem; --d:6.5s; --rot:14deg;">🔮</div>
-  <div class="sec-tag reveal"><span class="sec-num">#08</span> Behind the scenes</div>
-  <h2 class="reveal">เกร็ดน่ารู้เบื้องหลัง</h2>
-  <ul class="bullets card reveal">
-    <li>เจ. เค. โรว์ลิง ยืนยันว่านักแสดงหลักต้องเป็น <strong>ชาวอังกฤษ</strong> และถ่ายทำในสหราชอาณาจักรเท่านั้น</li>
-    <li>เด็ก ๆ หลายพันคนมาออดิชันบทแฮร์รี่ ก่อนผู้กำกับจะพบ แดเนียล แรดคลิฟฟ์ วัย 11 ปี</li>
-    <li>ฉากห้องโถงใหญ่ใช้เทียนลอยจริงหลายร้อยเล่มช่วงแรก ก่อนเปลี่ยนเป็น CG เพื่อความปลอดภัย</li>
-    <li>ฉากชานชาลาที่ 9¾ ถ่ายที่สถานีคิงส์ครอสในลอนดอน ปัจจุบันมีจุดถ่ายรูปให้แฟน ๆ จริง</li>
-    <li>ชื่อ "Philosopher's Stone" ถูกเปลี่ยนเป็น "Sorcerer's Stone" ในสหรัฐฯ ทำให้ต้องถ่ายบางฉากสองเวอร์ชัน</li>
-    <li>งูเหลือมที่คุยกับแฮร์รี่ในสวนสัตว์ คือการบอกใบ้ความสามารถ "พาร์เซลทัง" ที่จะสำคัญมากในภาคต่อ</li>
-  </ul>
+<section id="trivia" data-cam="20,30,34|0,24,0">
+  <div class="shell left">
+    <div class="panel reveal" style="width:min(560px,100%);">
+      <div class="eyebrow">Behind the scenes</div>
+      <div class="chapter">Chapter 08 — เกร็ดน่ารู้เบื้องหลัง</div>
+      <h2>ก่อนจะเป็นตำนาน</h2>
+      <ul class="bullets">
+        <li>โรว์ลิงยืนยันว่านักแสดงหลักต้องเป็น <strong>ชาวอังกฤษ</strong> ถ่ายทำในสหราชอาณาจักร</li>
+        <li>เด็กหลายพันคนออดิชันบทแฮร์รี่ ก่อนพบ แดเนียล แรดคลิฟฟ์ วัย 11 ปี</li>
+        <li>ห้องโถงใหญ่ใช้เทียนลอยจริงหลายร้อยเล่ม ก่อนเปลี่ยนเป็น CG เพื่อความปลอดภัย</li>
+        <li>ชานชาลาที่ 9¾ ถ่ายที่สถานีคิงส์ครอส — ปัจจุบันมีจุดถ่ายรูปจริง</li>
+        <li>ชื่อถูกเปลี่ยนเป็น "Sorcerer's Stone" ในสหรัฐฯ จึงต้องถ่ายบางฉากสองเวอร์ชัน</li>
+        <li>งูที่คุยกับแฮร์รี่ คือการบอกใบ้ "พาร์เซลทัง" ที่สำคัญมากในภาคต่อ</li>
+      </ul>
+    </div>
+  </div>
 </section>
 
 <!-- ============ QUOTE ============ -->
-<section class="quote-sec">
-  <div class="floaty px" data-speed="0.24" style="top:4%; left:10%; font-size:2.4rem; --d:7s; --rot:-8deg;">🪞</div>
-  <blockquote class="reveal">การหมกมุ่นอยู่กับความฝัน จนลืมมีชีวิตอยู่กับปัจจุบัน<br>ไม่ใช่สิ่งที่ควรทำ</blockquote>
-  <div class="quote-by reveal">— อัลบัส ดัมเบิลดอร์ · กล่าวถึงกระจกแห่งแอริแซด</div>
+<section data-cam="6,26,66|-60,55,-90">
+  <div class="quote-shell reveal">
+    <blockquote><span class="qm">“</span>การหมกมุ่นอยู่กับความฝัน จนลืมมีชีวิตอยู่กับปัจจุบัน<br>ไม่ใช่สิ่งที่ควรทำ<span class="qm">”</span></blockquote>
+    <div class="quote-by">— อัลบัส ดัมเบิลดอร์ · กล่าวถึงกระจกแห่งแอริแซด</div>
+  </div>
 </section>
 
 <!-- ============ OUTRO ============ -->
-<section class="outro">
-  <div class="floaty px" data-speed="0.3" style="top:18%; left:14%; font-size:2.4rem; --d:6s; --rot:10deg;">🦉</div>
-  <div class="floaty px" data-speed="0.22" style="bottom:22%; right:13%; font-size:2.4rem; --d:7s; --rot:-10deg;">⚡</div>
-  <div class="sec-tag reveal" style="justify-content:center;"><span class="sec-num">Fin.</span> Thank you</div>
+<section class="outro" data-cam="86,54,124|0,22,0">
+  <div class="eyebrow reveal" style="justify-content:center;">Fin — Thank you</div>
   <h2 class="reveal">ขอบคุณครับ/ค่ะ ✨</h2>
-  <p class="sub reveal" style="opacity:1; animation:none;">"It does not do to dwell on dreams and forget to live."<br>มีคำถามอะไร ถามได้เลย</p>
-  <a href="#" class="back-top reveal" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">⬆ กลับขึ้นด้านบน</a>
+  <p class="sub reveal">"It does not do to dwell on dreams and forget to live."<br>มีคำถามอะไร ถามได้เลย</p>
+  <a href="#top" class="back-top reveal">⬆ กลับขึ้นด้านบน</a>
 </section>
 
-<footer>HARRY POTTER &amp; THE PHILOSOPHER'S STONE · MOVIE PRESENTATION</footer>
+<footer>Harry Potter &amp; The Philosopher's Stone · 3D Movie Presentation</footer>
 
+<script src="vendor/three.min.js"></script>
 <script>
-  /* ---------- starfield ---------- */
-  const starsBox = document.getElementById('stars');
-  for (let i = 0; i < 110; i++) {
-    const s = document.createElement('div');
-    s.className = 'star';
-    const size = Math.random() * 2.4 + 0.6;
-    s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;animation-delay:${(Math.random()*4).toFixed(1)}s`;
-    starsBox.appendChild(s);
-  }
+'use strict';
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- reveal on scroll (staggered) ---------- */
-  document.querySelectorAll('.stagger').forEach(g => {
-    [...g.children].forEach((c, i) => c.style.transitionDelay = (i * 90) + 'ms');
+/* ---------- CSS star fallback (behind canvas) ---------- */
+const starsBox = document.getElementById('stars');
+for (let i = 0; i < 70; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 2 + 0.6;
+  s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;animation-delay:${(Math.random()*4).toFixed(1)}s`;
+  starsBox.appendChild(s);
+}
+
+/* ---------- reveals ---------- */
+document.querySelectorAll('.stagger').forEach(g => [...g.children].forEach((c,i)=>c.style.setProperty('--sd', (i*80)+'ms')));
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+}), { threshold:.15, rootMargin:'0px 0px -8% 0px' });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ---------- count-up ---------- */
+const cio = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return; cio.unobserve(e.target);
+  const el = e.target, to = +el.dataset.to, pre = el.dataset.prefix||'', suf = el.dataset.suffix||'';
+  const t0 = performance.now(), dur = 1400;
+  (function tick(t){ const p = Math.min(1,(t-t0)/dur), ez = 1-Math.pow(1-p,3);
+    el.textContent = pre + Math.round(to*ez).toLocaleString() + (p===1?suf:'');
+    if (p<1) requestAnimationFrame(tick); })(t0);
+}), { threshold:.6 });
+document.querySelectorAll('.count').forEach(el => cio.observe(el));
+
+/* ---------- poster tilt ---------- */
+const poster = document.getElementById('posterTilt');
+if (poster && matchMedia('(hover:hover)').matches) {
+  poster.addEventListener('mousemove', e => {
+    const r = poster.getBoundingClientRect();
+    const x = (e.clientX-r.left)/r.width-.5, y = (e.clientY-r.top)/r.height-.5;
+    poster.style.transform = `perspective(700px) rotateY(${(x*14).toFixed(1)}deg) rotateX(${(-y*10).toFixed(1)}deg)`;
   });
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-  }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  poster.addEventListener('mouseleave', () => poster.style.transform = '');
+}
 
-  /* ---------- scroll: progress + parallax + timeline ---------- */
-  const progress = document.getElementById('progress');
-  const pxEls = [...document.querySelectorAll('.px')].map(el => ({ el, speed: +el.dataset.speed || 0.2 }));
-  const tlFill = document.getElementById('tlFill');
-  const tlBox = document.querySelector('.tl');
-  let ticking = false;
+/* ---------- nav active chip ---------- */
+const chipLinks = [...document.querySelectorAll('.chip')];
+const chipTargets = chipLinks.map(a => document.querySelector(a.getAttribute('href')));
+function updChips() {
+  let ai = 0;
+  chipTargets.forEach((t,i) => { if (t && t.getBoundingClientRect().top < innerHeight*.5) ai = i; });
+  chipLinks.forEach((a,i) => a.classList.toggle('on', i===ai));
+}
 
-  function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      const doc = document.documentElement;
-      const max = doc.scrollHeight - innerHeight;
-      progress.style.width = (max > 0 ? (scrollY / max) * 100 : 0) + '%';
+/* ---------- scroll shared ---------- */
+const progress = document.getElementById('progress');
+const tlFill = document.getElementById('tlFill');
+const tlBox = document.querySelector('.tl');
+const pbPx = document.getElementById('pbPx');
+let scrollDirty = true;
+addEventListener('scroll', () => { scrollDirty = true; }, { passive:true });
 
-      const vh2 = innerHeight / 2;
-      for (const { el, speed } of pxEls) {
-        const parent = el.closest('section') || document.body;
-        const r = parent.getBoundingClientRect();
-        const delta = (r.top + r.height / 2 - vh2) * -speed;
-        el.style.transform = `translateY(${delta.toFixed(1)}px)`;
-      }
-
-      if (tlBox) {
-        const r = tlBox.getBoundingClientRect();
-        const p = Math.min(1, Math.max(0, (innerHeight * 0.75 - r.top) / r.height));
-        tlFill.style.transform = `scaleY(${p})`;
-      }
-      ticking = false;
-    });
+function uiScroll() {
+  const doc = document.documentElement;
+  const max = doc.scrollHeight - innerHeight;
+  progress.style.width = (max>0 ? scrollY/max*100 : 0) + '%';
+  if (tlBox) {
+    const r = tlBox.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, (innerHeight*.8 - r.top) / r.height));
+    tlFill.style.transform = `scaleY(${p})`;
   }
-  addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  if (pbPx) {
+    const r = pbPx.parentElement.getBoundingClientRect();
+    const d = (r.top + r.height/2 - innerHeight/2) * -0.1;
+    pbPx.style.transform = `translateY(${d.toFixed(1)}px)`;
+  }
+  updChips();
+}
 
-  /* ---------- 3D tilt cards ---------- */
-  if (matchMedia('(hover:hover)').matches) {
-    document.querySelectorAll('.tilt').forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const r = card.getBoundingClientRect();
-        const x = (e.clientX - r.left) / r.width - 0.5;
-        const y = (e.clientY - r.top) / r.height - 0.5;
-        card.style.transform = `perspective(800px) rotateY(${(x*12).toFixed(1)}deg) rotateX(${(-y*10).toFixed(1)}deg) translateY(-4px)`;
-      });
-      card.addEventListener('mouseleave', () => { card.style.transform = ''; });
-    });
+/* ============================================================
+   3D WORLD — low-poly night Hogwarts (Three.js)
+   ============================================================ */
+let render3d = null;
+try {
+  const canvas = document.getElementById('world');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a0e26);
+  scene.fog = new THREE.FogExp2(0x0a0e26, 0.0052);
+
+  const camera = new THREE.PerspectiveCamera(46, innerWidth/innerHeight, 0.1, 900);
+  camera.position.set(64,40,92);
+
+  /* ----- lights ----- */
+  scene.add(new THREE.HemisphereLight(0x6d7fd8, 0x10142e, 0.95));
+  const moonDir = new THREE.DirectionalLight(0xbfd0ff, 0.75);
+  moonDir.position.set(-80, 120, -60);
+  scene.add(moonDir);
+  const hearth = new THREE.PointLight(0xffb060, 1.1, 150, 1.6);
+  hearth.position.set(0, 26, 0);
+  scene.add(hearth);
+
+  const M = c => new THREE.MeshLambertMaterial({ color:c, flatShading:true });
+  const stone  = M(0x596194), roofM = M(0x2b3160), darkStone = M(0x3c4470);
+  const rockM  = M(0x252a4e), groundM = M(0x1a2044), treeM = M(0x1c4a44), trunkM = M(0x2e2438);
+  const winM   = new THREE.MeshBasicMaterial({ color:0xffcf7a });
+  const goldM  = new THREE.MeshLambertMaterial({ color:0xd8b23a, emissive:0x6b520f });
+  const redM   = M(0xb3202e), redDarkM = M(0x8f1a25), blackM = M(0x14141e);
+
+  /* ----- ground & hills ----- */
+  const ground = new THREE.Mesh(new THREE.CircleGeometry(320, 40), groundM);
+  ground.rotation.x = -Math.PI/2; scene.add(ground);
+  for (let i = 0; i < 9; i++) {
+    const h = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 0), M(0x161b3a));
+    const a = i/9*Math.PI*2 + 0.4;
+    h.position.set(Math.cos(a)*(195+Math.random()*65), -6, Math.sin(a)*(195+Math.random()*65));
+    h.scale.set(24+Math.random()*18, 12+Math.random()*10, 24+Math.random()*16);
+    h.rotation.y = Math.random()*Math.PI; scene.add(h);
   }
 
-  /* ---------- count-up stats ---------- */
-  const cio = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (!e.isIntersecting) return;
-      cio.unobserve(e.target);
-      const el = e.target, to = +el.dataset.to, pre = el.dataset.prefix || '', suf = el.dataset.suffix || '';
-      const t0 = performance.now(), dur = 1400;
-      (function tick(t) {
-        const p = Math.min(1, (t - t0) / dur), ease = 1 - Math.pow(1 - p, 3);
-        el.textContent = pre + Math.round(to * ease).toLocaleString() + (p === 1 ? suf : '');
-        if (p < 1) requestAnimationFrame(tick);
-      })(t0);
+  /* ----- lake (south, +z) ----- */
+  const lake = new THREE.Mesh(new THREE.CircleGeometry(95, 42), M(0x0e1c46));
+  lake.rotation.x = -Math.PI/2; lake.position.set(4, 0.25, 78); scene.add(lake);
+  const streak = new THREE.Mesh(new THREE.PlaneGeometry(9, 70),
+    new THREE.MeshBasicMaterial({ color:0x9fb2ff, transparent:true, opacity:0.10 }));
+  streak.rotation.x = -Math.PI/2; streak.rotation.z = 0.5;
+  streak.position.set(-14, 0.35, 74); scene.add(streak);
+
+  /* ----- castle rock ----- */
+  const rock = new THREE.Mesh(new THREE.IcosahedronGeometry(24, 1), rockM);
+  rock.scale.set(1.35, 0.75, 1.2); rock.position.y = 3; scene.add(rock);
+  const rock2 = new THREE.Mesh(new THREE.IcosahedronGeometry(13, 1), rockM);
+  rock2.scale.set(1.2, 0.9, 1); rock2.position.set(20, 1, 14); rock2.rotation.y = 1.2; scene.add(rock2);
+
+  /* ----- castle ----- */
+  const castle = new THREE.Group();
+  const winGeo = new THREE.BoxGeometry(0.55, 0.95, 0.12);
+
+  function addWindows(target, r, yFrom, yTo, n) {
+    for (let i = 0; i < n; i++) {
+      const w = new THREE.Mesh(winGeo, winM);
+      const a = Math.random()*Math.PI*2;
+      w.position.set(Math.cos(a)*(r+0.06), yFrom + Math.random()*(yTo-yFrom), Math.sin(a)*(r+0.06));
+      w.lookAt(w.position.x*2, w.position.y, w.position.z*2);
+      target.add(w);
+    }
+  }
+  function tower(x, z, r, h, flagColor) {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(r, r*1.12, h, 9), stone);
+    body.position.y = h/2; g.add(body);
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(r*1.4, r*2.9, 9), roofM);
+    roof.position.y = h + r*1.45; g.add(roof);
+    addWindows(g, r, h*0.3, h*0.92, Math.round(h/5));
+    if (flagColor) {
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 2.4, 5), darkStone);
+      pole.position.y = h + r*1.45 + 1.0; g.add(pole);
+      const flag = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1.0), new THREE.MeshLambertMaterial({ color:flagColor, side:THREE.DoubleSide }));
+      flag.position.set(0.95, h + r*1.45 + 1.7, 0); g.add(flag);
+      flags.push(flag);
+    }
+    g.position.set(x, 12, z);
+    castle.add(g);
+    return g;
+  }
+  const flags = [];
+  const keep = new THREE.Mesh(new THREE.BoxGeometry(15, 15, 11), stone);
+  keep.position.y = 19.5; castle.add(keep);
+  const keepRoof = new THREE.Mesh(new THREE.ConeGeometry(10.4, 7, 4), roofM);
+  keepRoof.position.y = 30.5; keepRoof.rotation.y = Math.PI/4; keepRoof.scale.x = 1.35; castle.add(keepRoof);
+  for (let i = 0; i < 26; i++) {
+    const w = new THREE.Mesh(winGeo, winM);
+    const side = Math.random() < 0.5 ? 1 : -1;
+    if (Math.random() < 0.5) w.position.set(side*7.56, 14+Math.random()*9, (Math.random()-0.5)*9);
+    else { w.position.set((Math.random()-0.5)*13, 14+Math.random()*9, side*5.56); w.rotation.y = Math.PI/2; }
+    w.rotation.y += w.position.x !== 0 && Math.abs(w.position.x) > 7 ? Math.PI/2 : 0;
+    castle.add(w);
+  }
+  const hall = new THREE.Mesh(new THREE.BoxGeometry(17, 8, 8), stone);
+  hall.position.set(-3, 16, 9); castle.add(hall);
+  const hallRoof = new THREE.Mesh(new THREE.ConeGeometry(6.2, 5, 4), roofM);
+  hallRoof.scale.x = 2.2; hallRoof.rotation.y = Math.PI/4; hallRoof.position.set(-3, 22.5, 9); castle.add(hallRoof);
+
+  tower(-10, -5, 3.4, 26);
+  tower(10, -6, 3.0, 22, 0xae2334);
+  tower(12, 6, 2.6, 18);
+  tower(-12, 7, 2.8, 20, 0xb8860b);
+  tower(0, -11, 3.8, 34, 0x2a5c9e);   // astronomy tower
+  tower(-5, 13, 2.2, 15, 0x1f6d43);
+  const wallGeo = new THREE.BoxGeometry(7, 5, 1.6);
+  [[-10,-5,10,-6],[10,-6,12,6],[-12,7,-5,13]].forEach(([x1,z1,x2,z2]) => {
+    const w = new THREE.Mesh(wallGeo, darkStone);
+    w.position.set((x1+x2)/2, 15, (z1+z2)/2);
+    w.rotation.y = -Math.atan2(z2-z1, x2-x1);
+    w.scale.x = Math.hypot(x2-x1, z2-z1)/7;
+    castle.add(w);
+  });
+  scene.add(castle);
+
+  /* ----- house banners courtyard (north, -z) ----- */
+  const bannerCols = [0xae2334, 0x1f6d43, 0x2a5c9e, 0xb8860b];
+  bannerCols.forEach((c, i) => {
+    const x = -16 + i*10.5;
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 13, 6), darkStone);
+    pole.position.set(x, 6.5, -38); scene.add(pole);
+    const b = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 8),
+      new THREE.MeshLambertMaterial({ color:c, side:THREE.DoubleSide }));
+    b.position.set(x, 8.6, -37.8); scene.add(b); flags.push(b);
+  });
+
+  /* ----- trees ----- */
+  const treeGeo = new THREE.ConeGeometry(1, 1, 7), trunkGeo = new THREE.CylinderGeometry(0.16, 0.2, 1, 5);
+  for (let i = 0; i < 70; i++) {
+    const a = Math.random()*Math.PI*2, d = 40 + Math.random()*130;
+    const x = Math.cos(a)*d, z = Math.sin(a)*d;
+    if (z > 18 && Math.hypot(x-4, z-78) < 100) continue;   // keep off the lake
+    if (Math.hypot(x+55, z+5) < 34) continue;              // keep off train loop
+    if (Math.hypot(x-48, z+14) < 20) continue;             // keep off quidditch
+    const s = 2.6 + Math.random()*4.4;
+    const tr = new THREE.Mesh(trunkGeo, trunkM); tr.scale.set(1, s*0.4, 1); tr.position.set(x, s*0.2, z);
+    const t = new THREE.Mesh(treeGeo, treeM); t.scale.set(s*0.55, s, s*0.55); t.position.set(x, s*0.4 + s/2, z);
+    scene.add(tr); scene.add(t);
+  }
+
+  /* ----- boats on the lake ----- */
+  const boats = [];
+  for (let i = 0; i < 6; i++) {
+    const g = new THREE.Group();
+    const hull = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.8, 1.2), M(0x3a2a18));
+    hull.scale.y = 0.8; g.add(hull);
+    const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 6), winM);
+    lamp.position.set(1.1, 0.9, 0); g.add(lamp);
+    g.position.set(-16 + (i%3)*13 + Math.random()*4, 0.6, 62 + Math.floor(i/3)*10 + Math.random()*4);
+    g.rotation.y = -0.4;
+    scene.add(g); boats.push(g);
+  }
+
+  /* ----- Hogwarts Express ----- */
+  const trainCurve = new THREE.EllipseCurve(-55, -5, 30, 42, 0, Math.PI*2);
+  const trackPts = trainCurve.getPoints(120).map(p => new THREE.Vector3(p.x, 0.35, p.y));
+  const track = new THREE.Mesh(
+    new THREE.TubeGeometry(new THREE.CatmullRomCurve3(trackPts, true), 120, 0.22, 5, true), blackM);
+  scene.add(track);
+  function car(len, matTop) {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.BoxGeometry(len, 2.1, 2.1), redM);
+    body.position.y = 1.7; g.add(body);
+    const roofS = new THREE.Mesh(new THREE.BoxGeometry(len, 0.4, 2.3), matTop);
+    roofS.position.y = 2.95; g.add(roofS);
+    return g;
+  }
+  const train = new THREE.Group();
+  const loco = car(4.6, blackM);
+  const boiler = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 3.4, 9), blackM);
+  boiler.rotation.z = Math.PI/2; boiler.position.set(-3.6, 1.7, 0); loco.add(boiler);
+  const chimney = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.42, 1.2, 7), blackM);
+  chimney.position.set(-4.6, 3.2, 0); loco.add(chimney);
+  train.add(loco);
+  const cars = [loco];
+  for (let i = 1; i <= 3; i++) { const c = car(4.2, redDarkM); train.add(c); cars.push(c); }
+  scene.add(train);
+  const smoke = [];
+  const smokeM = () => new THREE.MeshBasicMaterial({ color:0xc9cfe8, transparent:true, opacity:0.5 });
+  for (let i = 0; i < 9; i++) {
+    const s = new THREE.Mesh(new THREE.IcosahedronGeometry(0.6, 0), smokeM());
+    s.userData.life = Math.random(); scene.add(s); smoke.push(s);
+  }
+
+  /* ----- quidditch pitch (east) ----- */
+  const pitch = new THREE.Mesh(new THREE.CircleGeometry(11, 24), M(0x1d3a34));
+  pitch.scale.y = 1.7; pitch.rotation.x = -Math.PI/2; pitch.position.set(48, 0.3, -14); scene.add(pitch);
+  [-1, 1].forEach(end => {
+    [5.2, 7.5, 6.2].forEach((h, i) => {
+      const px = 48 + (i-1)*3.4, pz = -14 + end*15;
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, h, 6), darkStone);
+      pole.position.set(px, h/2, pz); scene.add(pole);
+      const hoop = new THREE.Mesh(new THREE.TorusGeometry(1.5, 0.14, 6, 14), goldM);
+      hoop.position.set(px, h + 1.5, pz); scene.add(hoop);
     });
-  }, { threshold: 0.6 });
-  document.querySelectorAll('.count').forEach(el => cio.observe(el));
+  });
 
-  /* ---------- flying golden snitch ---------- */
-  const snitch = document.getElementById('snitch');
-  let t = 0;
-  (function fly() {
-    t += 0.008;
-    const x = innerWidth  * (0.5 + 0.42 * Math.sin(t * 1.3) * Math.cos(t * 0.7));
-    const y = innerHeight * (0.4 + 0.3  * Math.sin(t * 0.9 + 1.7));
-    const dir = Math.cos(t * 1.3) >= 0 ? 1 : -1;
-    snitch.style.transform = `translate(${x.toFixed(0)}px, ${y.toFixed(0)}px) scaleX(${dir})`;
-    requestAnimationFrame(fly);
-  })();
+  /* ----- golden snitch ----- */
+  const snitch = new THREE.Group();
+  const ball = new THREE.Mesh(new THREE.SphereGeometry(0.55, 10, 8),
+    new THREE.MeshLambertMaterial({ color:0xffd54f, emissive:0x8a6a1c }));
+  snitch.add(ball);
+  const wingG = new THREE.PlaneGeometry(1.7, 0.55);
+  const wingMat = new THREE.MeshBasicMaterial({ color:0xf3f5ff, transparent:true, opacity:0.85, side:THREE.DoubleSide });
+  const wL = new THREE.Mesh(wingG, wingMat); wL.position.x = -1.1;
+  const wR = new THREE.Mesh(wingG, wingMat); wR.position.x = 1.1;
+  snitch.add(wL); snitch.add(wR);
+  scene.add(snitch);
 
-  /* ---------- sparkle cursor trail ---------- */
-  let lastSpark = 0;
+  /* ----- flying letters ----- */
+  const letters = [];
+  const letterM = new THREE.MeshBasicMaterial({ color:0xf5eeda, side:THREE.DoubleSide });
+  for (let i = 0; i < 7; i++) {
+    const l = new THREE.Mesh(new THREE.PlaneGeometry(1.05, 0.72), letterM);
+    l.userData = { a:Math.random()*Math.PI*2, r:5+Math.random()*7, y:20+Math.random()*9, sp:0.25+Math.random()*0.4, ph:Math.random()*6 };
+    scene.add(l); letters.push(l);
+  }
+
+  /* ----- moon + glow + stars ----- */
+  const moon = new THREE.Mesh(new THREE.SphereGeometry(10, 18, 14), new THREE.MeshBasicMaterial({ color:0xfff2cf, fog:false }));
+  moon.position.set(-130, 92, -170); scene.add(moon);
+  const glowCv = document.createElement('canvas'); glowCv.width = glowCv.height = 128;
+  const gcx = glowCv.getContext('2d');
+  const grad = gcx.createRadialGradient(64,64,6, 64,64,64);
+  grad.addColorStop(0, 'rgba(255,242,207,.55)'); grad.addColorStop(1, 'rgba(255,242,207,0)');
+  gcx.fillStyle = grad; gcx.fillRect(0,0,128,128);
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map:new THREE.CanvasTexture(glowCv), transparent:true, fog:false }));
+  glow.scale.set(85,85,1); glow.position.copy(moon.position); scene.add(glow);
+
+  const starN = 800, starPos = new Float32Array(starN*3);
+  for (let i = 0; i < starN; i++) {
+    const a = Math.random()*Math.PI*2, e = Math.random()*Math.PI*0.48, r = 260+Math.random()*160;
+    starPos[i*3]   = Math.cos(a)*Math.cos(e)*r;
+    starPos[i*3+1] = Math.sin(e)*r + 8;
+    starPos[i*3+2] = Math.sin(a)*Math.cos(e)*r;
+  }
+  const starGeo = new THREE.BufferGeometry();
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color:0xcfd8ff, size:1.6, transparent:true, opacity:0.85, fog:false })));
+
+  /* ----- camera rig: scroll-driven poses ----- */
+  const camSecs = [...document.querySelectorAll('section[data-cam]')];
+  const poses = camSecs.map(s => {
+    const [p, l] = s.dataset.cam.split('|').map(t => t.split(',').map(Number));
+    return { p:new THREE.Vector3(...p), l:new THREE.Vector3(...l) };
+  });
+  let tops = [];
+  function computeTops() {
+    tops = camSecs.map(s => s.getBoundingClientRect().top + scrollY);
+  }
+  computeTops();
+  addEventListener('load', computeTops);
+  setTimeout(computeTops, 1200);
+
+  /* Hold each pose while its section is on screen; fly only between
+     sections: transition runs while the next section scrolls in. */
+  function poseAt() {
+    const n = poses.length;
+    let f = n - 1;
+    for (let i = 0; i < n - 1; i++) {
+      const start = tops[i+1] - innerHeight * 0.95;   // next section entering
+      const end   = tops[i+1] - innerHeight * 0.25;   // next section settled
+      if (scrollY < start) { f = i; break; }
+      if (scrollY < end) {
+        const u = (scrollY - start) / (end - start);
+        f = i + u*u*(3-2*u); break;
+      }
+    }
+    const i = Math.min(Math.floor(f), n-2), u = f - i;
+    return {
+      p: new THREE.Vector3().lerpVectors(poses[i].p, poses[i+1].p, u),
+      l: new THREE.Vector3().lerpVectors(poses[i].l, poses[i+1].l, u),
+      f
+    };
+  }
+
+  let mx = 0, my = 0;
   addEventListener('mousemove', e => {
-    const now = performance.now();
-    if (now - lastSpark < 90) return;
-    lastSpark = now;
-    const s = document.createElement('span');
-    s.className = 'spark';
-    s.textContent = '✦';
-    s.style.left = (e.clientX + (Math.random()*16-8)) + 'px';
-    s.style.top  = (e.clientY + (Math.random()*16-8)) + 'px';
-    document.body.appendChild(s);
-    setTimeout(() => s.remove(), 850);
-  }, { passive: true });
+    mx = e.clientX/innerWidth - 0.5; my = e.clientY/innerHeight - 0.5;
+  }, { passive:true });
 
-  /* ---------- hero mouse parallax ---------- */
-  const hero = document.querySelector('.hero');
-  const heroFloats = [...hero.querySelectorAll('.floaty')];
-  addEventListener('mousemove', e => {
-    if (scrollY > innerHeight) return;
-    const dx = e.clientX / innerWidth - 0.5, dy = e.clientY / innerHeight - 0.5;
-    heroFloats.forEach((el, i) => {
-      const k = 14 + i * 6;
-      el.style.marginLeft = (dx * k) + 'px';
-      el.style.marginTop  = (dy * k) + 'px';
+  const curP = camera.position.clone(), curL = new THREE.Vector3(0,20,0);
+
+  addEventListener('resize', () => {
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+    computeTops();
+  });
+
+  let last = performance.now();
+  render3d = function(now) {
+    const dt = Math.min(0.05, (now-last)/1000); last = now;
+    const t = now/1000;
+
+    const tgt = poseAt();
+    if (!RM && tgt.f < 0.6) {          // gentle establishing orbit on the hero
+      const oa = t*0.06;
+      tgt.p.x += Math.sin(oa)*7; tgt.p.z += Math.cos(oa)*5 - 5;
+    }
+    tgt.p.x += mx*5; tgt.p.y += -my*3;
+    const k = 1 - Math.pow(0.0018, dt);
+    curP.lerp(tgt.p, k); curL.lerp(tgt.l, k);
+    camera.position.copy(curP);
+    camera.lookAt(curL);
+
+    /* train */
+    const tp = trainCurve.getPoint((t*0.022) % 1);
+    const headPos = new THREE.Vector3(tp.x, 0.5, tp.y);
+    cars.forEach((c, ci) => {
+      const back = trainCurve.getPoint(((t*0.022) - ci*0.016 + 1) % 1);
+      const nxt  = trainCurve.getPoint(((t*0.022) - ci*0.016 + 0.004 + 1) % 1);
+      c.position.set(back.x, 0.5, back.y);
+      c.lookAt(nxt.x, 0.5, nxt.y);
+      c.rotateY(Math.PI/2);
     });
-  }, { passive: true });
+    /* smoke */
+    smoke.forEach((s, si) => {
+      s.userData.life += dt*0.55;
+      if (s.userData.life > 1) { s.userData.life = 0; s.position.set(headPos.x-0, 3.4, headPos.z); }
+      const lf = s.userData.life;
+      s.position.y += dt*3.2;
+      const sc = 0.5 + lf*2.2; s.scale.set(sc,sc,sc);
+      s.material.opacity = 0.5*(1-lf);
+    });
+    /* boats */
+    boats.forEach((b, bi) => {
+      b.position.y = 0.55 + Math.sin(t*1.3 + bi*1.7)*0.14;
+      b.position.z -= dt*0.5;
+      if (b.position.z < 34) b.position.z = 82;
+    });
+    /* flags wave */
+    flags.forEach((fl, fi) => { fl.rotation.y = Math.sin(t*1.8 + fi)*0.18; });
+    /* snitch */
+    const sa = t*0.7;
+    snitch.position.set(14 + Math.cos(sa)*16, 27 + Math.sin(t*1.1)*4, 10 + Math.sin(sa)*13);
+    snitch.rotation.y = -sa + Math.PI/2;
+    const flap = Math.sin(t*26)*0.9;
+    wL.rotation.z =  flap*0.6 + 0.2; wR.rotation.z = -flap*0.6 - 0.2;
+    /* letters flutter */
+    letters.forEach(l => {
+      const u = l.userData; u.a += dt*u.sp;
+      l.position.set(34 + Math.cos(u.a)*u.r, u.y + Math.sin(t*1.4 + u.ph)*1.6, 52 + Math.sin(u.a)*u.r*0.7);
+      l.rotation.set(Math.sin(t*2+u.ph)*0.5, u.a, Math.cos(t*1.7+u.ph)*0.4);
+    });
+    /* hearth flicker */
+    hearth.intensity = 1.05 + Math.sin(t*7.3)*0.08 + Math.sin(t*13.7)*0.05;
+
+    renderer.render(scene, camera);
+  };
+} catch (err) {
+  document.getElementById('world').style.display = 'none';
+  console.warn('WebGL unavailable, falling back to static background.', err);
+}
+
+/* ---------- master loop ---------- */
+function loop(now) {
+  if (scrollDirty) { uiScroll(); scrollDirty = false; }
+  if (render3d) render3d(now);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
 </script>
 </body>
 </html>
