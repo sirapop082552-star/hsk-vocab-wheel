@@ -82,10 +82,11 @@
     user-select:none; white-space:nowrap;
   }
 
-  /* reveal-on-scroll */
-  .reveal { opacity:0; transform:translateY(52px) rotate(var(--r,0deg)) scale(.97); will-change:transform,opacity;
+  /* reveal-on-scroll (hidden state only when JS is running, so content
+     stays visible in viewers that block scripts) */
+  .reveal { will-change:transform,opacity;
     transition:opacity .85s cubic-bezier(.2,.7,.2,1), transform .85s cubic-bezier(.2,.7,.2,1); }
-  .reveal.in { opacity:1; transform:none; }
+  .js .reveal:not(.in) { opacity:0; transform:translateY(52px) rotate(var(--r,0deg)) scale(.97); }
 
   /* parallax items */
   .px { will-change:transform; }
@@ -190,7 +191,8 @@
   .tl { position:relative; max-width:820px; padding-left:44px; }
   .tl-line { position:absolute; left:18px; top:0; bottom:0; width:2px; background:rgba(255,255,255,.09); }
   .tl-line i { position:absolute; left:0; top:0; width:100%; height:100%; background:linear-gradient(180deg,var(--gold),#ff8a65);
-    transform-origin:top; transform:scaleY(0); box-shadow:0 0 10px rgba(255,213,79,.6); }
+    transform-origin:top; box-shadow:0 0 10px rgba(255,213,79,.6); }
+  .js .tl-line i { transform:scaleY(0); }
   .tl-item { position:relative; padding:16px 0 16px 16px; }
   .tl-item::before { content:""; position:absolute; left:-33px; top:26px; width:12px; height:12px; border-radius:50%;
     background:var(--bg0); border:2px solid var(--gold); box-shadow:0 0 10px rgba(255,213,79,.55); }
@@ -230,6 +232,7 @@
 </style>
 </head>
 <body>
+<script>document.documentElement.classList.add('js');</script>
 
 <div class="stars" id="stars"></div>
 <div class="bg-blob b1 px" data-speed="-0.06"></div>
@@ -260,7 +263,7 @@
 </section>
 
 <!-- ============ MARQUEE ============ -->
-<div class="marquee"><div class="track" id="mq1"></div></div>
+<div class="marquee"><div class="track"><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span></div></div>
 
 <!-- ============ 01 INFO ============ -->
 <section>
@@ -343,7 +346,7 @@
   </div>
 </section>
 
-<div class="marquee"><div class="track" id="mq2"></div></div>
+<div class="marquee"><div class="track"><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span><span>แฮร์รี่ พอตเตอร์</span><span>⚡</span><span>The Boy Who Lived</span><span>✦</span><span>Hogwarts</span><span>⚡</span><span>ศิลาอาถรรพ์</span><span>✦</span><span>Wingardium Leviosa</span><span>⚡</span><span>Quidditch</span><span>✦</span></div></div>
 
 <!-- ============ 05 TIMELINE ============ -->
 <section>
@@ -381,9 +384,9 @@
   <div class="sec-tag reveal"><span class="sec-num">#07</span> Achievements</div>
   <h2 class="reveal">ความสำเร็จของภาพยนตร์</h2>
   <div class="grid g3 stagger" style="margin-bottom:28px;">
-    <div class="card stat reveal"><div class="num"><span class="count" data-to="1000" data-prefix="$" data-suffix="+">$0</span></div><div class="lbl">ล้านดอลลาร์สหรัฐ<br>รายได้รวมทั่วโลก</div></div>
-    <div class="card stat reveal"><div class="num">อันดับ <span class="count" data-to="2">0</span></div><div class="lbl">หนังทำเงินสูงสุด<br>ของโลกในปี 2001</div></div>
-    <div class="card stat reveal"><div class="num"><span class="count" data-to="3">0</span> สาขา</div><div class="lbl">เข้าชิงรางวัลออสการ์<br>(เพลงประกอบ · กำกับศิลป์ · เครื่องแต่งกาย)</div></div>
+    <div class="card stat reveal"><div class="num"><span class="count" data-to="1000" data-prefix="$" data-suffix="+">$1,000+</span></div><div class="lbl">ล้านดอลลาร์สหรัฐ<br>รายได้รวมทั่วโลก</div></div>
+    <div class="card stat reveal"><div class="num">อันดับ <span class="count" data-to="2">2</span></div><div class="lbl">หนังทำเงินสูงสุด<br>ของโลกในปี 2001</div></div>
+    <div class="card stat reveal"><div class="num"><span class="count" data-to="3">3</span> สาขา</div><div class="lbl">เข้าชิงรางวัลออสการ์<br>(เพลงประกอบ · กำกับศิลป์ · เครื่องแต่งกาย)</div></div>
   </div>
   <ul class="bullets card reveal">
     <li>เปิดตัวแฟรนไชส์ภาพยนตร์ 8 ภาค ที่ทำรายได้รวมกันกว่า 7,700 ล้านดอลลาร์</li>
@@ -436,15 +439,6 @@
     const size = Math.random() * 2.4 + 0.6;
     s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;animation-delay:${(Math.random()*4).toFixed(1)}s`;
     starsBox.appendChild(s);
-  }
-
-  /* ---------- marquee ---------- */
-  const words = ['แฮร์รี่ พอตเตอร์','⚡','The Boy Who Lived','✦','Hogwarts','⚡','ศิลาอาถรรพ์','✦','Wingardium Leviosa','⚡','Quidditch','✦'];
-  for (const id of ['mq1','mq2']) {
-    const track = document.getElementById(id);
-    let html = '';
-    for (let r = 0; r < 4; r++) html += words.map(w => `<span>${w}</span>`).join('');
-    track.innerHTML = html;
   }
 
   /* ---------- reveal on scroll (staggered) ---------- */
