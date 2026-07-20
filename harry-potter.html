@@ -3,379 +3,419 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚡ แฮร์รี่ พอตเตอร์ กับศิลาอาถรรพ์ — พรีเซนเทชัน</title>
+<title>⚡ แฮร์รี่ พอตเตอร์ กับศิลาอาถรรพ์ — Presentation</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&family=Playfair+Display:wght@700;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap');
   :root {
-    --bg0:#0a0c1a;
-    --bg1:#131735;
+    --bg0:#08091a;
+    --bg1:#10132e;
     --card:rgba(255,255,255,.05);
-    --card-border:rgba(255,213,79,.18);
+    --card-border:rgba(255,213,79,.16);
     --gold:#ffd54f;
     --gold-dim:#c9a13b;
     --text:#eef1fb;
-    --muted:#9aa3c7;
-    --red:#ae2334;
-    --green:#1f6d43;
-    --blue:#2a5c9e;
-    --yellow:#b8860b;
+    --muted:#98a1c8;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  html, body { height:100%; }
+  html { scroll-behavior:smooth; }
   body {
     font-family:"Noto Sans Thai","Segoe UI",sans-serif;
-    background:radial-gradient(ellipse at 50% -20%, #1c2150 0%, var(--bg0) 60%);
-    color:var(--text);
-    overflow:hidden;
+    background:var(--bg0); color:var(--text);
+    overflow-x:hidden;
   }
+  ::selection { background:rgba(255,213,79,.35); }
 
-  /* ===== starfield ===== */
+  /* ================= fixed layers ================= */
   .stars { position:fixed; inset:0; pointer-events:none; z-index:0; }
-  .star {
-    position:absolute; border-radius:50%; background:#fff;
-    animation:twinkle var(--d,3s) ease-in-out infinite;
-    opacity:.6;
-  }
-  @keyframes twinkle {
-    0%,100% { opacity:.15; transform:scale(.8); }
-    50%     { opacity:.85; transform:scale(1.15); }
-  }
-  .bg-blob { position:fixed; border-radius:50%; filter:blur(120px); opacity:.4; pointer-events:none; z-index:0; }
-  .b1 { width:560px; height:560px; background:#3a2a7a; top:-180px; left:-140px; }
-  .b2 { width:520px; height:520px; background:#5a3a0e; bottom:-190px; right:-120px; }
+  .star { position:absolute; border-radius:50%; background:#fff; animation:twinkle var(--d,3s) ease-in-out infinite; }
+  @keyframes twinkle { 0%,100%{opacity:.12; transform:scale(.7)} 50%{opacity:.8; transform:scale(1.2)} }
 
-  /* ===== deck ===== */
-  .deck { position:relative; z-index:1; height:100%; }
-  .slide {
-    position:absolute; inset:0;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    padding:56px 6vw 96px;
-    opacity:0; visibility:hidden; transform:translateX(40px) scale(.985);
-    transition:opacity .45s ease, transform .45s ease, visibility .45s;
-    overflow-y:auto;
-  }
-  .slide.active { opacity:1; visibility:visible; transform:translateX(0) scale(1); }
-  .slide.prev   { transform:translateX(-40px) scale(.985); }
+  .bg-blob { position:fixed; border-radius:50%; filter:blur(130px); opacity:.38; pointer-events:none; z-index:0; }
+  .b1 { width:600px; height:600px; background:#37246e; top:-200px; left:-160px; }
+  .b2 { width:540px; height:540px; background:#5a3a0e; bottom:-200px; right:-140px; }
 
-  .kicker {
-    color:var(--gold); letter-spacing:.35em; text-transform:uppercase;
-    font-size:.78rem; font-weight:600; margin-bottom:14px;
+  .progress { position:fixed; top:0; left:0; height:3px; width:0; z-index:50;
+    background:linear-gradient(90deg,var(--gold),#ff8a65); box-shadow:0 0 14px rgba(255,213,79,.7); }
+
+  .side-text {
+    position:fixed; left:18px; top:50%; z-index:40;
+    transform:translateY(-50%) rotate(180deg); writing-mode:vertical-rl;
+    font-size:.68rem; letter-spacing:.42em; color:rgba(255,255,255,.28);
+    text-transform:uppercase; pointer-events:none; white-space:nowrap;
   }
-  h1 {
-    font-family:"Playfair Display","Noto Sans Thai",serif;
-    font-size:clamp(2.2rem, 5.4vw, 4.2rem); font-weight:900; text-align:center; line-height:1.15;
-    background:linear-gradient(180deg,#fff6d8 15%, var(--gold) 55%, #8a6a1c 100%);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    filter:drop-shadow(0 4px 22px rgba(255,213,79,.25));
+  .side-text.right { left:auto; right:18px; transform:translateY(-50%); }
+  @media (max-width:760px){ .side-text{ display:none; } }
+
+  /* golden snitch */
+  #snitch { position:fixed; z-index:45; width:26px; height:26px; pointer-events:none; will-change:transform; filter:drop-shadow(0 0 10px rgba(255,213,79,.8)); }
+  #snitch .ball { position:absolute; inset:4px; border-radius:50%;
+    background:radial-gradient(circle at 34% 30%, #fff3c4, #ffd54f 45%, #8a6a1c); }
+  #snitch .wing { position:absolute; top:7px; width:16px; height:9px; border-radius:100% 0 60% 40%;
+    background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.25));
+    transform-origin:right center; animation:flapL .18s ease-in-out infinite alternate; }
+  #snitch .wing.r { left:auto; right:-12px; left:auto; transform-origin:left center; border-radius:0 100% 40% 60%; animation-name:flapR; }
+  #snitch .wing.l { left:-12px; }
+  @keyframes flapL { from{transform:rotate(18deg)} to{transform:rotate(-32deg)} }
+  @keyframes flapR { from{transform:rotate(-18deg) scaleX(-1)} to{transform:rotate(32deg) scaleX(-1)} }
+
+  /* sparkle cursor trail */
+  .spark { position:fixed; z-index:60; pointer-events:none; color:var(--gold); font-size:11px; animation:sparkfade .8s ease-out forwards; }
+  @keyframes sparkfade { from{opacity:1; transform:translateY(0) scale(1)} to{opacity:0; transform:translateY(-26px) scale(.3)} }
+
+  /* ================= shared ================= */
+  section { position:relative; z-index:2; padding:15vh 7vw; max-width:1200px; margin:0 auto; }
+  .sec-tag {
+    display:flex; align-items:center; gap:14px; margin-bottom:14px;
+    color:var(--gold); font-size:.8rem; letter-spacing:.3em; text-transform:uppercase; font-weight:600;
   }
+  .sec-tag::after { content:""; height:1px; width:90px; background:linear-gradient(90deg,var(--gold),transparent); }
+  .sec-num { font-family:"Playfair Display",serif; font-style:italic; opacity:.9; }
   h2 {
-    font-size:clamp(1.5rem, 3.2vw, 2.3rem); font-weight:800; margin-bottom:26px; text-align:center;
-    background:linear-gradient(90deg,#fff2c9,var(--gold));
+    font-size:clamp(1.9rem, 4.6vw, 3.4rem); font-weight:800; line-height:1.2; margin-bottom:34px;
+    background:linear-gradient(90deg,#fff2c9,var(--gold) 70%);
     -webkit-background-clip:text; background-clip:text; color:transparent;
   }
-  h2 .emoji { -webkit-text-fill-color:initial; margin-right:10px; }
-  .lead { color:var(--muted); font-size:clamp(.95rem, 1.6vw, 1.15rem); text-align:center; max-width:760px; line-height:1.9; }
-
-  .divider {
-    width:180px; height:2px; margin:22px auto;
-    background:linear-gradient(90deg,transparent,var(--gold),transparent);
-    position:relative;
-  }
-  .divider::after {
-    content:"⚡"; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-    background:var(--bg0); padding:0 10px; color:var(--gold); font-size:.9rem;
+  .ghost {
+    position:absolute; top:6vh; right:2vw; z-index:-1;
+    font-family:"Playfair Display",serif; font-weight:900; font-size:clamp(4rem,14vw,11rem);
+    color:transparent; -webkit-text-stroke:1px rgba(255,213,79,.12); letter-spacing:.02em;
+    user-select:none; white-space:nowrap;
   }
 
-  /* ===== cards / grids ===== */
-  .grid { display:grid; gap:16px; width:100%; max-width:1040px; }
+  /* reveal-on-scroll */
+  .reveal { opacity:0; transform:translateY(52px) rotate(var(--r,0deg)) scale(.97); will-change:transform,opacity;
+    transition:opacity .85s cubic-bezier(.2,.7,.2,1), transform .85s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in { opacity:1; transform:none; }
+
+  /* parallax items */
+  .px { will-change:transform; }
+  .floaty { position:absolute; z-index:1; pointer-events:none; user-select:none;
+    animation:bob var(--d,6s) ease-in-out infinite; }
+  @keyframes bob { 0%,100%{transform:translateY(0) rotate(var(--rot,0deg))} 50%{transform:translateY(-20px) rotate(calc(var(--rot,0deg) + 6deg))} }
+
+  .card {
+    background:var(--card); border:1px solid var(--card-border); border-radius:18px;
+    padding:24px 26px; backdrop-filter:blur(6px);
+    transition:box-shadow .25s, border-color .25s;
+  }
+  .tilt { transform-style:preserve-3d; transition:transform .18s ease-out, box-shadow .25s; }
+  .tilt:hover { box-shadow:0 24px 50px -22px rgba(255,213,79,.4); border-color:rgba(255,213,79,.45); }
+  .tilt > * { transform:translateZ(28px); }
+
+  .grid { display:grid; gap:18px; }
   .g2 { grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); }
   .g3 { grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
   .g4 { grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
-  .card {
-    background:var(--card); border:1px solid var(--card-border); border-radius:16px;
-    padding:20px 22px; backdrop-filter:blur(6px);
-    transition:transform .2s, box-shadow .2s;
+
+  /* ================= hero ================= */
+  .hero { min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; max-width:none; padding:0 6vw; }
+  .hero .kicker { color:var(--gold); letter-spacing:.45em; font-size:clamp(.65rem,1.4vw,.85rem); text-transform:uppercase; font-weight:600; margin-bottom:22px; overflow:hidden; }
+  .hero h1 {
+    font-size:clamp(2.6rem, 8vw, 6.2rem); font-weight:800; line-height:1.12;
+    filter:drop-shadow(0 6px 30px rgba(255,213,79,.28));
   }
-  .card:hover { transform:translateY(-4px); box-shadow:0 14px 34px -18px rgba(255,213,79,.35); }
-  .card .icon { font-size:2rem; margin-bottom:10px; display:block; }
-  .card h3 { color:var(--gold); font-size:1.05rem; margin-bottom:6px; font-weight:700; }
-  .card .en { color:var(--muted); font-size:.8rem; font-weight:600; letter-spacing:.04em; margin-bottom:8px; }
-  .card p { color:#cdd4ee; font-size:.9rem; line-height:1.75; }
+  .hero h1 .word { display:inline-block; overflow:hidden; vertical-align:bottom; padding-bottom:.08em; }
+  .hero h1 .word span {
+    display:inline-block; transform:translateY(110%);
+    animation:riseup 1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:var(--dl,0s);
+    background:linear-gradient(180deg,#fff6d8 10%, var(--gold) 55%, #8a6a1c 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  @keyframes riseup { to{ transform:translateY(0);} }
+  .hero .sub { color:var(--muted); margin-top:26px; font-size:clamp(.9rem,1.8vw,1.15rem); line-height:2; opacity:0; animation:fadein 1s ease .9s forwards; }
+  @keyframes fadein { to{opacity:1} }
+  .scroll-cue { position:absolute; bottom:34px; left:50%; transform:translateX(-50%); color:var(--muted); font-size:.75rem; letter-spacing:.25em; animation:cue 2s ease-in-out infinite; }
+  @keyframes cue { 0%,100%{transform:translate(-50%,0); opacity:.5} 50%{transform:translate(-50%,10px); opacity:1} }
 
-  /* info rows (slide 2) */
-  .info-row { display:flex; align-items:baseline; gap:12px; padding:11px 0; border-bottom:1px dashed rgba(255,255,255,.1); }
+  /* ================= marquee ================= */
+  .marquee { position:relative; z-index:2; border-top:1px solid var(--card-border); border-bottom:1px solid var(--card-border);
+    padding:16px 0; overflow:hidden; background:rgba(255,213,79,.04); transform:rotate(-1.2deg) scale(1.02); }
+  .marquee .track { display:flex; gap:48px; width:max-content; animation:mq 26s linear infinite; }
+  .marquee span { font-family:"Playfair Display",serif; font-style:italic; font-weight:700;
+    font-size:clamp(1rem,2.4vw,1.5rem); color:rgba(255,229,143,.85); white-space:nowrap; letter-spacing:.06em; }
+  @keyframes mq { to{ transform:translateX(-50%);} }
+
+  /* ================= info ================= */
+  .info-wrap { display:grid; grid-template-columns:1fr 1.2fr; gap:44px; align-items:center; }
+  @media (max-width:860px){ .info-wrap{ grid-template-columns:1fr; } }
+  .poster {
+    aspect-ratio:2/3; max-width:330px; margin:0 auto; width:100%;
+    border-radius:20px; position:relative; overflow:hidden;
+    background:linear-gradient(160deg,#1c2150,#0d0f24 60%);
+    border:1px solid rgba(255,213,79,.35);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    box-shadow:0 30px 70px -30px rgba(0,0,0,.9);
+  }
+  .poster .glint { position:absolute; inset:-60%; background:linear-gradient(115deg,transparent 42%,rgba(255,246,214,.16) 50%,transparent 58%); animation:glint 4.5s ease-in-out infinite; }
+  @keyframes glint { 0%,100%{transform:translateX(-45%)} 55%,70%{transform:translateX(45%)} }
+  .poster .bolt { font-size:5rem; filter:drop-shadow(0 0 24px rgba(255,213,79,.7)); }
+  .poster .pt { font-family:"Playfair Display",serif; font-weight:900; text-align:center; line-height:1.3; font-size:1.3rem; color:#ffe9a8; padding:0 20px; }
+  .poster .py { color:var(--muted); letter-spacing:.4em; font-size:.75rem; }
+  .info-row { display:flex; gap:12px; padding:11px 0; border-bottom:1px dashed rgba(255,255,255,.1); align-items:baseline; }
   .info-row:last-child { border-bottom:none; }
-  .info-row .k { color:var(--gold); font-weight:700; min-width:150px; font-size:.92rem; }
-  .info-row .v { color:#d7ddf4; font-size:.95rem; line-height:1.7; }
+  .info-row .k { color:var(--gold); font-weight:700; min-width:130px; font-size:.9rem; flex-shrink:0; }
+  .info-row .v { color:#d7ddf4; font-size:.94rem; line-height:1.7; }
 
-  /* houses */
-  .house { border-top:4px solid var(--hc,#888); text-align:center; }
-  .house .crest { font-size:2.4rem; display:block; margin-bottom:8px; }
-  .house h3 { color:var(--hc); }
+  /* ================= synopsis ================= */
+  .syn p { font-size:clamp(1.05rem, 2vw, 1.35rem); line-height:2.1; color:#cdd4ee; max-width:850px; margin-bottom:30px; }
+  .syn strong { color:var(--gold); font-weight:700; }
+
+  /* ================= characters ================= */
+  .char-card { text-align:center; }
+  .char-card .icon { font-size:3rem; display:block; margin-bottom:12px; animation:bob var(--d,5s) ease-in-out infinite; }
+  .char-card h3 { color:var(--gold); font-size:1.1rem; margin-bottom:4px; font-weight:700; }
+  .char-card .en { color:var(--muted); font-size:.78rem; letter-spacing:.06em; margin-bottom:10px; font-weight:600; }
+  .char-card p { color:#cdd4ee; font-size:.9rem; line-height:1.8; }
+  .mini h3 { color:var(--gold); font-size:1rem; margin-bottom:6px; }
+  .mini .icon { font-size:1.9rem; display:block; margin-bottom:8px; }
+  .mini p { color:#c3cae6; font-size:.86rem; line-height:1.75; }
+
+  /* ================= houses ================= */
+  .house { border-top:4px solid var(--hc,#888); text-align:center; cursor:default; position:relative; overflow:hidden; }
+  .house::after { content:""; position:absolute; inset:0; background:radial-gradient(circle at 50% 0%, var(--hc), transparent 70%); opacity:0; transition:opacity .3s; pointer-events:none; }
+  .house:hover::after { opacity:.14; }
+  .house .crest { font-size:2.6rem; display:block; margin-bottom:10px; transition:transform .3s; }
+  .house:hover .crest { transform:scale(1.25) rotate(-6deg); }
+  .house h3 { color:var(--hc); margin-bottom:6px; }
   .house .trait { color:#cdd4ee; font-size:.86rem; line-height:1.7; }
 
-  /* timeline (slide ฉากเด่น) */
-  .timeline { max-width:860px; width:100%; }
-  .tl-item { display:flex; gap:18px; padding:13px 0; align-items:flex-start; }
-  .tl-num {
-    flex-shrink:0; width:38px; height:38px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    background:rgba(255,213,79,.12); border:1px solid var(--gold-dim);
-    color:var(--gold); font-weight:800; font-size:.95rem;
-  }
-  .tl-body h3 { color:#ffe9a8; font-size:1rem; margin-bottom:3px; }
-  .tl-body p { color:var(--muted); font-size:.88rem; line-height:1.7; }
+  /* ================= timeline ================= */
+  .tl { position:relative; max-width:820px; padding-left:44px; }
+  .tl-line { position:absolute; left:18px; top:0; bottom:0; width:2px; background:rgba(255,255,255,.09); }
+  .tl-line i { position:absolute; left:0; top:0; width:100%; height:100%; background:linear-gradient(180deg,var(--gold),#ff8a65);
+    transform-origin:top; transform:scaleY(0); box-shadow:0 0 10px rgba(255,213,79,.6); }
+  .tl-item { position:relative; padding:16px 0 16px 16px; }
+  .tl-item::before { content:""; position:absolute; left:-33px; top:26px; width:12px; height:12px; border-radius:50%;
+    background:var(--bg0); border:2px solid var(--gold); box-shadow:0 0 10px rgba(255,213,79,.55); }
+  .tl-item h3 { color:#ffe9a8; font-size:1.05rem; margin-bottom:4px; }
+  .tl-item p { color:var(--muted); font-size:.9rem; line-height:1.8; max-width:640px; }
 
-  /* stats */
+  /* ================= stats ================= */
   .stat { text-align:center; }
-  .stat .num {
-    font-family:"Playfair Display",serif; font-size:clamp(1.7rem,3.4vw,2.6rem); font-weight:900;
-    color:var(--gold); text-shadow:0 0 26px rgba(255,213,79,.4);
-  }
-  .stat .lbl { color:var(--muted); font-size:.85rem; margin-top:6px; line-height:1.5; }
+  .stat .num { font-family:"Playfair Display",serif; font-size:clamp(2rem,4.4vw,3.2rem); font-weight:900;
+    color:var(--gold); text-shadow:0 0 30px rgba(255,213,79,.45); font-variant-numeric:tabular-nums; }
+  .stat .lbl { color:var(--muted); font-size:.86rem; margin-top:8px; line-height:1.6; }
 
-  /* quote */
-  blockquote {
-    max-width:780px; text-align:center; font-size:clamp(1.1rem,2.2vw,1.5rem);
-    line-height:1.9; color:#f2e9c8; font-weight:600; position:relative; padding:0 30px;
-  }
-  blockquote::before, blockquote::after { color:var(--gold-dim); font-size:2.6rem; font-family:serif; position:absolute; }
-  blockquote::before { content:"“"; left:-6px; top:-18px; }
-  blockquote::after  { content:"”"; right:-6px; bottom:-34px; }
-  .quote-by { color:var(--muted); margin-top:30px; font-size:.9rem; }
-
-  ul.bullets { max-width:820px; list-style:none; }
-  ul.bullets li {
-    padding:11px 0 11px 36px; position:relative; color:#d7ddf4; line-height:1.8; font-size:.98rem;
-    border-bottom:1px dashed rgba(255,255,255,.08);
-  }
+  ul.bullets { list-style:none; max-width:840px; }
+  ul.bullets li { padding:13px 0 13px 36px; position:relative; color:#d7ddf4; line-height:1.85; font-size:.97rem;
+    border-bottom:1px dashed rgba(255,255,255,.08); }
   ul.bullets li:last-child { border-bottom:none; }
   ul.bullets li::before { content:"✦"; position:absolute; left:8px; color:var(--gold); }
+  ul.bullets strong { color:var(--gold); }
 
-  /* ===== nav ===== */
-  .navbar {
-    position:fixed; bottom:0; left:0; right:0; z-index:5;
-    display:flex; align-items:center; justify-content:center; gap:18px;
-    padding:14px 20px 18px;
-    background:linear-gradient(180deg,transparent, rgba(6,8,18,.85) 45%);
-  }
-  .nav-btn {
-    width:44px; height:44px; border-radius:50%; border:1px solid var(--card-border);
-    background:var(--card); color:var(--gold); font-size:1.15rem; cursor:pointer;
-    transition:all .18s; backdrop-filter:blur(6px);
-  }
-  .nav-btn:hover:not(:disabled) { background:rgba(255,213,79,.15); transform:scale(1.08); }
-  .nav-btn:disabled { opacity:.25; cursor:default; }
-  .dots { display:flex; gap:7px; }
-  .dot {
-    width:9px; height:9px; border-radius:50%; background:rgba(255,255,255,.18);
-    cursor:pointer; transition:all .2s; border:none; padding:0;
-  }
-  .dot:hover { background:rgba(255,255,255,.45); }
-  .dot.on { background:var(--gold); box-shadow:0 0 10px var(--gold); transform:scale(1.25); }
-  .counter { color:var(--muted); font-size:.8rem; min-width:52px; text-align:center; font-variant-numeric:tabular-nums; }
+  /* ================= quote ================= */
+  .quote-sec { text-align:center; max-width:900px; }
+  blockquote { font-family:"Playfair Display","Noto Sans Thai",serif; font-size:clamp(1.4rem,3.4vw,2.4rem); font-weight:700;
+    line-height:1.8; color:#f2e9c8; position:relative; padding:0 24px; }
+  blockquote::before { content:"“"; position:absolute; left:-14px; top:-40px; font-size:5rem; color:rgba(255,213,79,.25); }
+  .quote-by { color:var(--muted); margin-top:28px; font-size:.92rem; letter-spacing:.08em; }
 
-  .progress { position:fixed; top:0; left:0; height:3px; z-index:6; background:linear-gradient(90deg,var(--gold),#ff8a65); transition:width .4s ease; box-shadow:0 0 12px rgba(255,213,79,.6); }
+  /* ================= outro ================= */
+  .outro { min-height:90vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  .outro h2 { font-size:clamp(2.4rem,6.5vw,4.6rem); }
+  .outro .sub { color:var(--muted); line-height:2; }
+  .back-top { margin-top:36px; display:inline-block; padding:13px 34px; border-radius:99px;
+    border:1px solid var(--card-border); color:var(--gold); text-decoration:none; font-weight:600; font-size:.9rem;
+    background:var(--card); transition:all .25s; }
+  .back-top:hover { background:rgba(255,213,79,.14); transform:translateY(-3px); box-shadow:0 14px 30px -14px rgba(255,213,79,.5); }
 
-  .hint { position:fixed; top:14px; right:18px; z-index:5; color:var(--muted); font-size:.74rem; opacity:.75; }
-
-  .float { animation:float 5s ease-in-out infinite; display:inline-block; }
-  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
-
-  @media (max-width:640px) {
-    .slide { padding:40px 5vw 96px; justify-content:flex-start; }
-    .info-row { flex-direction:column; gap:2px; }
-    .dots { display:none; }
-  }
+  footer { position:relative; z-index:2; text-align:center; color:rgba(255,255,255,.25); font-size:.75rem; padding:26px 0 34px; letter-spacing:.15em; }
 </style>
 </head>
 <body>
 
 <div class="stars" id="stars"></div>
-<div class="bg-blob b1"></div>
-<div class="bg-blob b2"></div>
+<div class="bg-blob b1 px" data-speed="-0.06"></div>
+<div class="bg-blob b2 px" data-speed="0.05"></div>
 <div class="progress" id="progress"></div>
-<div class="hint">← → เลื่อนสไลด์</div>
+<div class="side-text">Hogwarts School of Witchcraft &amp; Wizardry</div>
+<div class="side-text right">Harry Potter · The Philosopher's Stone · 2001</div>
 
-<div class="deck" id="deck">
+<div id="snitch"><span class="wing l"></span><span class="ball"></span><span class="wing r"></span></div>
 
-  <!-- 1: Title -->
-  <section class="slide active">
-    <div class="float" style="font-size:4rem; margin-bottom:18px;">🪄</div>
-    <div class="kicker">Movie Presentation · 2001</div>
-    <h1>แฮร์รี่ พอตเตอร์<br>กับศิลาอาถรรพ์</h1>
-    <div class="divider"></div>
-    <p class="lead">Harry Potter and the Philosopher's Stone<br>
-    จุดเริ่มต้นของตำนานพ่อมดน้อยที่ครองใจผู้ชมทั่วโลกมากว่าสองทศวรรษ</p>
-  </section>
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="floaty px" data-speed="0.22" style="top:16%; left:10%; font-size:2.6rem; --d:7s; --rot:-14deg;">✉️</div>
+  <div class="floaty px" data-speed="0.3"  style="top:24%; right:12%; font-size:2rem; --d:5.5s; --rot:10deg;">✉️</div>
+  <div class="floaty px" data-speed="0.16" style="bottom:22%; left:16%; font-size:2.2rem; --d:6.5s; --rot:8deg;">🧹</div>
+  <div class="floaty px" data-speed="0.26" style="bottom:26%; right:16%; font-size:2.1rem; --d:6s; --rot:-8deg;">🧪</div>
+  <div class="floaty px" data-speed="0.36" style="top:52%; left:6%; font-size:1.7rem; --d:8s; --rot:16deg;">🕯️</div>
+  <div class="floaty px" data-speed="0.4"  style="top:60%; right:7%; font-size:1.8rem; --d:7.5s; --rot:-12deg;">🦉</div>
 
-  <!-- 2: ข้อมูลทั่วไป -->
-  <section class="slide">
-    <h2><span class="emoji">🎬</span>ข้อมูลทั่วไปของภาพยนตร์</h2>
-    <div class="card" style="max-width:760px; width:100%;">
+  <div class="kicker">Movie Presentation · Warner Bros. 2001</div>
+  <h1>
+    <span class="word"><span style="--dl:.05s">แฮร์รี่</span></span>
+    <span class="word"><span style="--dl:.18s">พอตเตอร์</span></span><br>
+    <span class="word"><span style="--dl:.34s">กับศิลาอาถรรพ์</span></span>
+  </h1>
+  <p class="sub">Harry Potter and the Philosopher's Stone<br>จุดเริ่มต้นของตำนานพ่อมดน้อยที่ครองใจผู้ชมทั่วโลกมากว่าสองทศวรรษ</p>
+  <div class="scroll-cue">SCROLL ↓</div>
+</section>
+
+<!-- ============ MARQUEE ============ -->
+<div class="marquee"><div class="track" id="mq1"></div></div>
+
+<!-- ============ 01 INFO ============ -->
+<section>
+  <div class="ghost px" data-speed="0.1">FILM</div>
+  <div class="sec-tag reveal"><span class="sec-num">#01</span> About the film</div>
+  <h2 class="reveal">ข้อมูลทั่วไปของภาพยนตร์</h2>
+  <div class="info-wrap">
+    <div class="reveal" style="--r:-3deg;">
+      <div class="poster tilt px" data-speed="0.06">
+        <div class="glint"></div>
+        <span class="bolt">⚡</span>
+        <div class="pt">HARRY POTTER<br><span style="font-size:.8rem; letter-spacing:.2em; color:var(--muted);">AND THE</span><br>PHILOSOPHER'S STONE</div>
+        <div class="py">— 2001 —</div>
+      </div>
+    </div>
+    <div class="card reveal" style="--r:2deg;">
       <div class="info-row"><span class="k">ชื่อไทย</span><span class="v">แฮร์รี่ พอตเตอร์ กับศิลาอาถรรพ์</span></div>
       <div class="info-row"><span class="k">ชื่ออังกฤษ</span><span class="v">Harry Potter and the Philosopher's Stone (สหรัฐฯ ใช้ชื่อ Sorcerer's Stone)</span></div>
       <div class="info-row"><span class="k">เข้าฉาย</span><span class="v">พฤศจิกายน ค.ศ. 2001 (พ.ศ. 2544)</span></div>
       <div class="info-row"><span class="k">ผู้กำกับ</span><span class="v">คริส โคลัมบัส (Chris Columbus)</span></div>
-      <div class="info-row"><span class="k">ดัดแปลงจาก</span><span class="v">นิยายเล่มแรกของ เจ. เค. โรว์ลิง (J.K. Rowling) ตีพิมพ์ปี 1997</span></div>
+      <div class="info-row"><span class="k">ดัดแปลงจาก</span><span class="v">นิยายเล่มแรกของ เจ. เค. โรว์ลิง ตีพิมพ์ปี 1997</span></div>
       <div class="info-row"><span class="k">ความยาว</span><span class="v">ประมาณ 152 นาที</span></div>
       <div class="info-row"><span class="k">แนว</span><span class="v">แฟนตาซี / ผจญภัย / ครอบครัว</span></div>
-      <div class="info-row"><span class="k">ค่ายหนัง</span><span class="v">Warner Bros. Pictures</span></div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- 3: เรื่องย่อ -->
-  <section class="slide">
-    <h2><span class="emoji">📜</span>เรื่องย่อ</h2>
-    <div class="card" style="max-width:820px;">
-      <p style="font-size:1rem; line-height:2;">
-        <strong style="color:var(--gold);">แฮร์รี่ พอตเตอร์</strong> เด็กกำพร้าที่ถูกเลี้ยงดูอย่างไร้ความรักโดยครอบครัวเดอร์สลีย์
-        ได้ค้นพบในวันเกิดอายุ 11 ปีว่าแท้จริงแล้วเขาคือ <strong style="color:var(--gold);">พ่อมด</strong>
-        และเป็นตำนานของโลกเวทมนตร์ในฐานะ "เด็กชายผู้รอดชีวิต" จากคำสาปของจอมมารโวลเดอมอร์
-        <br><br>
-        แฮร์รี่เดินทางสู่ <strong style="color:var(--gold);">โรงเรียนคาถาพ่อมดแม่มดฮอกวอตส์</strong>
-        ที่ซึ่งเขาได้พบเพื่อนแท้อย่างรอนและเฮอร์ไมโอนี่ ได้เรียนรู้เวทมนตร์ เล่นกีฬาควิดดิช
-        และค้นพบความลับเกี่ยวกับ <strong style="color:var(--gold);">ศิลาอาถรรพ์</strong> —
-        หินวิเศษที่มอบชีวิตอมตะ ซึ่งจอมมารผู้ไร้ชีวิตกำลังตามล่าเพื่อกลับคืนสู่อำนาจอีกครั้ง
-        ทั้งสามคนจึงต้องร่วมมือกันปกป้องศิลาก่อนที่ทุกอย่างจะสายเกินไป
-      </p>
-    </div>
-  </section>
+<!-- ============ 02 SYNOPSIS ============ -->
+<section class="syn">
+  <div class="ghost px" data-speed="0.12">STORY</div>
+  <div class="floaty px" data-speed="0.3" style="top:12%; right:6%; font-size:2.4rem; --d:7s; --rot:12deg;">🪄</div>
+  <div class="sec-tag reveal"><span class="sec-num">#02</span> Synopsis</div>
+  <h2 class="reveal">เรื่องย่อ</h2>
+  <p class="reveal"><strong>แฮร์รี่ พอตเตอร์</strong> เด็กกำพร้าที่ถูกเลี้ยงดูอย่างไร้ความรักโดยครอบครัวเดอร์สลีย์ ค้นพบในวันเกิดอายุ 11 ปีว่าแท้จริงแล้วเขาคือ <strong>พ่อมด</strong> และเป็นตำนานของโลกเวทมนตร์ในฐานะ "เด็กชายผู้รอดชีวิต" จากคำสาปของจอมมารโวลเดอมอร์</p>
+  <p class="reveal">เขาเดินทางสู่ <strong>โรงเรียนคาถาพ่อมดแม่มดฮอกวอตส์</strong> ได้พบเพื่อนแท้อย่างรอนและเฮอร์ไมโอนี่ ได้เรียนรู้เวทมนตร์ เล่นกีฬาควิดดิช และค้นพบความลับของ <strong>ศิลาอาถรรพ์</strong> — หินวิเศษที่มอบชีวิตอมตะ ซึ่งจอมมารไร้ร่างกำลังตามล่าเพื่อกลับคืนสู่อำนาจ</p>
+  <p class="reveal">สามสหายจึงต้องฝ่าด่านพิทักษ์สุดอันตราย เพื่อปกป้องศิลา…ก่อนที่ทุกอย่างจะสายเกินไป</p>
+</section>
 
-  <!-- 4: ตัวละครหลัก -->
-  <section class="slide">
-    <h2><span class="emoji">⚡</span>สามผู้กล้าแห่งกริฟฟินดอร์</h2>
-    <div class="grid g3">
-      <div class="card" style="text-align:center;">
-        <span class="icon">🧙‍♂️</span>
-        <h3>แฮร์รี่ พอตเตอร์</h3>
-        <div class="en">Daniel Radcliffe</div>
-        <p>เด็กชายผู้รอดชีวิต เจ้าของแผลเป็นรูปสายฟ้า กล้าหาญ มีน้ำใจ และพร้อมเสียสละเพื่อคนที่เขารัก</p>
-      </div>
-      <div class="card" style="text-align:center;">
-        <span class="icon">🐀</span>
-        <h3>รอน วีสลีย์</h3>
-        <div class="en">Rupert Grint</div>
-        <p>เพื่อนแท้คนแรกของแฮร์รี่ จากครอบครัวพ่อมดแท้ อารมณ์ขัน ซื่อสัตย์ และเก่งหมากรุกพ่อมดที่สุดในรุ่น</p>
-      </div>
-      <div class="card" style="text-align:center;">
-        <span class="icon">📚</span>
-        <h3>เฮอร์ไมโอนี่ เกรนเจอร์</h3>
-        <div class="en">Emma Watson</div>
-        <p>แม่มดสาวหัวใสจากครอบครัวมักเกิ้ล ฉลาดที่สุดในรุ่น ความรู้ของเธอช่วยชีวิตเพื่อนไว้หลายครั้ง</p>
-      </div>
-    </div>
-  </section>
+<!-- ============ 03 CHARACTERS ============ -->
+<section>
+  <div class="ghost px" data-speed="0.1">CAST</div>
+  <div class="sec-tag reveal"><span class="sec-num">#03</span> Characters</div>
+  <h2 class="reveal">สามผู้กล้าแห่งกริฟฟินดอร์</h2>
+  <div class="grid g3 stagger">
+    <div class="card char-card tilt reveal" style="--r:-2deg;"><span class="icon" style="--d:5s;">🧙‍♂️</span><h3>แฮร์รี่ พอตเตอร์</h3><div class="en">DANIEL RADCLIFFE</div><p>เด็กชายผู้รอดชีวิต เจ้าของแผลเป็นรูปสายฟ้า กล้าหาญ มีน้ำใจ และพร้อมเสียสละเพื่อคนที่เขารัก</p></div>
+    <div class="card char-card tilt reveal"><span class="icon" style="--d:6s;">🐀</span><h3>รอน วีสลีย์</h3><div class="en">RUPERT GRINT</div><p>เพื่อนแท้คนแรกของแฮร์รี่ จากครอบครัวพ่อมดแท้ อารมณ์ขัน ซื่อสัตย์ และเก่งหมากรุกพ่อมดที่สุดในรุ่น</p></div>
+    <div class="card char-card tilt reveal" style="--r:2deg;"><span class="icon" style="--d:5.5s;">📚</span><h3>เฮอร์ไมโอนี่ เกรนเจอร์</h3><div class="en">EMMA WATSON</div><p>แม่มดสาวหัวใสจากครอบครัวมักเกิ้ล ฉลาดที่สุดในรุ่น ความรู้ของเธอช่วยชีวิตเพื่อนไว้หลายครั้ง</p></div>
+  </div>
+  <div style="height:34px;"></div>
+  <div class="grid g3 stagger">
+    <div class="card mini tilt reveal"><span class="icon">🦉</span><h3>อัลบัส ดัมเบิลดอร์</h3><p>อาจารย์ใหญ่ฮอกวอตส์ พ่อมดผู้ยิ่งใหญ่ที่สุดแห่งยุค ผู้คอยชี้ทางให้แฮร์รี่อย่างอบอุ่นและลึกซึ้ง</p></div>
+    <div class="card mini tilt reveal"><span class="icon">🐈</span><h3>มิเนอร์วา มักกอนนากัล</h3><p>รองอาจารย์ใหญ่ หัวหน้าบ้านกริฟฟินดอร์ เข้มงวดแต่ยุติธรรม แปลงร่างเป็นแมวได้</p></div>
+    <div class="card mini tilt reveal"><span class="icon">🧪</span><h3>เซเวอรัส สเนป</h3><p>อาจารย์ปรุงยาผู้ลึกลับ ดูเป็นวายร้ายตลอดเรื่อง แต่ความจริงซับซ้อนกว่าที่เห็น</p></div>
+    <div class="card mini tilt reveal"><span class="icon">🌂</span><h3>รูเบอัส แฮกริด</h3><p>ผู้รักษากุญแจแห่งฮอกวอตส์ ร่างยักษ์ใจดี ผู้พาแฮร์รี่เข้าสู่โลกเวทมนตร์เป็นคนแรก</p></div>
+    <div class="card mini tilt reveal"><span class="icon">🐍</span><h3>เดรโก มัลฟอย</h3><p>คู่ปรับจากบ้านสลิธีริน หยิ่งในชาติกำเนิด คอยหาเรื่องแฮร์รี่และผองเพื่อนตลอดปี</p></div>
+    <div class="card mini tilt reveal"><span class="icon">💀</span><h3>ลอร์ดโวลเดอมอร์</h3><p>จอมมารผู้สังหารพ่อแม่ของแฮร์รี่ สิงร่างศาสตราจารย์ควีเรลล์เพื่อชิงศิลาอาถรรพ์</p></div>
+  </div>
+</section>
 
-  <!-- 5: ตัวละครสำคัญ -->
-  <section class="slide">
-    <h2><span class="emoji">🏰</span>ตัวละครสำคัญอื่น ๆ</h2>
-    <div class="grid g3">
-      <div class="card"><span class="icon">🦉</span><h3>อัลบัส ดัมเบิลดอร์</h3><p>อาจารย์ใหญ่ฮอกวอตส์ พ่อมดผู้ยิ่งใหญ่ที่สุดแห่งยุค ผู้คอยชี้ทางให้แฮร์รี่อย่างอบอุ่นและลึกซึ้ง</p></div>
-      <div class="card"><span class="icon">🐈</span><h3>มิเนอร์วา มักกอนนากัล</h3><p>รองอาจารย์ใหญ่และหัวหน้าบ้านกริฟฟินดอร์ เข้มงวดแต่ยุติธรรม แปลงร่างเป็นแมวได้</p></div>
-      <div class="card"><span class="icon">🧪</span><h3>เซเวอรัส สเนป</h3><p>อาจารย์วิชาปรุงยาผู้ลึกลับ ดูเป็นวายร้ายตลอดเรื่อง แต่ความจริงกลับซับซ้อนกว่าที่เห็น</p></div>
-      <div class="card"><span class="icon">🌂</span><h3>รูเบอัส แฮกริด</h3><p>ผู้รักษากุญแจแห่งฮอกวอตส์ ร่างยักษ์ใจดี ผู้พาแฮร์รี่ก้าวเข้าสู่โลกเวทมนตร์เป็นคนแรก</p></div>
-      <div class="card"><span class="icon">🐍</span><h3>เดรโก มัลฟอย</h3><p>คู่ปรับจากบ้านสลิธีริน หยิ่งยโสในชาติกำเนิด คอยหาเรื่องแฮร์รี่และผองเพื่อนตลอดปี</p></div>
-      <div class="card"><span class="icon">💀</span><h3>ลอร์ดโวลเดอมอร์</h3><p>จอมมารผู้สังหารพ่อแม่ของแฮร์รี่ ไร้ร่างกายและสิงอยู่กับศาสตราจารย์ควีเรลล์เพื่อชิงศิลาอาถรรพ์</p></div>
-    </div>
-  </section>
+<!-- ============ 04 HOUSES ============ -->
+<section>
+  <div class="ghost px" data-speed="0.12">HOUSES</div>
+  <div class="floaty px" data-speed="0.28" style="top:10%; right:8%; font-size:2.6rem; --d:6s; --rot:-10deg;">🎩</div>
+  <div class="sec-tag reveal"><span class="sec-num">#04</span> The four houses</div>
+  <h2 class="reveal">บ้านทั้งสี่แห่งฮอกวอตส์</h2>
+  <p class="reveal" style="color:var(--muted); margin:-16px 0 28px; line-height:1.9;">หมวกคัดสรร (Sorting Hat) จะอ่านใจนักเรียนใหม่ แล้วเลือกบ้านที่เหมาะสมที่สุดให้</p>
+  <div class="grid g4 stagger">
+    <div class="card house reveal" style="--hc:#e05555; --r:-2deg;"><span class="crest">🦁</span><h3>กริฟฟินดอร์</h3><p class="trait">ความกล้าหาญ<br>ความมุ่งมั่น น้ำใจนักสู้</p></div>
+    <div class="card house reveal" style="--hc:#4fc36b;"><span class="crest">🐍</span><h3>สลิธีริน</h3><p class="trait">ความทะเยอทะยาน<br>ไหวพริบ ความเจ้าเล่ห์</p></div>
+    <div class="card house reveal" style="--hc:#5b8dde;"><span class="crest">🦅</span><h3>เรเวนคลอ</h3><p class="trait">สติปัญญา<br>ความรอบรู้ ความคิดสร้างสรรค์</p></div>
+    <div class="card house reveal" style="--hc:#e8c15a; --r:2deg;"><span class="crest">🦡</span><h3>ฮัฟเฟิลพัฟ</h3><p class="trait">ความขยัน ซื่อสัตย์<br>ความยุติธรรม ความอดทน</p></div>
+  </div>
+</section>
 
-  <!-- 6: บ้านทั้งสี่ -->
-  <section class="slide">
-    <h2><span class="emoji">🎩</span>บ้านทั้งสี่แห่งฮอกวอตส์</h2>
-    <p class="lead" style="margin-bottom:22px;">หมวกคัดสรร (Sorting Hat) จะอ่านใจนักเรียนใหม่ แล้วเลือกบ้านที่เหมาะสมที่สุดให้</p>
-    <div class="grid g4">
-      <div class="card house" style="--hc:#e05555;"><span class="crest">🦁</span><h3>กริฟฟินดอร์</h3><p class="trait">ความกล้าหาญ<br>ความมุ่งมั่น น้ำใจนักสู้</p></div>
-      <div class="card house" style="--hc:#4fc36b;"><span class="crest">🐍</span><h3>สลิธีริน</h3><p class="trait">ความทะเยอทะยาน<br>ไหวพริบ ความเจ้าเล่ห์</p></div>
-      <div class="card house" style="--hc:#5b8dde;"><span class="crest">🦅</span><h3>เรเวนคลอ</h3><p class="trait">สติปัญญา<br>ความรอบรู้ ความคิดสร้างสรรค์</p></div>
-      <div class="card house" style="--hc:#e8c15a;"><span class="crest">🦡</span><h3>ฮัฟเฟิลพัฟ</h3><p class="trait">ความขยัน ซื่อสัตย์<br>ความยุติธรรม ความอดทน</p></div>
-    </div>
-  </section>
+<div class="marquee"><div class="track" id="mq2"></div></div>
 
-  <!-- 7: ฉากเด่น -->
-  <section class="slide">
-    <h2><span class="emoji">✨</span>เหตุการณ์สำคัญในเรื่อง</h2>
-    <div class="timeline card">
-      <div class="tl-item"><div class="tl-num">1</div><div class="tl-body"><h3>จดหมายจากฮอกวอตส์ 📬</h3><p>จดหมายนับพันฉบับถาโถมใส่บ้านเดอร์สลีย์ จนแฮกริดต้องมาตามตัวแฮร์รี่ด้วยตัวเอง</p></div></div>
-      <div class="tl-item"><div class="tl-num">2</div><div class="tl-body"><h3>ตรอกไดแอกอนและชานชาลาที่ 9¾ 🚂</h3><p>แฮร์รี่ซื้อไม้กายสิทธิ์คู่ใจ รับนกฮูกเฮ็ดวิก แล้วทะลุกำแพงขึ้นรถไฟด่วนสายฮอกวอตส์</p></div></div>
-      <div class="tl-item"><div class="tl-num">3</div><div class="tl-body"><h3>โทรลล์ในห้องน้ำ 🧌</h3><p>สามสหายร่วมมือกันปราบโทรลล์ยักษ์ นาทีที่เปลี่ยนคนแปลกหน้าให้กลายเป็นเพื่อนแท้</p></div></div>
-      <div class="tl-item"><div class="tl-num">4</div><div class="tl-body"><h3>แมตช์ควิดดิชนัดแรก 🧹</h3><p>ผู้เล่นตำแหน่งซีกเกอร์ที่อายุน้อยที่สุดในรอบศตวรรษ คว้าลูกสนิชด้วยปาก!</p></div></div>
-      <div class="tl-item"><div class="tl-num">5</div><div class="tl-body"><h3>กระจกแห่งแอริแซด 🪞</h3><p>กระจกที่สะท้อน "ความปรารถนาลึกที่สุดในใจ" — แฮร์รี่ได้เห็นพ่อแม่เป็นครั้งแรก</p></div></div>
-      <div class="tl-item"><div class="tl-num">6</div><div class="tl-body"><h3>ด่านพิทักษ์ศิลาอาถรรพ์ ♟️</h3><p>ต้นกับดักปีศาจ กุญแจบิน และหมากรุกพ่อมดยักษ์ที่รอนยอมเสียสละตัวเองให้เพื่อนไปต่อ</p></div></div>
-      <div class="tl-item"><div class="tl-num">7</div><div class="tl-body"><h3>เผชิญหน้าจอมมาร 💥</h3><p>แฮร์รี่พบว่าผู้ร้ายตัวจริงคือควีเรลล์ที่มีโวลเดอมอร์สิงอยู่ และเอาชนะได้ด้วยพลังแห่งความรักของแม่</p></div></div>
-    </div>
-  </section>
+<!-- ============ 05 TIMELINE ============ -->
+<section>
+  <div class="ghost px" data-speed="0.1">SCENES</div>
+  <div class="sec-tag reveal"><span class="sec-num">#05</span> Key moments</div>
+  <h2 class="reveal">เหตุการณ์สำคัญในเรื่อง</h2>
+  <div class="tl">
+    <div class="tl-line"><i id="tlFill"></i></div>
+    <div class="tl-item reveal"><h3>จดหมายจากฮอกวอตส์ 📬</h3><p>จดหมายนับพันฉบับถาโถมใส่บ้านเดอร์สลีย์ จนแฮกริดต้องมาตามตัวแฮร์รี่ด้วยตัวเอง</p></div>
+    <div class="tl-item reveal"><h3>ตรอกไดแอกอน &amp; ชานชาลาที่ 9¾ 🚂</h3><p>แฮร์รี่ซื้อไม้กายสิทธิ์คู่ใจ รับนกฮูกเฮ็ดวิก แล้วทะลุกำแพงขึ้นรถไฟด่วนสายฮอกวอตส์</p></div>
+    <div class="tl-item reveal"><h3>โทรลล์ในห้องน้ำ 🧌</h3><p>สามสหายร่วมมือกันปราบโทรลล์ยักษ์ นาทีที่เปลี่ยนคนแปลกหน้าให้กลายเป็นเพื่อนแท้</p></div>
+    <div class="tl-item reveal"><h3>แมตช์ควิดดิชนัดแรก 🧹</h3><p>ซีกเกอร์อายุน้อยที่สุดในรอบศตวรรษ คว้าลูกสนิชด้วยปาก!</p></div>
+    <div class="tl-item reveal"><h3>กระจกแห่งแอริแซด 🪞</h3><p>กระจกที่สะท้อน "ความปรารถนาลึกที่สุดในใจ" — แฮร์รี่ได้เห็นพ่อแม่เป็นครั้งแรก</p></div>
+    <div class="tl-item reveal"><h3>ด่านพิทักษ์ศิลาอาถรรพ์ ♟️</h3><p>ต้นกับดักปีศาจ กุญแจบิน และหมากรุกพ่อมดยักษ์ที่รอนยอมเสียสละตัวเองให้เพื่อนไปต่อ</p></div>
+    <div class="tl-item reveal"><h3>เผชิญหน้าจอมมาร 💥</h3><p>ผู้ร้ายตัวจริงคือควีเรลล์ที่มีโวลเดอมอร์สิงอยู่ — แฮร์รี่เอาชนะได้ด้วยพลังแห่งความรักของแม่</p></div>
+  </div>
+</section>
 
-  <!-- 8: แก่นเรื่อง -->
-  <section class="slide">
-    <h2><span class="emoji">💛</span>แก่นเรื่องที่หนังอยากบอก</h2>
-    <div class="grid g2">
-      <div class="card"><span class="icon">🤝</span><h3>มิตรภาพ</h3><p>แฮร์รี่ไม่มีทางผ่านด่านสุดท้ายได้เพียงลำพัง — ชัยชนะเกิดจากความสามารถของเพื่อนทุกคนรวมกัน</p></div>
-      <div class="card"><span class="icon">🦁</span><h3>ความกล้าหาญ</h3><p>ความกล้าไม่ใช่การไม่กลัว แต่คือการลงมือทำสิ่งที่ถูกต้องทั้งที่กลัว แม้ต้องเผชิญหน้ากับเพื่อนก็ตาม</p></div>
-      <div class="card"><span class="icon">❤️</span><h3>พลังแห่งความรัก</h3><p>ความรักของแม่ที่ยอมสละชีวิตปกป้องลูก คือเวทมนตร์ที่ทรงพลังที่สุด ที่แม้จอมมารก็ไม่อาจแตะต้อง</p></div>
-      <div class="card"><span class="icon">🧭</span><h3>ทางเลือกกำหนดตัวตน</h3><p>หมวกคัดสรรเกือบส่งแฮร์รี่ไปสลิธีริน แต่สิ่งที่เขา "เลือก" ต่างหากที่บอกว่าเขาเป็นใครจริง ๆ</p></div>
-    </div>
-  </section>
+<!-- ============ 06 THEMES ============ -->
+<section>
+  <div class="ghost px" data-speed="0.12">THEMES</div>
+  <div class="sec-tag reveal"><span class="sec-num">#06</span> Themes</div>
+  <h2 class="reveal">แก่นเรื่องที่หนังอยากบอก</h2>
+  <div class="grid g2 stagger">
+    <div class="card tilt reveal" style="--r:-2deg;"><span style="font-size:2.2rem; display:block; margin-bottom:10px;">🤝</span><h3 style="color:var(--gold); margin-bottom:8px;">มิตรภาพ</h3><p style="color:#cdd4ee; font-size:.93rem; line-height:1.85;">แฮร์รี่ไม่มีทางผ่านด่านสุดท้ายได้เพียงลำพัง — ชัยชนะเกิดจากความสามารถของเพื่อนทุกคนรวมกัน</p></div>
+    <div class="card tilt reveal"><span style="font-size:2.2rem; display:block; margin-bottom:10px;">🦁</span><h3 style="color:var(--gold); margin-bottom:8px;">ความกล้าหาญ</h3><p style="color:#cdd4ee; font-size:.93rem; line-height:1.85;">ความกล้าไม่ใช่การไม่กลัว แต่คือการลงมือทำสิ่งที่ถูกต้องทั้งที่กลัว แม้ต้องขัดใจเพื่อนก็ตาม</p></div>
+    <div class="card tilt reveal"><span style="font-size:2.2rem; display:block; margin-bottom:10px;">❤️</span><h3 style="color:var(--gold); margin-bottom:8px;">พลังแห่งความรัก</h3><p style="color:#cdd4ee; font-size:.93rem; line-height:1.85;">ความรักของแม่ที่ยอมสละชีวิตปกป้องลูก คือเวทมนตร์ที่ทรงพลังที่สุด ที่แม้จอมมารก็ไม่อาจแตะต้อง</p></div>
+    <div class="card tilt reveal" style="--r:2deg;"><span style="font-size:2.2rem; display:block; margin-bottom:10px;">🧭</span><h3 style="color:var(--gold); margin-bottom:8px;">ทางเลือกกำหนดตัวตน</h3><p style="color:#cdd4ee; font-size:.93rem; line-height:1.85;">หมวกคัดสรรเกือบส่งแฮร์รี่ไปสลิธีริน แต่สิ่งที่เขา "เลือก" ต่างหากที่บอกว่าเขาเป็นใครจริง ๆ</p></div>
+  </div>
+</section>
 
-  <!-- 9: ความสำเร็จ -->
-  <section class="slide">
-    <h2><span class="emoji">🏆</span>ความสำเร็จของภาพยนตร์</h2>
-    <div class="grid g3" style="margin-bottom:26px;">
-      <div class="card stat"><div class="num">$1,000+</div><div class="lbl">ล้านดอลลาร์สหรัฐ<br>รายได้รวมทั่วโลก</div></div>
-      <div class="card stat"><div class="num">อันดับ 2</div><div class="lbl">หนังทำเงินสูงสุด<br>ของโลกในปี 2001</div></div>
-      <div class="card stat"><div class="num">3 สาขา</div><div class="lbl">เข้าชิงรางวัลออสการ์<br>(เพลงประกอบ · กำกับศิลป์ · เครื่องแต่งกาย)</div></div>
-    </div>
-    <ul class="bullets card" style="width:100%; max-width:820px;">
-      <li>เปิดตัวแฟรนไชส์ภาพยนตร์ 8 ภาค ที่ทำรายได้รวมกันกว่า 7,700 ล้านดอลลาร์</li>
-      <li>ดนตรีประกอบโดย <strong style="color:var(--gold);">จอห์น วิลเลียมส์</strong> — ท่วงทำนอง "Hedwig's Theme" กลายเป็นเพลงจำของแฟรนไชส์</li>
-      <li>ปั้นนักแสดงเด็กทั้งสามให้กลายเป็นดาราระดับโลก และเติบโตไปพร้อมผู้ชมตลอด 10 ปี</li>
-    </ul>
-  </section>
+<!-- ============ 07 SUCCESS ============ -->
+<section>
+  <div class="ghost px" data-speed="0.1">BOX OFFICE</div>
+  <div class="sec-tag reveal"><span class="sec-num">#07</span> Achievements</div>
+  <h2 class="reveal">ความสำเร็จของภาพยนตร์</h2>
+  <div class="grid g3 stagger" style="margin-bottom:28px;">
+    <div class="card stat reveal"><div class="num"><span class="count" data-to="1000" data-prefix="$" data-suffix="+">$0</span></div><div class="lbl">ล้านดอลลาร์สหรัฐ<br>รายได้รวมทั่วโลก</div></div>
+    <div class="card stat reveal"><div class="num">อันดับ <span class="count" data-to="2">0</span></div><div class="lbl">หนังทำเงินสูงสุด<br>ของโลกในปี 2001</div></div>
+    <div class="card stat reveal"><div class="num"><span class="count" data-to="3">0</span> สาขา</div><div class="lbl">เข้าชิงรางวัลออสการ์<br>(เพลงประกอบ · กำกับศิลป์ · เครื่องแต่งกาย)</div></div>
+  </div>
+  <ul class="bullets card reveal">
+    <li>เปิดตัวแฟรนไชส์ภาพยนตร์ 8 ภาค ที่ทำรายได้รวมกันกว่า 7,700 ล้านดอลลาร์</li>
+    <li>ดนตรีประกอบโดย <strong>จอห์น วิลเลียมส์</strong> — ท่วงทำนอง "Hedwig's Theme" กลายเป็นเพลงจำของแฟรนไชส์</li>
+    <li>ปั้นนักแสดงเด็กทั้งสามให้กลายเป็นดาราระดับโลก และเติบโตไปพร้อมผู้ชมตลอด 10 ปี</li>
+  </ul>
+</section>
 
-  <!-- 10: เกร็ดน่ารู้ -->
-  <section class="slide">
-    <h2><span class="emoji">🔮</span>เกร็ดน่ารู้เบื้องหลัง</h2>
-    <ul class="bullets card" style="width:100%; max-width:840px;">
-      <li>เจ. เค. โรว์ลิง ยืนยันกับผู้สร้างว่านักแสดงหลักต้องเป็น <strong style="color:var(--gold);">ชาวอังกฤษ</strong> และถ่ายทำในสหราชอาณาจักรเท่านั้น</li>
-      <li>เด็ก ๆ หลายพันคนมาออดิชันบทแฮร์รี่ ก่อนผู้กำกับจะพบ แดเนียล แรดคลิฟฟ์ วัย 11 ปี</li>
-      <li>ฉากห้องโถงใหญ่ (Great Hall) ใช้เทียนลอยจริงหลายร้อยเล่มในช่วงแรก ก่อนเปลี่ยนเป็น CG เพื่อความปลอดภัย</li>
-      <li>ฉากชานชาลาที่ 9¾ ถ่ายทำที่สถานีรถไฟคิงส์ครอสในลอนดอน ปัจจุบันมีจุดถ่ายรูปให้แฟน ๆ จริง</li>
-      <li>ชื่อ "Philosopher's Stone" ถูกเปลี่ยนเป็น "Sorcerer's Stone" ในสหรัฐฯ ทำให้ต้องถ่ายบางฉากสองเวอร์ชัน</li>
-      <li>งูเหลือมในสวนสัตว์ที่คุยกับแฮร์รี่ คือการบอกใบ้ความสามารถ "พาร์เซลทัง" ที่จะสำคัญมากในภาคต่อ</li>
-    </ul>
-  </section>
+<!-- ============ 08 TRIVIA ============ -->
+<section>
+  <div class="ghost px" data-speed="0.12">TRIVIA</div>
+  <div class="floaty px" data-speed="0.3" style="top:14%; right:5%; font-size:2.2rem; --d:6.5s; --rot:14deg;">🔮</div>
+  <div class="sec-tag reveal"><span class="sec-num">#08</span> Behind the scenes</div>
+  <h2 class="reveal">เกร็ดน่ารู้เบื้องหลัง</h2>
+  <ul class="bullets card reveal">
+    <li>เจ. เค. โรว์ลิง ยืนยันว่านักแสดงหลักต้องเป็น <strong>ชาวอังกฤษ</strong> และถ่ายทำในสหราชอาณาจักรเท่านั้น</li>
+    <li>เด็ก ๆ หลายพันคนมาออดิชันบทแฮร์รี่ ก่อนผู้กำกับจะพบ แดเนียล แรดคลิฟฟ์ วัย 11 ปี</li>
+    <li>ฉากห้องโถงใหญ่ใช้เทียนลอยจริงหลายร้อยเล่มช่วงแรก ก่อนเปลี่ยนเป็น CG เพื่อความปลอดภัย</li>
+    <li>ฉากชานชาลาที่ 9¾ ถ่ายที่สถานีคิงส์ครอสในลอนดอน ปัจจุบันมีจุดถ่ายรูปให้แฟน ๆ จริง</li>
+    <li>ชื่อ "Philosopher's Stone" ถูกเปลี่ยนเป็น "Sorcerer's Stone" ในสหรัฐฯ ทำให้ต้องถ่ายบางฉากสองเวอร์ชัน</li>
+    <li>งูเหลือมที่คุยกับแฮร์รี่ในสวนสัตว์ คือการบอกใบ้ความสามารถ "พาร์เซลทัง" ที่จะสำคัญมากในภาคต่อ</li>
+  </ul>
+</section>
 
-  <!-- 11: คำคม -->
-  <section class="slide">
-    <div class="float" style="font-size:3rem; margin-bottom:26px;">🪞</div>
-    <blockquote>
-      การหมกมุ่นอยู่กับความฝัน จนลืมมีชีวิตอยู่กับปัจจุบัน<br>ไม่ใช่สิ่งที่ควรทำ
-    </blockquote>
-    <div class="quote-by">— อัลบัส ดัมเบิลดอร์ (กล่าวถึงกระจกแห่งแอริแซด)</div>
-  </section>
+<!-- ============ QUOTE ============ -->
+<section class="quote-sec">
+  <div class="floaty px" data-speed="0.24" style="top:4%; left:10%; font-size:2.4rem; --d:7s; --rot:-8deg;">🪞</div>
+  <blockquote class="reveal">การหมกมุ่นอยู่กับความฝัน จนลืมมีชีวิตอยู่กับปัจจุบัน<br>ไม่ใช่สิ่งที่ควรทำ</blockquote>
+  <div class="quote-by reveal">— อัลบัส ดัมเบิลดอร์ · กล่าวถึงกระจกแห่งแอริแซด</div>
+</section>
 
-  <!-- 12: ปิดท้าย -->
-  <section class="slide">
-    <div class="float" style="font-size:4rem; margin-bottom:18px;">🦉</div>
-    <h1 style="font-size:clamp(1.8rem,4vw,3rem);">ขอบคุณครับ/ค่ะ</h1>
-    <div class="divider"></div>
-    <p class="lead">"It does not do to dwell on dreams and forget to live."<br><br>
-    มีคำถามอะไร ถามได้เลย ✨</p>
-  </section>
+<!-- ============ OUTRO ============ -->
+<section class="outro">
+  <div class="floaty px" data-speed="0.3" style="top:18%; left:14%; font-size:2.4rem; --d:6s; --rot:10deg;">🦉</div>
+  <div class="floaty px" data-speed="0.22" style="bottom:22%; right:13%; font-size:2.4rem; --d:7s; --rot:-10deg;">⚡</div>
+  <div class="sec-tag reveal" style="justify-content:center;"><span class="sec-num">Fin.</span> Thank you</div>
+  <h2 class="reveal">ขอบคุณครับ/ค่ะ ✨</h2>
+  <p class="sub reveal" style="opacity:1; animation:none;">"It does not do to dwell on dreams and forget to live."<br>มีคำถามอะไร ถามได้เลย</p>
+  <a href="#" class="back-top reveal" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">⬆ กลับขึ้นด้านบน</a>
+</section>
 
-</div>
-
-<nav class="navbar">
-  <button class="nav-btn" id="prevBtn" aria-label="สไลด์ก่อนหน้า">‹</button>
-  <div class="dots" id="dots"></div>
-  <span class="counter" id="counter">1 / 12</span>
-  <button class="nav-btn" id="nextBtn" aria-label="สไลด์ถัดไป">›</button>
-</nav>
+<footer>HARRY POTTER &amp; THE PHILOSOPHER'S STONE · MOVIE PRESENTATION</footer>
 
 <script>
-  // starfield
+  /* ---------- starfield ---------- */
   const starsBox = document.getElementById('stars');
-  for (let i = 0; i < 90; i++) {
+  for (let i = 0; i < 110; i++) {
     const s = document.createElement('div');
     s.className = 'star';
     const size = Math.random() * 2.4 + 0.6;
@@ -383,60 +423,126 @@
     starsBox.appendChild(s);
   }
 
-  const slides = [...document.querySelectorAll('.slide')];
-  const dotsBox = document.getElementById('dots');
-  const counter = document.getElementById('counter');
-  const progress = document.getElementById('progress');
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
-  let cur = 0;
-
-  slides.forEach((_, i) => {
-    const d = document.createElement('button');
-    d.className = 'dot' + (i === 0 ? ' on' : '');
-    d.setAttribute('aria-label', 'ไปสไลด์ที่ ' + (i + 1));
-    d.addEventListener('click', () => go(i));
-    dotsBox.appendChild(d);
-  });
-  const dots = [...dotsBox.children];
-
-  function go(i) {
-    if (i < 0 || i >= slides.length || i === cur) return;
-    slides[cur].classList.remove('active');
-    slides[cur].classList.toggle('prev', i > cur);
-    slides[i].classList.remove('prev');
-    slides[i].classList.add('active');
-    slides[i].scrollTop = 0;
-    dots[cur].classList.remove('on');
-    dots[i].classList.add('on');
-    cur = i;
-    counter.textContent = `${cur + 1} / ${slides.length}`;
-    progress.style.width = ((cur + 1) / slides.length * 100) + '%';
-    prevBtn.disabled = cur === 0;
-    nextBtn.disabled = cur === slides.length - 1;
+  /* ---------- marquee ---------- */
+  const words = ['แฮร์รี่ พอตเตอร์','⚡','The Boy Who Lived','✦','Hogwarts','⚡','ศิลาอาถรรพ์','✦','Wingardium Leviosa','⚡','Quidditch','✦'];
+  for (const id of ['mq1','mq2']) {
+    const track = document.getElementById(id);
+    let html = '';
+    for (let r = 0; r < 4; r++) html += words.map(w => `<span>${w}</span>`).join('');
+    track.innerHTML = html;
   }
-  progress.style.width = (1 / slides.length * 100) + '%';
-  prevBtn.disabled = true;
 
-  prevBtn.addEventListener('click', () => go(cur - 1));
-  nextBtn.addEventListener('click', () => go(cur + 1));
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); go(cur + 1); }
-    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(cur - 1); }
-    if (e.key === 'Home') go(0);
-    if (e.key === 'End') go(slides.length - 1);
+  /* ---------- reveal on scroll (staggered) ---------- */
+  document.querySelectorAll('.stagger').forEach(g => {
+    [...g.children].forEach((c, i) => c.style.transitionDelay = (i * 90) + 'ms');
   });
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-  // swipe for mobile
-  let touchX = null;
-  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, {passive:true});
-  document.addEventListener('touchend', e => {
-    if (touchX === null) return;
-    const dx = e.changedTouches[0].clientX - touchX;
-    if (Math.abs(dx) > 50) go(cur + (dx < 0 ? 1 : -1));
-    touchX = null;
-  }, {passive:true});
+  /* ---------- scroll: progress + parallax + timeline ---------- */
+  const progress = document.getElementById('progress');
+  const pxEls = [...document.querySelectorAll('.px')].map(el => ({ el, speed: +el.dataset.speed || 0.2 }));
+  const tlFill = document.getElementById('tlFill');
+  const tlBox = document.querySelector('.tl');
+  let ticking = false;
+
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const doc = document.documentElement;
+      const max = doc.scrollHeight - innerHeight;
+      progress.style.width = (max > 0 ? (scrollY / max) * 100 : 0) + '%';
+
+      const vh2 = innerHeight / 2;
+      for (const { el, speed } of pxEls) {
+        const parent = el.closest('section') || document.body;
+        const r = parent.getBoundingClientRect();
+        const delta = (r.top + r.height / 2 - vh2) * -speed;
+        el.style.transform = `translateY(${delta.toFixed(1)}px)`;
+      }
+
+      if (tlBox) {
+        const r = tlBox.getBoundingClientRect();
+        const p = Math.min(1, Math.max(0, (innerHeight * 0.75 - r.top) / r.height));
+        tlFill.style.transform = `scaleY(${p})`;
+      }
+      ticking = false;
+    });
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* ---------- 3D tilt cards ---------- */
+  if (matchMedia('(hover:hover)').matches) {
+    document.querySelectorAll('.tilt').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        card.style.transform = `perspective(800px) rotateY(${(x*12).toFixed(1)}deg) rotateX(${(-y*10).toFixed(1)}deg) translateY(-4px)`;
+      });
+      card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+    });
+  }
+
+  /* ---------- count-up stats ---------- */
+  const cio = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      cio.unobserve(e.target);
+      const el = e.target, to = +el.dataset.to, pre = el.dataset.prefix || '', suf = el.dataset.suffix || '';
+      const t0 = performance.now(), dur = 1400;
+      (function tick(t) {
+        const p = Math.min(1, (t - t0) / dur), ease = 1 - Math.pow(1 - p, 3);
+        el.textContent = pre + Math.round(to * ease).toLocaleString() + (p === 1 ? suf : '');
+        if (p < 1) requestAnimationFrame(tick);
+      })(t0);
+    });
+  }, { threshold: 0.6 });
+  document.querySelectorAll('.count').forEach(el => cio.observe(el));
+
+  /* ---------- flying golden snitch ---------- */
+  const snitch = document.getElementById('snitch');
+  let t = 0;
+  (function fly() {
+    t += 0.008;
+    const x = innerWidth  * (0.5 + 0.42 * Math.sin(t * 1.3) * Math.cos(t * 0.7));
+    const y = innerHeight * (0.4 + 0.3  * Math.sin(t * 0.9 + 1.7));
+    const dir = Math.cos(t * 1.3) >= 0 ? 1 : -1;
+    snitch.style.transform = `translate(${x.toFixed(0)}px, ${y.toFixed(0)}px) scaleX(${dir})`;
+    requestAnimationFrame(fly);
+  })();
+
+  /* ---------- sparkle cursor trail ---------- */
+  let lastSpark = 0;
+  addEventListener('mousemove', e => {
+    const now = performance.now();
+    if (now - lastSpark < 90) return;
+    lastSpark = now;
+    const s = document.createElement('span');
+    s.className = 'spark';
+    s.textContent = '✦';
+    s.style.left = (e.clientX + (Math.random()*16-8)) + 'px';
+    s.style.top  = (e.clientY + (Math.random()*16-8)) + 'px';
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 850);
+  }, { passive: true });
+
+  /* ---------- hero mouse parallax ---------- */
+  const hero = document.querySelector('.hero');
+  const heroFloats = [...hero.querySelectorAll('.floaty')];
+  addEventListener('mousemove', e => {
+    if (scrollY > innerHeight) return;
+    const dx = e.clientX / innerWidth - 0.5, dy = e.clientY / innerHeight - 0.5;
+    heroFloats.forEach((el, i) => {
+      const k = 14 + i * 6;
+      el.style.marginLeft = (dx * k) + 'px';
+      el.style.marginTop  = (dy * k) + 'px';
+    });
+  }, { passive: true });
 </script>
 </body>
 </html>
