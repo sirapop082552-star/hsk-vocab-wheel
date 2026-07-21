@@ -275,6 +275,13 @@
   .mtitle { font-family:var(--display); font-weight:800; font-size:1.6rem; color:var(--tc, var(--gold)); line-height:1.1; }
   .msub { color:var(--muted); font-size:.82rem; margin-top:4px; letter-spacing:.06em; }
   .mbody { padding:20px 28px 30px; overflow-y:auto; }
+  .mvid { position:relative; margin:0 0 18px; border-radius:16px; overflow:hidden;
+    border:1px solid var(--tc, var(--gold)); box-shadow:0 14px 40px -18px var(--tc, var(--gold)), 0 0 0 1px rgba(255,255,255,.05) inset;
+    background:#0b0620; aspect-ratio:16/9; }
+  .mvid video { width:100%; height:100%; display:block; object-fit:cover; }
+  .mvid .tagv { position:absolute; top:10px; left:12px; z-index:2; font-size:.64rem; letter-spacing:.14em;
+    text-transform:uppercase; font-weight:700; color:#fff; background:rgba(10,4,26,.6);
+    border:1px solid var(--tc, var(--gold)); padding:4px 11px; border-radius:99px; backdrop-filter:blur(4px); }
   .mbody p { color:#ddd8f2; font-size:.94rem; line-height:1.95; margin-bottom:13px; }
   .mbody p strong { color:var(--gold); }
   .mbody h4 { color:#ffe9a8; font-size:.72rem; letter-spacing:.24em; text-transform:uppercase; margin:18px 0 7px; }
@@ -581,6 +588,13 @@ const M_INFO = {
   riley: { title:'Riley',   sub:'Favourite character · scene · quote · new word', tc:'var(--riley)' },
   end:   { title:'The End — Conclusion', sub:'Our score and recommendation', tc:'var(--gold)' },
 };
+const M_VIDEO = {
+  plot:  'videos/plot',
+  ang:   'videos/anger',
+  joy:   'videos/joy',
+  sad:   'videos/sadness',
+  riley: 'videos/riley',
+};
 const mback = document.getElementById('mback');
 const mpanel = document.getElementById('mpanel');
 const mbody = document.getElementById('mbody');
@@ -599,6 +613,18 @@ function openModal(id) {
   const srcArt = document.querySelector('.tile[data-m="' + id + '"] .tile-art');
   mportrait.innerHTML = srcArt ? srcArt.innerHTML : '';
   mbody.innerHTML = '';
+  const vsrc = M_VIDEO[id];
+  if (vsrc) {
+    const wrap = document.createElement('div');
+    wrap.className = 'mvid';
+    wrap.innerHTML = '<span class="tagv">🎬 Clip</span>' +
+      '<video autoplay muted loop playsinline controls preload="metadata">' +
+      '<source src="' + vsrc + '.webm" type="video/webm">' +
+      '<source src="' + vsrc + '.mp4" type="video/mp4"></video>';
+    mbody.appendChild(wrap);
+    const v = wrap.querySelector('video');
+    v.play && v.play().catch(() => {});
+  }
   mbody.appendChild(tpl.content.cloneNode(true));
   mbody.scrollTop = 0;
   mback.classList.add('open');
@@ -608,6 +634,8 @@ function openModal(id) {
 function closeModal() {
   mback.classList.remove('open');
   document.body.classList.remove('locked');
+  const v = mbody.querySelector('video');
+  if (v) { v.pause(); }
   if (lastFocus) lastFocus.focus();
 }
 const RMOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
