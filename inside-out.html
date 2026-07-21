@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧠 Inside Out — Group Presentation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&family=Baloo+2:wght@600;700;800&display=swap');
+  :root {
+    --bg0:#150f38;
+    --panel:rgba(24,14,52,.8);
+    --panel-border:rgba(255,213,79,.22);
+    --gold:#ffd54f;
+    --text:#f2f0fc;
+    --muted:#a89fd6;
+    --joy:#ffd54f; --sad:#4aa3e8; --ang:#e8452c; --dis:#7ed957; --fear:#b57ae0; --riley:#ff8ac2;
+    --display:"Baloo 2","Noto Sans Thai",cursive;
+    --sans:"Noto Sans Thai","Leelawadee UI","Thonburi","Segoe UI",sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { font-family:var(--sans); background:var(--bg0); color:var(--text); overflow-x:hidden; }
+  ::selection { background:rgba(255,213,79,.35); }
+
+  /* ===== fixed layers ===== */
+  #world { position:fixed; inset:0; z-index:1; display:block; }
+  .stars { position:fixed; inset:0; z-index:0; pointer-events:none; }
+  .star { position:absolute; border-radius:50%; background:#fff; animation:twinkle var(--d,3s) ease-in-out infinite; }
+  @keyframes twinkle { 0%,100%{opacity:.1} 50%{opacity:.7} }
+  .vignette { position:fixed; inset:0; z-index:2; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(12,6,30,.5) 100%); }
+
+  .progress { position:fixed; top:0; left:0; height:3px; width:0; z-index:60;
+    background:linear-gradient(90deg,var(--joy),var(--riley),var(--sad)); box-shadow:0 0 14px rgba(255,180,220,.7); }
+
+  /* ===== top nav ===== */
+  .topnav { position:fixed; top:0; left:0; right:0; z-index:55;
+    display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 26px;
+    background:linear-gradient(180deg, rgba(16,8,38,.85), transparent); }
+  .brand { display:flex; align-items:baseline; gap:10px; text-decoration:none; }
+  .brand .bolt { font-size:1.15rem; }
+  .brand .t { font-family:var(--display); font-weight:800; font-size:1.05rem; color:#ffe9a8; letter-spacing:.03em; white-space:nowrap; }
+  .brand .s { color:var(--muted); font-size:.68rem; letter-spacing:.24em; text-transform:uppercase; white-space:nowrap; }
+  .chips { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+  .chip { padding:7px 15px; border-radius:99px; text-decoration:none; font-size:.78rem; font-weight:600;
+    color:var(--muted); white-space:nowrap; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+    backdrop-filter:blur(10px); transition:all .22s; }
+  .chip:hover { color:var(--text); border-color:rgba(255,213,79,.55); transform:translateY(-1px); }
+  .chip.on { color:#241338; background:var(--gold); border-color:var(--gold); box-shadow:0 4px 18px -6px rgba(255,213,79,.7); }
+  @media (max-width:1000px){ .chips{ display:none; } }
+
+  /* ===== sections & cards ===== */
+  section { position:relative; z-index:3; min-height:108vh; display:flex; align-items:center; padding:14vh 6vw; }
+  .shell { width:100%; max-width:1180px; margin:0 auto; display:flex; }
+  .shell.left  { justify-content:flex-start; }
+  .shell.right { justify-content:flex-end; }
+  .shell.center{ justify-content:center; }
+  .panel { width:min(500px, 100%); background:var(--panel); border:1px solid var(--panel-border); border-radius:24px;
+    padding:34px 36px; backdrop-filter:blur(16px); box-shadow:0 34px 80px -34px rgba(6,2,20,.9); }
+  .panel.wide { width:100%; max-width:1180px; }
+
+  .eyebrow { display:flex; align-items:center; gap:12px; margin-bottom:6px;
+    color:var(--gold); font-size:.72rem; letter-spacing:.32em; text-transform:uppercase; font-weight:600; }
+  .eyebrow::after { content:""; height:1px; flex:0 0 74px; background:linear-gradient(90deg,var(--gold),transparent); }
+  .chapter { font-family:var(--display); font-weight:700; color:var(--muted); font-size:.88rem; letter-spacing:.04em; margin-bottom:16px; }
+  .speaker { display:inline-flex; align-items:center; gap:8px; margin:0 6px 14px 0;
+    padding:6px 14px; border-radius:99px; font-size:.76rem; font-weight:600; letter-spacing:.04em;
+    color:#ffe9a8; background:rgba(255,213,79,.1); border:1px solid rgba(255,213,79,.4); }
+  h2 { font-family:var(--display); font-size:clamp(1.7rem, 3.6vw, 2.6rem); font-weight:800; line-height:1.22; margin-bottom:18px;
+    background:linear-gradient(90deg,#fff2c9,var(--gold) 60%,var(--riley));
+    -webkit-background-clip:text; background-clip:text; color:transparent; text-wrap:balance; }
+  .panel p.body { color:#d9d4f2; font-size:.96rem; line-height:1.95; max-width:64ch; }
+  .panel p.body + p.body { margin-top:14px; }
+  .panel p.body strong { color:var(--gold); font-weight:700; }
+
+  /* reveal (hidden only when JS runs) */
+  .reveal { will-change:transform,opacity;
+    transition:opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+  .js .reveal:not(.in) { opacity:0; transform:translateY(46px) scale(.98); }
+  .stagger > * { transition-delay:var(--sd,0ms); }
+
+  /* ===== hero ===== */
+  .hero { min-height:100vh; flex-direction:column; justify-content:center; text-align:center; }
+  .hero .kicker { color:var(--gold); letter-spacing:.42em; font-size:clamp(.62rem,1.3vw,.8rem);
+    text-transform:uppercase; font-weight:600; margin-bottom:20px; text-shadow:0 2px 18px rgba(10,4,28,.9); }
+  .hero h1 { font-family:var(--display); font-size:clamp(3.4rem, 11vw, 8rem); font-weight:800; line-height:1.02;
+    filter:drop-shadow(0 8px 34px rgba(10,4,28,.9)) drop-shadow(0 0 30px rgba(255,180,220,.25)); }
+  .hero h1 .word { display:inline-block; overflow:hidden; vertical-align:bottom; padding-bottom:.06em; }
+  .hero h1 .word span { display:inline-block;
+    background:linear-gradient(180deg,#fff6d8 8%, var(--joy) 42%, var(--riley) 78%, var(--fear));
+    -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .js .hero h1 .word span { transform:translateY(112%); animation:riseup 1.1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:var(--dl,0s); }
+  @keyframes riseup { to{ transform:translateY(0);} }
+  .hero .en-title { font-family:var(--display); color:var(--muted); margin-top:12px; font-size:clamp(.9rem,1.7vw,1.1rem); }
+  .hero .sub { margin-top:20px; color:#d5cff0; font-size:clamp(.9rem,1.7vw,1.08rem); line-height:2; max-width:760px;
+    text-shadow:0 2px 16px rgba(10,4,28,.95); }
+  .js .hero .sub { opacity:0; animation:fadein 1.2s ease 1s forwards; }
+  @keyframes fadein { to{opacity:1} }
+  .members { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:26px; }
+  .js .members { opacity:0; animation:fadein 1.2s ease 1.3s forwards; }
+  .member { display:inline-flex; align-items:center; gap:8px; padding:7px 16px; border-radius:99px;
+    font-size:.82rem; font-weight:700; color:var(--text);
+    background:rgba(255,255,255,.07); border:1.5px solid var(--mc,#888);
+    box-shadow:0 0 16px -6px var(--mc,#888); backdrop-filter:blur(8px); }
+  .member::before { content:""; width:9px; height:9px; border-radius:50%; background:var(--mc); box-shadow:0 0 8px var(--mc); }
+  .member small { color:var(--muted); font-weight:600; }
+  .scroll-cue { position:absolute; bottom:30px; left:50%; transform:translateX(-50%);
+    color:#c0b8e6; font-size:.72rem; letter-spacing:.3em; animation:cue 2.2s ease-in-out infinite;
+    text-shadow:0 2px 12px rgba(10,4,28,.95); }
+  @keyframes cue { 0%,100%{transform:translate(-50%,0); opacity:.55} 50%{transform:translate(-50%,10px); opacity:1} }
+
+  /* ===== info / poster ===== */
+  .info-grid { display:grid; grid-template-columns:300px 1fr; gap:32px; align-items:center; }
+  @media (max-width:880px){ .info-grid{ grid-template-columns:1fr; } }
+  .poster { aspect-ratio:2/3; border-radius:18px; position:relative; overflow:hidden;
+    border:1px solid rgba(255,213,79,.4); box-shadow:0 26px 60px -26px rgba(6,2,20,.95);
+    transform-style:preserve-3d; transition:transform .18s ease-out;
+    background:linear-gradient(200deg,#3c2a7d 0%, #241850 55%, #150f38 100%);
+    display:flex; flex-direction:column; }
+  .poster .strip { flex:1; display:flex; }
+  .poster .strip i { flex:1; opacity:.85; }
+  .poster .pt { padding:26px 18px 10px; text-align:center; }
+  .poster .pt .studio { color:var(--muted); letter-spacing:.3em; font-size:.66rem; text-transform:uppercase; }
+  .poster .pt .name { font-family:var(--display); font-weight:800; font-size:2.6rem; line-height:1.05; color:#fff;
+    text-shadow:0 4px 22px rgba(255,180,220,.4); margin-top:8px; transform:rotate(-3deg); }
+  .poster .orbrow { display:flex; justify-content:center; gap:9px; padding:16px 0 8px; }
+  .poster .orbrow b { width:22px; height:22px; border-radius:50%; background:var(--oc); box-shadow:0 0 14px var(--oc); }
+  .poster .py { text-align:center; color:var(--muted); letter-spacing:.35em; font-size:.7rem; padding-bottom:20px; }
+  .poster .glint { position:absolute; inset:-60%; background:linear-gradient(115deg,transparent 42%,rgba(255,246,214,.16) 50%,transparent 58%); animation:glint 4.5s ease-in-out infinite; pointer-events:none; }
+  @keyframes glint { 0%,100%{transform:translateX(-45%)} 55%,70%{transform:translateX(45%)} }
+  .facts { display:flex; flex-direction:column; }
+  .fact { display:flex; gap:14px; padding:10px 0; border-bottom:1px dashed rgba(255,255,255,.12); align-items:baseline; }
+  .fact:last-child { border-bottom:none; }
+  .fact .k { color:var(--gold); font-weight:700; min-width:118px; font-size:.86rem; flex-shrink:0; }
+  .fact .v { color:#ddd8f4; font-size:.92rem; line-height:1.7; }
+
+  /* ===== grids & cards ===== */
+  .grid { display:grid; gap:14px; }
+  .g3 { grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
+  .g2 { grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+  .cardlet { background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.12);
+    border-radius:16px; padding:18px 19px; transition:transform .22s, border-color .22s, box-shadow .22s; }
+  .cardlet:hover { transform:translateY(-4px); border-color:rgba(255,213,79,.5);
+    box-shadow:0 16px 36px -18px rgba(255,213,79,.35); }
+  .cardlet .ico { font-size:1.9rem; display:block; margin-bottom:8px; }
+  .cardlet h3 { font-family:var(--display); color:var(--gold); font-size:1.02rem; margin-bottom:4px; font-weight:700; }
+  .cardlet p { color:#d3cdec; font-size:.86rem; line-height:1.78; }
+  .emo { border-top:3.5px solid var(--hc,#888); }
+  .emo h3 { color:var(--hc); }
+  .emo:hover { border-color:var(--hc); box-shadow:0 16px 36px -18px var(--hc); }
+
+  /* favourite member cards */
+  .fav-card { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-top:4px solid var(--mc);
+    border-radius:18px; padding:20px 21px; }
+  .fav-card .who { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .fav-card .who .em { font-size:1.7rem; }
+  .fav-card .who .nm { font-family:var(--display); font-weight:800; font-size:1.05rem; color:var(--mc); }
+  .fav-card .who .rl { color:var(--muted); font-size:.74rem; letter-spacing:.06em; }
+  .fav-card h4 { color:#ffe9a8; font-size:.72rem; letter-spacing:.22em; text-transform:uppercase; margin:12px 0 5px; }
+  .fav-card p { color:#d3cdec; font-size:.85rem; line-height:1.78; }
+  .fav-card .q { font-style:italic; color:#efe6c8; border-left:3px solid var(--mc); padding-left:12px; }
+  .vchip { display:inline-block; margin:3px 4px 0 0; padding:4px 11px; border-radius:99px;
+    background:rgba(255,213,79,.12); border:1px solid rgba(255,213,79,.35); color:#ffe9a8; font-size:.76rem; font-weight:600; }
+
+  /* ===== timeline ===== */
+  .tl { position:relative; padding-left:36px; margin-top:6px; }
+  .tl-line { position:absolute; left:12px; top:6px; bottom:6px; width:2px; background:rgba(255,255,255,.12); }
+  .tl-line i { position:absolute; inset:0; background:linear-gradient(180deg,var(--joy),var(--riley),var(--sad));
+    transform-origin:top; box-shadow:0 0 10px rgba(255,180,220,.6); }
+  .js .tl-line i { transform:scaleY(0); }
+  .tl-item { position:relative; padding:12px 0; }
+  .tl-item::before { content:""; position:absolute; left:-30px; top:20px; width:10px; height:10px; border-radius:50%;
+    background:var(--bg0); border:2px solid var(--gold); box-shadow:0 0 9px rgba(255,213,79,.6); }
+  .tl-item h3 { font-family:var(--display); color:#ffe9a8; font-size:1rem; margin-bottom:2px; }
+  .tl-item p { color:#c9c2e8; font-size:.88rem; line-height:1.78; max-width:62ch; }
+  .tl-item .by { color:var(--muted); font-size:.76rem; font-style:italic; margin-top:4px; }
+
+  /* ===== rating ===== */
+  .score-line { display:flex; align-items:center; gap:20px; flex-wrap:wrap; margin-bottom:18px; }
+  .score-num { font-family:var(--display); font-weight:800; font-size:clamp(2.4rem,5vw,3.6rem);
+    color:var(--gold); text-shadow:0 0 26px rgba(255,213,79,.5); }
+  .stars-row { position:relative; display:inline-block; font-size:1.9rem; letter-spacing:6px; color:rgba(255,255,255,.18); }
+  .stars-row .fill { position:absolute; inset:0; overflow:hidden; color:var(--gold); white-space:nowrap;
+    text-shadow:0 0 18px rgba(255,213,79,.5); }
+  ul.bullets { list-style:none; }
+  ul.bullets li { padding:11px 0 11px 30px; position:relative; color:#d9d4f2; line-height:1.85; font-size:.92rem;
+    border-bottom:1px dashed rgba(255,255,255,.1); }
+  ul.bullets li:last-child { border-bottom:none; }
+  ul.bullets li::before { content:"✦"; position:absolute; left:4px; color:var(--gold); }
+  ul.bullets strong { color:var(--gold); }
+
+  /* ===== quote & outro ===== */
+  .quote-shell { text-align:center; max-width:880px; margin:0 auto; }
+  blockquote { font-family:var(--display); font-size:clamp(1.4rem,3.2vw,2.3rem); font-weight:700;
+    line-height:1.7; color:#f7edd2; text-shadow:0 4px 30px rgba(10,4,28,.95); text-wrap:balance; }
+  blockquote .qm { color:rgba(255,213,79,.55); font-size:1.4em; }
+  .quote-by { color:#b9b0dc; margin-top:24px; font-size:.9rem; letter-spacing:.08em; text-shadow:0 2px 14px rgba(10,4,28,.9); }
+
+  .outro { flex-direction:column; justify-content:center; text-align:center; }
+  .outro h2 { font-size:clamp(2.3rem,6vw,4.2rem); filter:drop-shadow(0 6px 30px rgba(10,4,28,.9)); }
+  .outro .sub { color:#d5cff0; line-height:2; text-shadow:0 2px 16px rgba(10,4,28,.9); }
+  .back-top { margin-top:34px; display:inline-block; padding:13px 36px; border-radius:99px;
+    border:1px solid var(--panel-border); color:var(--gold); text-decoration:none; font-weight:600; font-size:.9rem;
+    background:var(--panel); backdrop-filter:blur(10px); transition:all .25s; }
+  .back-top:hover { background:rgba(255,213,79,.16); transform:translateY(-3px); box-shadow:0 14px 34px -14px rgba(255,213,79,.5); }
+
+  /* flyover caption */
+  .fly-cap { text-align:center; max-width:720px; margin:0 auto; }
+  .fly-cap h3 { font-family:var(--display); font-size:clamp(1.5rem,3.4vw,2.4rem); font-weight:800; color:#ffe9a8;
+    text-shadow:0 2px 26px rgba(10,4,28,.95); margin-bottom:10px; }
+  .fly-cap p { color:#d5cff0; font-size:clamp(.88rem,1.6vw,1.02rem); text-shadow:0 2px 16px rgba(10,4,28,.95); line-height:1.9; }
+
+  footer { position:relative; z-index:3; text-align:center; color:rgba(255,255,255,.32); font-size:.72rem;
+    padding:24px 0 32px; letter-spacing:.18em; text-transform:uppercase; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior:auto; }
+    .js .hero h1 .word span { animation-duration:.01s; }
+    .scroll-cue { animation:none; }
+  }
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js');</script>
+
+<div class="stars" id="stars"></div>
+<canvas id="world"></canvas>
+<div class="vignette"></div>
+<div class="progress" id="progress"></div>
+
+<nav class="topnav">
+  <a class="brand" href="#top">
+    <span class="bolt">🧠</span>
+    <span class="t">Inside Out</span>
+    <span class="s">Disney · Pixar 2015</span>
+  </a>
+  <div class="chips" id="chips">
+    <a class="chip" href="#top">Home</a>
+    <a class="chip" href="#about">About</a>
+    <a class="chip" href="#plot">Plot</a>
+    <a class="chip" href="#characters">Characters</a>
+    <a class="chip" href="#fav1">Favourites</a>
+    <a class="chip" href="#lessons">Lessons</a>
+    <a class="chip" href="#rating">Rating</a>
+  </div>
+</nav>
+
+<!-- ============ HERO / OPENING ============ -->
+<section class="hero" id="top" data-cam="72,40,104|0,16,0">
+  <div class="kicker">A Group Movie Presentation · Disney &amp; Pixar 2015</div>
+  <h1>
+    <span class="word"><span style="--dl:.05s">Inside</span></span>
+    <span class="word"><span style="--dl:.24s">Out</span></span>
+  </h1>
+  <div class="en-title">The little voices inside your head</div>
+  <p class="sub">Good afternoon everyone, and welcome to our presentation.<br>
+  Today we'll take you inside the mind of an 11-year-old girl named Riley — where five emotions run the show.</p>
+  <div class="speaker" style="margin-top:18px;">🎤 Opening — โม (Mo)</div>
+  <div class="members">
+    <span class="member" style="--mc:var(--ang);">โม <small>· Anger</small></span>
+    <span class="member" style="--mc:var(--joy);">น้ำมนต์ <small>· Joy</small></span>
+    <span class="member" style="--mc:var(--fear);">เอม <small>· Fear</small></span>
+    <span class="member" style="--mc:var(--sad);">อันอัน <small>· Sadness</small></span>
+    <span class="member" style="--mc:var(--dis);">มงกี้ <small>· Disgust</small></span>
+    <span class="member" style="--mc:var(--riley);">คิตตี้ <small>· Riley</small></span>
+  </div>
+  <div class="scroll-cue">SCROLL ↓</div>
+</section>
+
+<!-- ============ 01 ABOUT ============ -->
+<section id="about" data-cam="40,22,60|0,14,0">
+  <div class="shell left">
+    <div class="panel wide reveal">
+      <div class="eyebrow">About the film</div>
+      <div class="chapter">Part 01 — Basic information</div>
+      <div>
+        <span class="speaker">🎤 น้ำมนต์ · movie &amp; genre</span>
+        <span class="speaker">🎤 เอม · why we chose it</span>
+        <span class="speaker">🎤 อันอัน + มงกี้ + คิตตี้ · outline</span>
+      </div>
+      <div class="info-grid">
+        <div class="poster" id="posterTilt">
+          <div class="pt">
+            <div class="studio">Disney · Pixar</div>
+            <div class="name">INSIDE<br>OUT</div>
+          </div>
+          <div class="orbrow">
+            <b style="--oc:var(--joy);"></b><b style="--oc:var(--sad);"></b><b style="--oc:var(--ang);"></b><b style="--oc:var(--dis);"></b><b style="--oc:var(--fear);"></b>
+          </div>
+          <div class="py">— MEET THE VOICES —</div>
+          <div class="strip">
+            <i style="background:linear-gradient(180deg,transparent,var(--joy));"></i>
+            <i style="background:linear-gradient(180deg,transparent,var(--sad));"></i>
+            <i style="background:linear-gradient(180deg,transparent,var(--ang));"></i>
+            <i style="background:linear-gradient(180deg,transparent,var(--dis));"></i>
+            <i style="background:linear-gradient(180deg,transparent,var(--fear));"></i>
+          </div>
+          <div class="glint"></div>
+        </div>
+        <div>
+          <h2>A Pixar journey into the mind</h2>
+          <p class="body" style="margin-bottom:14px;">We chose this movie because it teaches us about <strong>emotions</strong>, <strong>mental health</strong>, and how our feelings affect our daily lives. It also has an interesting story and meaningful lessons for everyone.</p>
+          <div class="facts">
+            <div class="fact"><span class="k">Genre</span><span class="v">Animation · Comedy · Drama</span></div>
+            <div class="fact"><span class="k">Studio</span><span class="v">Walt Disney Pictures &amp; Pixar Animation Studios</span></div>
+            <div class="fact"><span class="k">Released</span><span class="v">June 2015</span></div>
+            <div class="fact"><span class="k">Director</span><span class="v">Pete Docter</span></div>
+            <div class="fact"><span class="k">Runtime</span><span class="v">about 95 minutes</span></div>
+            <div class="fact"><span class="k">Award</span><span class="v">Academy Award — Best Animated Feature (2016)</span></div>
+            <div class="fact"><span class="k">Our talk</span><span class="v">5 parts · about 12 minutes · questions welcome at the end</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FLYOVER ============ -->
+<section data-cam="0,105,35|0,0,-5">
+  <div class="fly-cap reveal">
+    <h3>Welcome to Headquarters</h3>
+    <p>The control centre of Riley's mind — memory orbs, the Train of Thought,<br>and the floating Personality Islands that make Riley… Riley.</p>
+  </div>
+</section>
+
+<!-- ============ 02 PLOT ============ -->
+<section id="plot" data-cam="-102,28,54|-48,10,-6">
+  <div class="shell left">
+    <div class="panel reveal" style="width:min(560px,100%);">
+      <div class="eyebrow">The plot</div>
+      <div class="chapter">Part 02 — Riley's story</div>
+      <div class="speaker">🎤 คิตตี้ opens · then มงกี้ → อันอัน → เอม → น้ำมนต์ → โม</div>
+      <h2>Five emotions, one girl</h2>
+      <div class="tl">
+        <div class="tl-line"><i id="tlFill"></i></div>
+        <div class="tl-item reveal"><h3>Moving day 📦</h3><p>Riley is an 11-year-old girl who moves from Minnesota to San Francisco because of her father's new job. Inside her mind, five emotions control her feelings and decisions.</p><div class="by">— มงกี้</div></div>
+        <div class="tl-item reveal"><h3>Lost in the mind 🌀</h3><p>Joy wants Riley to be happy all the time. One day, Joy and Sadness accidentally leave the control centre.</p><div class="by">— อันอัน</div></div>
+        <div class="tl-item reveal"><h3>Everything falls apart 😟</h3><p>Only Anger, Fear, and Disgust are left in control. Riley becomes upset and decides to run away.</p><div class="by">— เอม</div></div>
+        <div class="tl-item reveal"><h3>Joy's lesson 💡</h3><p>Joy learns that sadness is important because it helps people understand and support each other. Joy lets Sadness take control.</p><div class="by">— น้ำมนต์</div></div>
+        <div class="tl-item reveal"><h3>Coming home 🏠</h3><p>Riley goes back home and tells her parents how she feels. They comfort her, and she slowly accepts her new life.</p><div class="by">— โม</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 CHARACTERS ============ -->
+<section id="characters" data-cam="24,15,30|0,11,4">
+  <div class="shell center">
+    <div class="panel wide reveal">
+      <div class="eyebrow">Main characters</div>
+      <div class="chapter">Part 03 — The voices at the console</div>
+      <h2>Meet the five emotions (and Riley)</h2>
+      <div class="grid g3 stagger">
+        <div class="cardlet emo reveal" style="--hc:var(--joy);"><span class="ico">⭐</span><h3>Joy</h3><p>The sparkling leader of the team. She wants Riley to be happy every single day — until she learns that happiness is not everything.</p></div>
+        <div class="cardlet emo reveal" style="--hc:var(--sad);"><span class="ico">💧</span><h3>Sadness</h3><p>Quiet, gentle, and misunderstood. By the end of the story she turns out to be the most important emotion of all.</p></div>
+        <div class="cardlet emo reveal" style="--hc:var(--ang);"><span class="ico">🔥</span><h3>Anger</h3><p>Short, red, and always ready to explode — literally. He fights for what is fair for Riley, with a head full of fire.</p></div>
+        <div class="cardlet emo reveal" style="--hc:var(--fear);"><span class="ico">😨</span><h3>Fear</h3><p>Riley's safety inspector. He checks every possible danger — and counts surviving a school day as a great success.</p></div>
+        <div class="cardlet emo reveal" style="--hc:var(--dis);"><span class="ico">🥦</span><h3>Disgust</h3><p>Stylish and honest. She protects Riley from being poisoned — physically and socially. Her greatest enemy: broccoli.</p></div>
+        <div class="cardlet emo reveal" style="--hc:var(--riley);"><span class="ico">🎀</span><h3>Riley</h3><p>The 11-year-old girl whose mind we live in. Moving to a new city turns her whole world — inside and out — upside down.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 FAVOURITES I ============ -->
+<section id="fav1" data-cam="-88,18,-6|-58,11,-10">
+  <div class="shell center">
+    <div class="panel wide reveal">
+      <div class="eyebrow">Our favourites</div>
+      <div class="chapter">Part 04 — Favourite characters, scenes &amp; quotes (Ⅰ)</div>
+      <div class="speaker">🎤 Everyone speaks — three of us first</div>
+      <div class="grid g3 stagger">
+        <div class="fav-card reveal" style="--mc:var(--ang);">
+          <div class="who"><span class="em">🔥</span><div><div class="nm">โม (Mo)</div><div class="rl">FAVOURITE: ANGER</div></div></div>
+          <p>Anger always wants to <strong>protect Riley</strong> and hates unfair things. He taught me that anger is a normal feeling — we just have to control it in a good way.</p>
+          <h4>Favourite scene</h4>
+          <p>The dinner-table scene: Riley talks back, Anger blows up, and his head catches on fire. Funny — but it shows how emotions drive our actions.</p>
+          <h4>Favourite quotes</h4>
+          <p class="q">“Congratulations, San Francisco, you've ruined pizza!”</p>
+          <p class="q" style="margin-top:6px;">“Oh, I'll show you attitude, old man!”</p>
+          <h4>New word</h4>
+          <p><span class="vchip">emotion</span> a feeling such as happiness, sadness, anger, fear, or disgust.</p>
+        </div>
+        <div class="fav-card reveal" style="--mc:var(--joy);">
+          <div class="who"><span class="em">⭐</span><div><div class="nm">น้ำมนต์ (Nammon)</div><div class="rl">FAVOURITE: JOY</div></div></div>
+          <p>Joy is always <strong>positive and caring</strong>. She grows up in this movie — and learns that happiness is not the only emotion that matters.</p>
+          <h4>Favourite scene</h4>
+          <p>When Joy finally lets Sadness take the controls, Riley can show her true feelings and talk honestly with her parents. We don't have to be happy all the time.</p>
+          <h4>Favourite quote</h4>
+          <p class="q">“I just wanted Riley to be happy.”</p>
+          <h4>New word</h4>
+          <p><span class="vchip">joy</span> a feeling of great happiness — stronger than just “happy”, as in <em>“bring joy to others.”</em></p>
+        </div>
+        <div class="fav-card reveal" style="--mc:var(--fear);">
+          <div class="who"><span class="em">😨</span><div><div class="nm">เอม (Aim)</div><div class="rl">FAVOURITE: FEAR</div></div></div>
+          <p>Fear always tries to <strong>keep Riley safe</strong>. He worries a lot, but he thinks before acting — being careful is important too.</p>
+          <h4>Favourite scene</h4>
+          <p>Fear checking every possible problem before Riley's first day at her new school. Funny, and it shows how much he cares.</p>
+          <h4>Favourite quote</h4>
+          <p class="q">“All right! We did not die today. I call that an unqualified success.”</p>
+          <h4>New expressions</h4>
+          <p><span class="vchip">keep someone safe</span><span class="vchip">stay away</span><span class="vchip">be careful</span><span class="vchip">worry about</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 FAVOURITES II ============ -->
+<section data-cam="92,17,-4|60,11,-12">
+  <div class="shell center">
+    <div class="panel wide reveal">
+      <div class="eyebrow">Our favourites</div>
+      <div class="chapter">Part 04 — Favourite characters, scenes &amp; quotes (Ⅱ)</div>
+      <div class="speaker">🎤 …and the other three of us</div>
+      <div class="grid g3 stagger">
+        <div class="fav-card reveal" style="--mc:var(--sad);">
+          <div class="who"><span class="em">💧</span><div><div class="nm">อันอัน (Anan)</div><div class="rl">FAVOURITE: SADNESS</div></div></div>
+          <p>Sadness is <strong>kind</strong> and truly understands other people's feelings.</p>
+          <h4>Favourite scene</h4>
+          <p>Sadness comforting Bing Bong after he loses his rocket wagon. She just sits and listens. Sometimes people don't need advice — they need someone to listen.</p>
+          <h4>Favourite quote</h4>
+          <p class="q">“I'm sorry they took away something you loved… You and Riley had so many wonderful adventures together. It's okay, Bing Bong.”</p>
+          <h4>New phrase</h4>
+          <p><span class="vchip">feel better</span> to feel happier or less sad after something bad happens.</p>
+        </div>
+        <div class="fav-card reveal" style="--mc:var(--dis);">
+          <div class="who"><span class="em">🥦</span><div><div class="nm">มงกี้ (Monkey)</div><div class="rl">FAVOURITE: DISGUST</div></div></div>
+          <p>Disgust protects Riley's <strong>physical, mental and social well-being</strong> — she teaches Riley to say no to bad things and make safe decisions.</p>
+          <h4>Favourite scene</h4>
+          <p>Riley refuses to eat broccoli and Disgust shouts, <em>“No! Broccoli!”</em> Funny, honest, and easy to remember.</p>
+          <h4>Favourite quote</h4>
+          <p class="q">“The only thing I want to say is thank you… if you and I can keep smiling, it will help him. Let's do it together.” — Riley's mother</p>
+          <h4>New words</h4>
+          <p><span class="vchip">Core Memories</span><span class="vchip">Personality Islands</span><span class="vchip">Long-Term Memory</span><span class="vchip">Belief System</span></p>
+        </div>
+        <div class="fav-card reveal" style="--mc:var(--riley);">
+          <div class="who"><span class="em">🎀</span><div><div class="nm">คิตตี้ (Kitty)</div><div class="rl">FAVOURITE: RILEY</div></div></div>
+          <p>I can see Riley's <strong>growth</strong> through the whole movie. Growing up is not easy — and it's okay to feel different emotions.</p>
+          <h4>Favourite scene</h4>
+          <p>When Riley almost runs away — then Sadness touches the control panel, Riley realises what she is doing, runs back home and hugs her parents.</p>
+          <h4>Favourite quote</h4>
+          <p class="q">“Crying helps me slow down and obsess over the weight of life's problems.” — Sadness</p>
+          <h4>New word</h4>
+          <p><span class="vchip">realize</span> to understand something — <em>“Riley realizes she made a mistake.”</em></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 LESSONS ============ -->
+<section id="lessons" data-cam="-4,14,-58|0,8,-30">
+  <div class="shell center">
+    <div class="panel wide reveal">
+      <div class="eyebrow">What we learned</div>
+      <div class="chapter">Part 05 — Lessons from the movie</div>
+      <h2>Every emotion has a job to do</h2>
+      <div class="grid g2 stagger" style="margin-bottom:22px;">
+        <div class="cardlet reveal"><span class="ico">🌈</span><h3>Every emotion matters</h3><p>Joy, Sadness, Anger, Fear and Disgust all protect Riley in their own way. We need all of them — not just happiness.</p></div>
+        <div class="cardlet reveal"><span class="ico">💙</span><h3>It's okay to be sad</h3><p>Sadness helps us slow down, understand ourselves, and lets other people know we need support. Crying is not weakness.</p></div>
+        <div class="cardlet reveal"><span class="ico">🗣️</span><h3>Talk about your feelings</h3><p>Riley only feels better after she tells her parents the truth. Sharing feelings honestly is how people help each other.</p></div>
+        <div class="cardlet reveal"><span class="ico">🌱</span><h3>Growing up is hard — and normal</h3><p>New city, new school, new life. Change is difficult for everyone, and adjusting takes time. That's completely okay.</p></div>
+      </div>
+      <h4 style="color:#ffe9a8; font-size:.74rem; letter-spacing:.22em; text-transform:uppercase; margin-bottom:8px;">📖 Our new vocabulary from this movie</h4>
+      <p>
+        <span class="vchip">emotion</span><span class="vchip">joy</span><span class="vchip">realize</span><span class="vchip">feel better</span><span class="vchip">keep someone safe</span><span class="vchip">worry about</span><span class="vchip">be careful</span><span class="vchip">stay away</span><span class="vchip">Core Memories</span><span class="vchip">Personality Islands</span><span class="vchip">Long-Term Memory</span><span class="vchip">Belief System</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 RATING ============ -->
+<section id="rating" data-cam="6,130,85|0,0,0">
+  <div class="shell center">
+    <div class="panel wide reveal">
+      <div class="eyebrow">Our rating</div>
+      <div class="chapter">Conclusion — Score &amp; recommendation</div>
+      <div class="speaker">🎤 คิตตี้</div>
+      <h2>10 out of 10 — here's why</h2>
+      <div class="score-line">
+        <span class="score-num"><span class="count" data-to="10">10</span>/10</span>
+        <span class="stars-row">★★★★★<span class="fill" style="width:100%;">★★★★★</span></span>
+      </div>
+      <p class="body" style="margin-bottom:14px;">In conclusion, <strong>Inside Out</strong> is a fun and meaningful movie. It teaches us that every emotion is important — even sadness. We highly recommend it to everyone.</p>
+      <ul class="bullets">
+        <li>A great story with an <strong>important lesson</strong> about emotions and mental health</li>
+        <li>Funny and touching at the same time — perfect for every age</li>
+        <li>Clear, simple English — great for <strong>learning new words and expressions</strong></li>
+        <li>Winner of the Academy Award for Best Animated Feature</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUOTE ============ -->
+<section data-cam="8,30,72|-55,58,-95">
+  <div class="quote-shell reveal">
+    <blockquote><span class="qm">“</span>Crying helps me slow down and obsess<br>over the weight of life's problems.<span class="qm">”</span></blockquote>
+    <div class="quote-by">— Sadness · Inside Out (2015)</div>
+  </div>
+</section>
+
+<!-- ============ CLOSING ============ -->
+<section class="outro" data-cam="95,55,135|0,18,0">
+  <div class="eyebrow reveal" style="justify-content:center;">Fin — Closing</div>
+  <h2 class="reveal">Thank You for Listening 🌟</h2>
+  <p class="sub reveal">That was our journey through <em>Inside Out</em>.<br>Do you have any questions?</p>
+  <div class="speaker reveal" style="margin-top:18px;">🎤 คิตตี้ · closing</div>
+  <a href="#top" class="back-top reveal">⬆ Back to top</a>
+</section>
+
+<footer>Inside Out · A Group Presentation in English</footer>
+
+<script src="vendor/three.min.js"></script>
+<script>
+'use strict';
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- CSS star fallback ---------- */
+const starsBox = document.getElementById('stars');
+for (let i = 0; i < 70; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 2 + 0.6;
+  s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;animation-delay:${(Math.random()*4).toFixed(1)}s`;
+  starsBox.appendChild(s);
+}
+
+/* ---------- reveals ---------- */
+document.querySelectorAll('.stagger').forEach(g => [...g.children].forEach((c,i)=>c.style.setProperty('--sd', (i*80)+'ms')));
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+}), { threshold:.15, rootMargin:'0px 0px -8% 0px' });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ---------- count-up ---------- */
+const cio = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return; cio.unobserve(e.target);
+  const el = e.target, to = +el.dataset.to;
+  const t0 = performance.now(), dur = 1200;
+  (function tick(t){ const p = Math.min(1,(t-t0)/dur), ez = 1-Math.pow(1-p,3);
+    el.textContent = Math.round(to*ez);
+    if (p<1) requestAnimationFrame(tick); })(t0);
+}), { threshold:.6 });
+document.querySelectorAll('.count').forEach(el => cio.observe(el));
+
+/* ---------- poster tilt ---------- */
+const poster = document.getElementById('posterTilt');
+if (poster && matchMedia('(hover:hover)').matches) {
+  poster.addEventListener('mousemove', e => {
+    const r = poster.getBoundingClientRect();
+    const x = (e.clientX-r.left)/r.width-.5, y = (e.clientY-r.top)/r.height-.5;
+    poster.style.transform = `perspective(700px) rotateY(${(x*14).toFixed(1)}deg) rotateX(${(-y*10).toFixed(1)}deg)`;
+  });
+  poster.addEventListener('mouseleave', () => poster.style.transform = '');
+}
+
+/* ---------- nav active chip ---------- */
+const chipLinks = [...document.querySelectorAll('.chip')];
+const chipTargets = chipLinks.map(a => document.querySelector(a.getAttribute('href')));
+function updChips() {
+  let ai = 0;
+  chipTargets.forEach((t,i) => { if (t && t.getBoundingClientRect().top < innerHeight*.5) ai = i; });
+  chipLinks.forEach((a,i) => a.classList.toggle('on', i===ai));
+}
+
+/* ---------- scroll shared ---------- */
+const progress = document.getElementById('progress');
+const tlFill = document.getElementById('tlFill');
+const tlBox = document.querySelector('.tl');
+let scrollDirty = true;
+addEventListener('scroll', () => { scrollDirty = true; }, { passive:true });
+function uiScroll() {
+  const doc = document.documentElement;
+  const max = doc.scrollHeight - innerHeight;
+  progress.style.width = (max>0 ? scrollY/max*100 : 0) + '%';
+  if (tlBox) {
+    const r = tlBox.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, (innerHeight*.8 - r.top) / r.height));
+    tlFill.style.transform = `scaleY(${p})`;
+  }
+  updChips();
+}
+
+/* ============================================================
+   3D WORLD — Riley's Mind World (Three.js)
+   ============================================================ */
+let render3d = null;
+try {
+  const canvas = document.getElementById('world');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.22;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x191243);
+  scene.fog = new THREE.FogExp2(0x231856, 0.0038);
+
+  const camera = new THREE.PerspectiveCamera(46, innerWidth/innerHeight, 0.1, 1200);
+  camera.position.set(72,40,104);
+
+  /* ---------- glow sprites ---------- */
+  const glowCache = {};
+  function glowTex(color) {
+    if (glowCache[color]) return glowCache[color];
+    const cv = document.createElement('canvas'); cv.width = cv.height = 128;
+    const cx = cv.getContext('2d');
+    const g = cx.createRadialGradient(64,64,4, 64,64,64);
+    g.addColorStop(0, color); g.addColorStop(1, 'rgba(0,0,0,0)');
+    cx.fillStyle = g; cx.fillRect(0,0,128,128);
+    const t = new THREE.CanvasTexture(cv);
+    glowCache[color] = t; return t;
+  }
+  function glowSprite(color, size, opacity, noFog) {
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({
+      map:glowTex(color), transparent:true, opacity:(opacity==null?1:opacity),
+      blending:THREE.AdditiveBlending, depthWrite:false, fog:!noFog }));
+    s.scale.set(size, size, 1);
+    return s;
+  }
+
+  /* ---------- lights ---------- */
+  scene.add(new THREE.HemisphereLight(0x9a7fe8, 0x241a4e, 0.9));
+  const keyLight = new THREE.DirectionalLight(0xffe2b8, 0.85);
+  keyLight.position.set(-80, 140, -60);
+  keyLight.castShadow = true;
+  keyLight.shadow.mapSize.set(2048, 2048);
+  keyLight.shadow.camera.left = -160; keyLight.shadow.camera.right = 160;
+  keyLight.shadow.camera.top = 160; keyLight.shadow.camera.bottom = -160;
+  keyLight.shadow.camera.near = 20; keyLight.shadow.camera.far = 450;
+  keyLight.shadow.bias = -0.0006;
+  scene.add(keyLight); scene.add(keyLight.target);
+  const fillPink = new THREE.DirectionalLight(0xff9ad2, 0.5);
+  fillPink.position.set(80, 50, 140); scene.add(fillPink);
+  const fillBlue = new THREE.DirectionalLight(0x7fd0ff, 0.35);
+  fillBlue.position.set(-120, 40, 80); scene.add(fillBlue);
+  const hqLight = new THREE.PointLight(0xfff0c0, 1.3, 130, 1.7);
+  hqLight.position.set(0, 18, 0); scene.add(hqLight);
+
+  /* ---------- materials ---------- */
+  const Mat = (c, o) => new THREE.MeshStandardMaterial(Object.assign({ color:c, flatShading:true, roughness:0.92, metalness:0.02 }, o||{}));
+  const EMO = { joy:0xffd54f, sad:0x4aa3e8, ang:0xe8452c, dis:0x7ed957, fear:0xb57ae0, riley:0xff8ac2 };
+  const EMOLIST = [EMO.joy, EMO.sad, EMO.ang, EMO.dis, EMO.fear];
+  const towerM = Mat(0xe7ddf7), towerDark = Mat(0xb9a8e0), pinkM = Mat(0xf2a8c8);
+  const plateauM = Mat(0x6a58b5), rockM = Mat(0x51419a);
+  const orbMat = c => new THREE.MeshStandardMaterial({ color:c, emissive:c, emissiveIntensity:0.55, roughness:0.35, metalness:0.1 });
+  const cloudWhite = Mat(0xf6effc, { roughness:1 });
+
+  /* ---------- terrain ---------- */
+  function hash(ix, iz) {
+    let h = ix*374761393 + iz*668265263;
+    h = (h ^ (h >> 13)) * 1274126177;
+    return ((h ^ (h >> 16)) >>> 0) / 4294967295;
+  }
+  function vnoise(x, z) {
+    const ix = Math.floor(x), iz = Math.floor(z), fx = x-ix, fz = z-iz;
+    const s = t => t*t*(3-2*t);
+    const a = hash(ix,iz), b = hash(ix+1,iz), c = hash(ix,iz+1), d = hash(ix+1,iz+1);
+    return a + (b-a)*s(fx) + (c-a)*s(fz) + (a-b-c+d)*s(fx)*s(fz);
+  }
+  const fbm = (x,z) => vnoise(x,z)*0.55 + vnoise(x*2.13+7, z*2.13+3)*0.28 + vnoise(x*4.31+13, z*4.31+9)*0.17;
+
+  const terGeo = new THREE.PlaneGeometry(680, 680, 108, 108);
+  terGeo.rotateX(-Math.PI/2);
+  {
+    const posA = terGeo.attributes.position;
+    const colA = new THREE.Color(0x2b2060), colB = new THREE.Color(0x53409e), colDeep = new THREE.Color(0x1c1548);
+    const cols = new Float32Array(posA.count*3);
+    const cTmp = new THREE.Color();
+    for (let i = 0; i < posA.count; i++) {
+      const x = posA.getX(i), z = posA.getZ(i);
+      const d0 = Math.hypot(x, z);
+      let h = Math.pow(fbm(x*0.012, z*0.012), 1.5) * 58;
+      h *= THREE.MathUtils.smoothstep(d0, 60, 260);
+      const e = Math.pow((x+55)/36, 2) + Math.pow((z+5)/48, 2);
+      if (e > 0.55 && e < 1.5) h *= 0.12;
+      posA.setY(i, h);
+      const u = THREE.MathUtils.clamp(h/32, 0, 1);
+      cTmp.copy(h < 1 ? colDeep : colA).lerp(colB, u).convertSRGBToLinear();
+      const j = (hash(i, 7) - 0.5) * 0.02;
+      cols[i*3] = cTmp.r + j; cols[i*3+1] = cTmp.g + j; cols[i*3+2] = cTmp.b + j;
+    }
+    terGeo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+    terGeo.computeVertexNormals();
+  }
+  const terrain = new THREE.Mesh(terGeo, new THREE.MeshStandardMaterial({ vertexColors:true, flatShading:true, roughness:1 }));
+  terrain.receiveShadow = true;
+  scene.add(terrain);
+
+  /* ---------- Headquarters ---------- */
+  const hq = new THREE.Group();
+  const plateau = new THREE.Mesh(new THREE.CylinderGeometry(19, 24, 6, 14), plateauM);
+  plateau.position.y = 3; plateau.castShadow = plateau.receiveShadow = true; hq.add(plateau);
+  const deckTop = new THREE.Mesh(new THREE.CylinderGeometry(19, 19, 0.8, 14), Mat(0x8a76cc));
+  deckTop.position.y = 6.4; deckTop.receiveShadow = true; hq.add(deckTop);
+
+  const towerBase = new THREE.Mesh(new THREE.CylinderGeometry(8, 9.5, 12, 12), towerM);
+  towerBase.position.y = 12.8; towerBase.castShadow = true; hq.add(towerBase);
+  const towerBand = new THREE.Mesh(new THREE.CylinderGeometry(8.4, 8.4, 1.1, 12), pinkM);
+  towerBand.position.y = 14; hq.add(towerBand);
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(8.2, 18, 12, 0, Math.PI*2, 0, Math.PI/2),
+    new THREE.MeshPhongMaterial({ color:0xbfe8ff, transparent:true, opacity:0.32, shininess:80 }));
+  dome.position.y = 18.8; hq.add(dome);
+  const domeGlow = glowSprite('rgba(255,240,190,0.5)', 26); domeGlow.position.y = 21; hq.add(domeGlow);
+  for (let i = 0; i < 10; i++) {   // tall windows around the tower
+    const a = i/10 * Math.PI*2;
+    const w = new THREE.Mesh(new THREE.PlaneGeometry(1, 3.2), new THREE.MeshBasicMaterial({ color:0xfff0b8 }));
+    w.position.set(Math.cos(a)*8.05, 12.6, Math.sin(a)*8.05);
+    w.rotation.y = -a + Math.PI/2;
+    hq.add(w);
+  }
+
+  /* console + buttons */
+  const consoleT = new THREE.Mesh(new THREE.CylinderGeometry(3.1, 2.2, 1.1, 14), pinkM);
+  consoleT.scale.x = 1.7; consoleT.position.set(0, 7.4, 10.5); consoleT.castShadow = true; hq.add(consoleT);
+  const blinkers = [];
+  for (let i = 0; i < 22; i++) {
+    const bm = new THREE.MeshBasicMaterial({ color: EMOLIST[i % 5] });
+    const b = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.24, 0.36), bm);
+    const a = Math.random()*Math.PI*2, r = Math.random()*2.4;
+    b.position.set(Math.cos(a)*r*1.7, 8.05, 10.5 + Math.sin(a)*r*0.8);
+    b.userData.ph = Math.random()*6.28;
+    hq.add(b); blinkers.push(b);
+  }
+  const lever = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 1.3, 6), Mat(0x2c2450));
+  lever.position.set(1.6, 8.5, 10.2); lever.rotation.z = -0.4; hq.add(lever);
+  const leverTop = new THREE.Mesh(new THREE.SphereGeometry(0.26, 8, 6), orbMat(EMO.ang));
+  leverTop.position.set(2.05, 9.05, 10.2); hq.add(leverTop);
+
+  /* the five emotions at the console */
+  const emotions = [];
+  Object.values(EMO).slice(0,5).forEach((c, i) => {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.62, 1.15, 10),
+      new THREE.MeshStandardMaterial({ color:c, emissive:c, emissiveIntensity:0.25, roughness:0.6 }));
+    body.position.y = 0.58; body.castShadow = true; g.add(body);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 10),
+      new THREE.MeshStandardMaterial({ color:c, emissive:c, emissiveIntensity:0.3, roughness:0.55 }));
+    head.position.y = 1.5; g.add(head);
+    const halo = glowSprite('rgba(255,255,255,0.35)', 2.6); halo.position.y = 1.5; g.add(halo);
+    const a = -0.85 + i*0.42;
+    g.position.set(Math.sin(a)*5.2, 6.8, 10.5 - Math.cos(a)*3.4 + 6.2);
+    g.userData.ph = i*1.3;
+    hq.add(g); emotions.push(g);
+  });
+
+  /* big memory screen */
+  const screen = new THREE.Mesh(new THREE.PlaneGeometry(7.5, 4.2), new THREE.MeshBasicMaterial({ color:0x9fd8ff }));
+  screen.position.set(0, 10.6, 8.42); hq.add(screen);
+  const screenGlow = glowSprite('rgba(160,220,255,0.5)', 12); screenGlow.position.set(0, 10.6, 9.2); hq.add(screenGlow);
+  scene.add(hq);
+
+  /* ---------- memory shelves (arcs of glowing orbs) ---------- */
+  const orbGeo = new THREE.SphereGeometry(0.72, 10, 8);
+  const shelfPole = new THREE.CylinderGeometry(0.14, 0.14, 8.4, 6);
+  for (const R of [33, 40]) {
+    for (let i = 0; i < 13; i++) {
+      const a = Math.PI * (1.08 + i * 0.066);   // behind HQ (north arc)
+      const x = Math.cos(a)*R, z = Math.sin(a)*R * 1.06;
+      const pole = new THREE.Mesh(shelfPole, towerDark);
+      pole.position.set(x, 4.2, z); pole.castShadow = true; scene.add(pole);
+      for (let k = 0; k < 4; k++) {
+        const o = new THREE.Mesh(orbGeo, orbMat(EMOLIST[(i + k + (R>35?2:0)) % 5]));
+        o.position.set(x, 1.6 + k*2.0, z);
+        scene.add(o);
+      }
+      if (i % 3 === 0) { const gl = glowSprite('rgba(255,225,150,0.35)', 7); gl.position.set(x, 8.6, z); scene.add(gl); }
+    }
+  }
+
+  /* ---------- orb rail: rolling memories ---------- */
+  const railCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(6, 8.5, -8),
+    new THREE.Vector3(16, 7.5, -18),
+    new THREE.Vector3(10, 6.5, -30),
+    new THREE.Vector3(-6, 5.8, -36),
+    new THREE.Vector3(-22, 5.2, -32),
+    new THREE.Vector3(-30, 4.8, -22),
+  ]);
+  const rail = new THREE.Mesh(new THREE.TubeGeometry(railCurve, 60, 0.28, 6, false),
+    new THREE.MeshBasicMaterial({ color:0x8fd0ff, transparent:true, opacity:0.28 }));
+  scene.add(rail);
+  const railPts = railCurve.getPoints(200);
+  const railOrbs = [];
+  for (let i = 0; i < 6; i++) {
+    const o = new THREE.Mesh(orbGeo, orbMat(EMOLIST[i % 5]));
+    o.userData.t = i/6;
+    scene.add(o); railOrbs.push(o);
+  }
+
+  /* ---------- personality islands ---------- */
+  const islands = [];
+  function islandBase(x, y, z, r, topColor) {
+    const g = new THREE.Group();
+    const under = new THREE.Mesh(new THREE.ConeGeometry(r, r*1.15, 9), rockM);
+    under.rotation.x = Math.PI; under.position.y = -r*0.55; under.castShadow = true; g.add(under);
+    const top = new THREE.Mesh(new THREE.CylinderGeometry(r, r*1.02, 1.6, 9), Mat(topColor));
+    top.position.y = 0.8; top.receiveShadow = true; top.castShadow = true; g.add(top);
+    g.position.set(x, y, z);
+    scene.add(g); islands.push(g);
+    return g;
+  }
+  /* Family Island */
+  {
+    const g = islandBase(-62, 12, -38, 11, 0x7fc9a5);
+    const house = new THREE.Mesh(new THREE.BoxGeometry(4, 3, 3.4), Mat(0xf3e2c4));
+    house.position.y = 3.1; house.castShadow = true; g.add(house);
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(3.2, 2.2, 4), Mat(0xd96a5a));
+    roof.position.y = 5.7; roof.rotation.y = Math.PI/4; roof.castShadow = true; g.add(roof);
+    const win = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.9), new THREE.MeshBasicMaterial({ color:0xffe9a8 }));
+    win.position.set(0, 3.1, 1.75); g.add(win);
+    const wGlow = glowSprite('rgba(255,220,150,0.6)', 4); wGlow.position.set(0, 3.2, 2.2); g.add(wGlow);
+    for (const [tx, tz] of [[-4.5, 2.5],[4.6, -2]]) {
+      const tr = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.3, 1.6, 5), Mat(0x6b4a3a));
+      tr.position.set(tx, 2.2, tz); g.add(tr);
+      const cn = new THREE.Mesh(new THREE.SphereGeometry(1.4, 8, 6), Mat(0x5fae7f));
+      cn.position.set(tx, 3.8, tz); cn.castShadow = true; g.add(cn);
+    }
+  }
+  /* Friendship Island */
+  {
+    const g = islandBase(-70, 10, 30, 9.5, 0xf0b8d0);
+    const arch = new THREE.Mesh(new THREE.TorusGeometry(3, 0.5, 8, 14, Math.PI), Mat(0xff8ac2));
+    arch.position.y = 1.7; arch.castShadow = true; g.add(arch);
+    [[-3,0],[3,0]].forEach(([px,pz]) => {
+      const b = new THREE.Mesh(new THREE.SphereGeometry(1.5, 9, 7), Mat(0xba85e8));
+      b.position.set(px, 2.6, pz-3.5); b.castShadow = true; g.add(b);
+    });
+    const hGlow = glowSprite('rgba(255,150,200,0.55)', 8); hGlow.position.y = 4.4; g.add(hGlow);
+  }
+  /* Hockey Island */
+  {
+    const g = islandBase(58, 11, -45, 10.5, 0x9fd8ff);
+    const rink = new THREE.Mesh(new THREE.CylinderGeometry(6.2, 6.2, 0.4, 12), Mat(0xf2f6ff));
+    rink.scale.z = 0.62; rink.position.y = 1.85; g.add(rink);
+    [[-4.6, 0],[4.6, 0]].forEach(([px], gi) => {
+      const goal = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.4, 2.6), Mat(0xe8452c));
+      goal.position.set(px, 2.8, 0); goal.castShadow = true; g.add(goal);
+    });
+    const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 4.4, 6), Mat(0xcf9a5e));
+    stick.rotation.z = 0.7; stick.position.set(0, 3.6, -2.5); g.add(stick);
+  }
+  /* Goofball Island */
+  {
+    const g = islandBase(72, 13, 25, 9, 0xffd54f);
+    let py = 2.2;
+    [[2.4, 0xff8ac2],[1.7, 0xffd54f],[1.15, 0x7fd0ff]].forEach(([r, c]) => {
+      const b = new THREE.Mesh(new THREE.SphereGeometry(r, 10, 8), Mat(c));
+      b.position.y = py + r*0.7; b.castShadow = true; g.add(b);
+      py += r*1.5;
+    });
+    const gGlow = glowSprite('rgba(255,213,120,0.5)', 9); gGlow.position.y = py + 1; g.add(gGlow);
+  }
+  /* Honesty Island */
+  {
+    const g = islandBase(6, 15, -85, 9, 0x9fb6ff);
+    const obelisk = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.5, 7, 4), Mat(0xcfd8ff));
+    obelisk.position.y = 5; obelisk.castShadow = true; g.add(obelisk);
+    const tip = new THREE.Mesh(new THREE.ConeGeometry(1.1, 1.6, 4), orbMat(0x9fd8ff));
+    tip.position.y = 9.2; g.add(tip);
+    const tGlow = glowSprite('rgba(160,200,255,0.7)', 7); tGlow.position.y = 9.4; g.add(tGlow);
+  }
+
+  /* light bridges from HQ to islands */
+  islands.forEach(isl => {
+    const from = new THREE.Vector3(0, 8, 0);
+    const to = isl.position.clone().add(new THREE.Vector3(0, 1.5, 0));
+    const len = from.distanceTo(to);
+    const bridge = new THREE.Mesh(new THREE.PlaneGeometry(len, 1.4),
+      new THREE.MeshBasicMaterial({ color:0xbfd4ff, transparent:true, opacity:0.14, side:THREE.DoubleSide,
+        blending:THREE.AdditiveBlending, depthWrite:false }));
+    bridge.position.copy(from.clone().add(to).multiplyScalar(0.5));
+    bridge.lookAt(to);
+    bridge.rotateY(Math.PI/2);
+    scene.add(bridge);
+  });
+
+  /* ---------- Train of Thought (elevated) ---------- */
+  const trainCurve = new THREE.EllipseCurve(-55, -5, 30, 42, 0, Math.PI*2);
+  const TRAIN_Y = 6;
+  const trackPts = trainCurve.getPoints(140).map(pt => new THREE.Vector3(pt.x, TRAIN_Y, pt.y));
+  const track = new THREE.Mesh(
+    new THREE.TubeGeometry(new THREE.CatmullRomCurve3(trackPts, true), 140, 0.24, 5, true), Mat(0x8a76cc));
+  track.castShadow = true;
+  scene.add(track);
+  for (let i = 0; i < 140; i += 10) {   // trestle legs
+    const p = trackPts[i];
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.5, TRAIN_Y, 0.5), towerDark);
+    leg.position.set(p.x, TRAIN_Y/2, p.z);
+    leg.castShadow = true;
+    scene.add(leg);
+  }
+  const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.2, 10);
+  const trainDark = Mat(0x4a3c85);
+  function addWheels(g, len, n) {
+    for (let i = 0; i < n; i++) {
+      const wx = -len/2 + 0.9 + i * ((len-1.8)/(n-1 || 1));
+      [-1.05, 1.05].forEach(side => {
+        const wh = new THREE.Mesh(wheelGeo, trainDark);
+        wh.rotation.x = Math.PI/2;
+        wh.position.set(wx, 0.4, side);
+        g.add(wh);
+      });
+    }
+  }
+  function mindCar(len, bodyColor) {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.BoxGeometry(len, 1.9, 2), Mat(bodyColor));
+    body.position.y = 1.6; body.castShadow = true; g.add(body);
+    const roofS = new THREE.Mesh(new THREE.BoxGeometry(len, 0.32, 2.2), Mat(0x7a5fc0));
+    roofS.position.y = 2.7; g.add(roofS);
+    for (let i = 0; i < 2; i++) {
+      const o = new THREE.Mesh(orbGeo, orbMat(EMOLIST[(i*3+1) % 5]));
+      o.scale.setScalar(0.6);
+      o.position.set(-len/4 + i*len/2, 3.1, 0);
+      g.add(o);
+    }
+    addWheels(g, len, 2);
+    return g;
+  }
+  const train = new THREE.Group(); scene.add(train);
+  const loco = new THREE.Group();
+  const boiler = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, 3.2, 12), Mat(0xf06fb8));
+  boiler.rotation.z = Math.PI/2; boiler.position.set(-0.6, 1.55, 0); boiler.castShadow = true; loco.add(boiler);
+  const cab = new THREE.Mesh(new THREE.BoxGeometry(1.7, 2.3, 2), Mat(0x9a6fe0));
+  cab.position.set(1.5, 1.85, 0); cab.castShadow = true; loco.add(cab);
+  const chimney = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.4, 1, 8), Mat(0x4a3c85));
+  chimney.position.set(-1.8, 2.9, 0); loco.add(chimney);
+  const lampGlow = glowSprite('rgba(255,230,170,0.9)', 3); lampGlow.position.set(-2.5, 1.55, 0); loco.add(lampGlow);
+  addWheels(loco, 4.2, 3);
+  train.add(loco);
+  const cars = [loco];
+  for (let i = 1; i <= 3; i++) { const c = mindCar(3.8, i % 2 ? 0x7fd0ff : 0xffd54f); train.add(c); cars.push(c); }
+
+  const puffs = [];
+  for (let i = 0; i < 12; i++) {
+    const s = new THREE.Mesh(new THREE.IcosahedronGeometry(0.55, 0),
+      new THREE.MeshStandardMaterial({ color:0xffd6f2, transparent:true, opacity:0.4, flatShading:true, roughness:1 }));
+    s.userData.life = Math.random();
+    scene.add(s); puffs.push(s);
+  }
+
+  /* ---------- dream clouds ---------- */
+  const clouds = [];
+  for (let i = 0; i < 9; i++) {
+    const g = new THREE.Group();
+    for (let k = 0; k < 3; k++) {
+      const puff = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 0), cloudWhite);
+      puff.scale.setScalar(2.2 - k*0.5);
+      puff.position.set(k*2.4 - 2.4, (k%2)*0.8, 0);
+      g.add(puff);
+    }
+    const a = Math.random()*Math.PI*2, d = 90 + Math.random()*120;
+    g.position.set(Math.cos(a)*d, 34 + Math.random()*26, Math.sin(a)*d);
+    g.userData.sp = 0.4 + Math.random()*0.5;
+    scene.add(g); clouds.push(g);
+  }
+
+  /* ---------- golden core-memory sun + halo + stars ---------- */
+  const core = new THREE.Mesh(new THREE.SphereGeometry(11, 20, 16), new THREE.MeshBasicMaterial({ color:0xffe9a8, fog:false }));
+  core.position.set(-120, 85, -160); scene.add(core);
+  const halo1 = glowSprite('rgba(255,225,150,0.55)', 100, 1, true); halo1.position.copy(core.position); scene.add(halo1);
+  const halo2 = glowSprite('rgba(255,170,220,0.25)', 200, 1, true); halo2.position.copy(core.position); scene.add(halo2);
+
+  const starN = 850, starPos = new Float32Array(starN*3);
+  for (let i = 0; i < starN; i++) {
+    const a = Math.random()*Math.PI*2, e = Math.random()*Math.PI*0.48, r = 280+Math.random()*180;
+    starPos[i*3]   = Math.cos(a)*Math.cos(e)*r;
+    starPos[i*3+1] = Math.sin(e)*r + 8;
+    starPos[i*3+2] = Math.sin(a)*Math.cos(e)*r;
+  }
+  const starGeo = new THREE.BufferGeometry();
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color:0xd8d2ff, size:1.6, transparent:true, opacity:0.8, fog:false })));
+
+  /* ---------- idea sparks ---------- */
+  const ffN = 60, ffPos = new Float32Array(ffN*3), ffBase = [];
+  for (let i = 0; i < ffN; i++) {
+    const a = Math.random()*Math.PI*2, d = 22 + Math.random()*40;
+    const bx = Math.cos(a)*d, bz = Math.sin(a)*d, by = 2 + Math.random()*10;
+    ffBase.push([bx, by, bz, Math.random()*6.28]);
+    ffPos[i*3] = bx; ffPos[i*3+1] = by; ffPos[i*3+2] = bz;
+  }
+  const ffGeo = new THREE.BufferGeometry();
+  ffGeo.setAttribute('position', new THREE.BufferAttribute(ffPos, 3));
+  const ffPts = new THREE.Points(ffGeo, new THREE.PointsMaterial({
+    color:0xffe2a0, size:0.7, transparent:true, opacity:0.9,
+    blending:THREE.AdditiveBlending, depthWrite:false }));
+  scene.add(ffPts);
+
+  /* ---------- floating memory orbs near the hero camera ---------- */
+  const floaters = [];
+  for (let i = 0; i < 8; i++) {
+    const o = new THREE.Mesh(orbGeo, orbMat(EMOLIST[i % 5]));
+    o.scale.setScalar(0.7 + Math.random()*0.5);
+    o.userData = { a:Math.random()*Math.PI*2, r:6+Math.random()*9, y:16+Math.random()*12, sp:0.2+Math.random()*0.35, ph:Math.random()*6 };
+    scene.add(o); floaters.push(o);
+  }
+
+  /* ---------- wandering golden orb (like a floating core memory) ---------- */
+  const wanderer = new THREE.Mesh(new THREE.SphereGeometry(0.6, 12, 10), orbMat(EMO.joy));
+  const wGlow2 = glowSprite('rgba(255,220,130,0.8)', 4.5); wanderer.add(wGlow2);
+  scene.add(wanderer);
+
+  /* ---------- ground mist ---------- */
+  const mists = [];
+  for (let i = 0; i < 7; i++) {
+    const m = glowSprite('rgba(190,160,255,0.08)', 45 + Math.random()*40, 0.5);
+    m.position.set(-50 + Math.random()*120, 2.5, -30 + Math.random()*80);
+    m.userData.ph = Math.random()*6.28;
+    scene.add(m); mists.push(m);
+  }
+
+  /* ---------- linear color workflow (guarded) ---------- */
+  scene.traverse(o => {
+    if (o.material) {
+      (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => {
+        if (m.isSpriteMaterial || m.isPointsMaterial || m.isMeshBasicMaterial) return;
+        if (m.userData.__linearized) return;
+        m.userData.__linearized = true;
+        if (m.color) m.color.convertSRGBToLinear();
+        if (m.emissive) m.emissive.convertSRGBToLinear();
+      });
+    }
+  });
+  scene.fog.color.convertSRGBToLinear();
+
+  /* ---------- camera rig ---------- */
+  const camSecs = [...document.querySelectorAll('section[data-cam]')];
+  const poses = camSecs.map(s => {
+    const parts = s.dataset.cam.split('|').map(t => t.split(',').map(Number));
+    return { p:new THREE.Vector3(...parts[0]), l:new THREE.Vector3(...parts[1]) };
+  });
+  let tops = [];
+  function computeTops() {
+    tops = camSecs.map(s => s.getBoundingClientRect().top + scrollY);
+  }
+  computeTops();
+  addEventListener('load', computeTops);
+  setTimeout(computeTops, 1200);
+
+  function poseAt() {
+    const n = poses.length;
+    let f = n - 1;
+    for (let i = 0; i < n - 1; i++) {
+      const startT = tops[i+1] - innerHeight * 0.95;
+      const endT   = tops[i+1] - innerHeight * 0.25;
+      if (scrollY < startT) { f = i; break; }
+      if (scrollY < endT) {
+        const u = (scrollY - startT) / (endT - startT);
+        f = i + u*u*(3-2*u); break;
+      }
+    }
+    const i = Math.min(Math.floor(f), n-2), u = f - i;
+    return {
+      p: new THREE.Vector3().lerpVectors(poses[i].p, poses[i+1].p, u),
+      l: new THREE.Vector3().lerpVectors(poses[i].l, poses[i+1].l, u),
+      f
+    };
+  }
+
+  let mx = 0, my = 0;
+  addEventListener('mousemove', e => {
+    mx = e.clientX/innerWidth - 0.5; my = e.clientY/innerHeight - 0.5;
+  }, { passive:true });
+
+  const curP = camera.position.clone(), curL = new THREE.Vector3(0,16,0);
+
+  addEventListener('resize', () => {
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+    computeTops();
+  });
+
+  let last = performance.now();
+  render3d = function(now) {
+    const dt = Math.max(0, Math.min(0.05, (now-last)/1000)); last = now;
+    const t = now/1000;
+
+    const tgt = poseAt();
+    if (!RM && tgt.f < 0.6) {
+      const oa = t*0.06;
+      tgt.p.x += Math.sin(oa)*7; tgt.p.z += Math.cos(oa)*5 - 5;
+    }
+    tgt.p.x += mx*5; tgt.p.y += -my*3;
+    const k = 1 - Math.pow(0.0018, dt);
+    curP.lerp(tgt.p, k); curL.lerp(tgt.l, k);
+    camera.position.copy(curP);
+    camera.lookAt(curL);
+
+    /* train of thought */
+    const headT = (t*0.02) % 1;
+    cars.forEach((c, ci) => {
+      const back = trainCurve.getPoint(((headT) - ci*0.016 + 1) % 1);
+      const nxt  = trainCurve.getPoint(((headT) - ci*0.016 + 0.004 + 1) % 1);
+      c.position.set(back.x, TRAIN_Y + 0.15, back.y);
+      c.lookAt(nxt.x, TRAIN_Y + 0.15, nxt.y);
+      c.rotateY(Math.PI/2);
+    });
+    const head = trainCurve.getPoint(headT);
+    puffs.forEach(s => {
+      s.userData.life += dt*0.5;
+      if (s.userData.life > 1) { s.userData.life = 0; s.position.set(head.x, TRAIN_Y + 3.2, head.y); }
+      const lf = s.userData.life;
+      s.position.y += dt*3;
+      const sc = 0.5 + lf*2.4; s.scale.set(sc, sc, sc);
+      s.material.opacity = 0.4*(1-lf);
+    });
+
+    /* islands float */
+    islands.forEach((isl, ii) => {
+      isl.position.y += Math.sin(t*0.7 + ii*1.4) * dt * 0.6;
+      isl.rotation.y = Math.sin(t*0.15 + ii)*0.05;
+    });
+
+    /* emotions bob at the console */
+    emotions.forEach((em, ei) => {
+      em.position.y = 6.8 + Math.abs(Math.sin(t*2.2 + em.userData.ph))*0.5;
+      em.rotation.y = Math.sin(t*0.9 + em.userData.ph)*0.4;
+    });
+
+    /* console buttons blink */
+    blinkers.forEach((b, bi) => {
+      const s2 = 0.8 + 0.35*Math.abs(Math.sin(t*3 + b.userData.ph));
+      b.scale.set(s2, s2, s2);
+    });
+
+    /* rolling orbs on the rail */
+    railOrbs.forEach(o => {
+      let u = o.userData.t + dt*0.05;
+      if (!isFinite(u) || u < 0 || u >= 1) u = 0;
+      o.userData.t = u;
+      const p = railPts[Math.floor(u*200)];
+      o.position.set(p.x, p.y + 0.55, p.z);
+      o.rotation.x += dt*4;
+    });
+
+    /* floaters near hero */
+    floaters.forEach(o => {
+      const u = o.userData; u.a += dt*u.sp;
+      o.position.set(36 + Math.cos(u.a)*u.r, u.y + Math.sin(t*1.2 + u.ph)*1.6, 50 + Math.sin(u.a)*u.r*0.7);
+    });
+
+    /* wanderer orb */
+    const sa = t*0.6;
+    wanderer.position.set(12 + Math.cos(sa)*18, 22 + Math.sin(t*1.1)*4, 8 + Math.sin(sa)*14);
+
+    /* clouds drift */
+    clouds.forEach(c => {
+      c.position.x += dt * c.userData.sp;
+      if (c.position.x > 220) c.position.x = -220;
+    });
+
+    /* mist + sparks */
+    mists.forEach((m, mi) => {
+      m.position.x += dt * 0.6 * (mi % 2 ? 1 : -1);
+      if (m.position.x > 90) m.position.x = -60;
+      if (m.position.x < -70) m.position.x = 80;
+      m.material.opacity = 0.3 + 0.14*Math.sin(t*0.4 + m.userData.ph);
+    });
+    {
+      const arr = ffGeo.attributes.position.array;
+      for (let i = 0; i < ffN; i++) {
+        const b = ffBase[i];
+        arr[i*3]   = b[0] + Math.sin(t*0.5 + b[3])*1.6;
+        arr[i*3+1] = b[1] + Math.sin(t*0.9 + b[3]*2)*0.9;
+        arr[i*3+2] = b[2] + Math.cos(t*0.4 + b[3])*1.6;
+      }
+      ffGeo.attributes.position.needsUpdate = true;
+      ffPts.material.opacity = 0.5 + 0.4*Math.sin(t*2.1);
+    }
+
+    /* hq light breathing */
+    hqLight.intensity = 1.25 + Math.sin(t*2.2)*0.15;
+
+    renderer.render(scene, camera);
+  };
+} catch (err) {
+  document.getElementById('world').style.display = 'none';
+  console.warn('WebGL unavailable, falling back to static background.', err);
+}
+
+/* ---------- master loop ---------- */
+function loop(now) {
+  if (scrollDirty) { uiScroll(); scrollDirty = false; }
+  if (render3d) render3d(now);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
