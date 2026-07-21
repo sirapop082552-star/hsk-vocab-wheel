@@ -223,6 +223,26 @@
     transition:transform .22s, box-shadow .22s; }
   .tile:hover, .tile:focus-visible { transform:translateY(-7px) scale(1.02);
     box-shadow:0 26px 54px -20px var(--tc); outline-color:var(--tc); }
+  .tile:active { transform:translateY(-2px) scale(.95); transition:transform .09s ease; }
+  .tile.pressed { animation:tilePop .5s cubic-bezier(.18,.9,.28,1.3); }
+  @keyframes tilePop {
+    0%   { transform:translateY(-2px) scale(.9); }
+    45%  { transform:translateY(-10px) scale(1.06); }
+    100% { transform:translateY(0) scale(1); }
+  }
+  .tile.pressed .tile-art { animation:artFlash .5s ease; }
+  @keyframes artFlash { 0%,100%{filter:none} 40%{filter:brightness(1.35) saturate(1.3)} }
+  .tile.pressed .lbl { animation:lblKick .5s cubic-bezier(.2,.8,.2,1.2); }
+  @keyframes lblKick { 0%{transform:translateY(6px)} 50%{transform:translateY(-3px)} 100%{transform:translateY(0)} }
+  /* ripple burst spawned on tap */
+  .ripple { position:absolute; border-radius:50%; pointer-events:none; z-index:3;
+    background:radial-gradient(circle, var(--tc) 0%, transparent 70%); mix-blend-mode:screen;
+    transform:translate(-50%,-50%) scale(0); opacity:.85; animation:rippleOut .6s ease-out forwards; }
+  @keyframes rippleOut { to { transform:translate(-50%,-50%) scale(1); opacity:0; } }
+  /* glow ring pulse around the whole tile */
+  .tile.pressed::after { content:""; position:absolute; inset:0; z-index:4; border-radius:18px;
+    border:3px solid var(--tc); pointer-events:none; animation:ringPulse .55s ease-out; }
+  @keyframes ringPulse { 0%{opacity:.9; transform:scale(1)} 100%{opacity:0; transform:scale(1.14)} }
   .tile-art { position:absolute; inset:0; display:block; }
   .tile-art svg, .tile-art img { width:100%; height:100%; display:block; object-fit:cover; }
   .tile .lbl { position:absolute; left:0; right:0; bottom:0; z-index:2; padding:26px 10px 10px; text-align:center;
@@ -590,7 +610,29 @@ function closeModal() {
   document.body.classList.remove('locked');
   if (lastFocus) lastFocus.focus();
 }
-document.querySelectorAll('[data-m]').forEach(el => el.addEventListener('click', () => openModal(el.dataset.m)));
+const RMOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* tap animation: ripple from the click point + pop, then open the modal */
+function animateTap(tile, ev) {
+  if (RMOTION || !tile.classList.contains('tile')) return 0;
+  const r = tile.getBoundingClientRect();
+  const rip = document.createElement('span');
+  rip.className = 'ripple';
+  const size = Math.max(r.width, r.height) * 2.2;
+  const cx = ev && ev.clientX ? ev.clientX - r.left : r.width / 2;
+  const cy = ev && ev.clientY ? ev.clientY - r.top : r.height / 2;
+  rip.style.cssText = `width:${size}px;height:${size}px;left:${cx}px;top:${cy}px`;
+  tile.appendChild(rip);
+  tile.classList.remove('pressed');
+  void tile.offsetWidth;               // restart animation
+  tile.classList.add('pressed');
+  setTimeout(() => { rip.remove(); tile.classList.remove('pressed'); }, 620);
+  return 190;                          // delay so the pop is visible before the modal
+}
+document.querySelectorAll('[data-m]').forEach(el => el.addEventListener('click', ev => {
+  const wait = animateTap(el, ev);
+  if (wait) setTimeout(() => openModal(el.dataset.m), wait);
+  else openModal(el.dataset.m);
+}));
 document.getElementById('mclose').addEventListener('click', closeModal);
 mback.addEventListener('click', e => { if (e.target === mback) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && mback.classList.contains('open')) closeModal(); });
