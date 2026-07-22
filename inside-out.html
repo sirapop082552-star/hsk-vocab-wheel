@@ -258,7 +258,7 @@
     padding:4vh 4vw; background:rgba(10,5,26,.7); backdrop-filter:blur(10px);
     opacity:0; pointer-events:none; transition:opacity .3s; }
   .mback.open { opacity:1; pointer-events:auto; }
-  .modal { width:min(880px, 100%); max-height:88vh; display:flex; flex-direction:column;
+  .modal { position:relative; width:min(880px, 100%); max-height:88vh; display:flex; flex-direction:column;
     background:rgba(26,16,54,.96); border:1px solid rgba(255,255,255,.14); border-top:5px solid var(--tc, var(--gold));
     border-radius:24px; box-shadow:0 50px 120px -40px rgba(0,0,0,.95);
     transform:translateY(26px) scale(.97); transition:transform .3s cubic-bezier(.2,.7,.2,1); }
@@ -275,13 +275,41 @@
   .mtitle { font-family:var(--display); font-weight:800; font-size:1.6rem; color:var(--tc, var(--gold)); line-height:1.1; }
   .msub { color:var(--muted); font-size:.82rem; margin-top:4px; letter-spacing:.06em; }
   .mbody { padding:20px 28px 30px; overflow-y:auto; }
-  .mvid { position:relative; margin:0 0 18px; border-radius:16px; overflow:hidden;
-    border:1px solid var(--tc, var(--gold)); box-shadow:0 14px 40px -18px var(--tc, var(--gold)), 0 0 0 1px rgba(255,255,255,.05) inset;
-    background:#0b0620; aspect-ratio:16/9; }
-  .mvid video { width:100%; height:100%; display:block; object-fit:cover; }
-  .mvid .tagv { position:absolute; top:10px; left:12px; z-index:2; font-size:.64rem; letter-spacing:.14em;
-    text-transform:uppercase; font-weight:700; color:#fff; background:rgba(10,4,26,.6);
-    border:1px solid var(--tc, var(--gold)); padding:4px 11px; border-radius:99px; backdrop-filter:blur(4px); }
+
+  /* small clip button pinned to the modal's edge */
+  .clip-chip { position:absolute; bottom:18px; right:18px; z-index:6;
+    width:132px; height:84px; border-radius:14px; overflow:hidden; cursor:pointer; padding:0;
+    border:2px solid var(--tc, var(--gold)); background:#0b0620;
+    box-shadow:0 12px 30px -12px rgba(0,0,0,.9), 0 0 18px -6px var(--tc, var(--gold));
+    transition:transform .2s, box-shadow .2s; }
+  .clip-chip:hover, .clip-chip:focus-visible { transform:translateY(-3px) scale(1.05);
+    box-shadow:0 18px 40px -12px var(--tc, var(--gold)); outline:none; }
+  .clip-chip img { width:100%; height:100%; object-fit:cover; display:block; opacity:.9; }
+  .clip-chip .cplay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:1.1rem; color:#fff; }
+  .clip-chip .cplay::before { content:""; position:absolute; width:34px; height:34px; border-radius:50%;
+    background:var(--tc, var(--gold)); opacity:.92; box-shadow:0 0 16px var(--tc, var(--gold)); }
+  .clip-chip .cplay b { position:relative; z-index:1; color:#160c30; font-size:.9rem; margin-left:2px; }
+  .clip-chip .clab { position:absolute; bottom:0; left:0; right:0; z-index:1; padding:9px 6px 4px; text-align:center;
+    font-size:.56rem; letter-spacing:.18em; font-weight:800; color:#fff; text-transform:uppercase;
+    background:linear-gradient(180deg,transparent,rgba(10,4,26,.85)); }
+  .clip-chip.pulse { animation:chipPulse 2.4s ease-in-out infinite; }
+  @keyframes chipPulse { 0%,100%{box-shadow:0 12px 30px -12px rgba(0,0,0,.9), 0 0 12px -4px var(--tc)}
+    50%{box-shadow:0 12px 30px -12px rgba(0,0,0,.9), 0 0 26px 0 var(--tc)} }
+
+  /* expanded clip stage — grows out of the chip */
+  .clip-stage { position:absolute; inset:0; z-index:9; display:flex; align-items:center; justify-content:center;
+    padding:20px; background:rgba(6,2,18,.9); border-radius:24px;
+    opacity:0; pointer-events:none; transform:scale(.25); transform-origin:bottom right;
+    transition:opacity .32s ease, transform .38s cubic-bezier(.18,.9,.3,1.15); }
+  .clip-stage.on { opacity:1; pointer-events:auto; transform:scale(1); }
+  .clip-stage .frame { position:relative; width:100%; max-width:780px; border-radius:16px; overflow:hidden;
+    border:1px solid var(--tc, var(--gold)); box-shadow:0 24px 60px -20px var(--tc, var(--gold)); background:#000; }
+  .clip-stage video { width:100%; max-height:70vh; display:block; background:#000; }
+  .clip-x { position:absolute; top:12px; right:14px; z-index:2; width:40px; height:40px; border-radius:50%;
+    border:1px solid rgba(255,255,255,.3); background:rgba(10,4,26,.65); color:#fff; font-size:1.05rem;
+    cursor:pointer; transition:all .2s; backdrop-filter:blur(4px); }
+  .clip-x:hover { background:rgba(255,255,255,.22); transform:rotate(90deg); }
   .mbody p { color:#ddd8f2; font-size:.94rem; line-height:1.95; margin-bottom:13px; }
   .mbody p strong { color:var(--gold); }
   .mbody h4 { color:#ffe9a8; font-size:.72rem; letter-spacing:.24em; text-transform:uppercase; margin:18px 0 7px; }
@@ -589,12 +617,18 @@ const M_INFO = {
   end:   { title:'The End — Conclusion', sub:'Our score and recommendation', tc:'var(--gold)' },
 };
 const M_VIDEO = {
-  fear:  'videos/fear',
-  ang:   'videos/anger',
-  joy:   'videos/joy',
-  sad:   'videos/sadness',
-  riley: 'videos/riley',
+  fear:    { base:'videos/fear',    name:'fear' },
+  ang:     { base:'videos/anger',   name:'anger' },
+  joy:     { base:'videos/joy',     name:'joy' },
+  sad:     { base:'videos/sadness', name:'sadness' },
+  riley:   { base:'videos/riley',   name:'riley' },
+  dis:     { base:'videos/disgust', name:'disgust' },
 };
+function videoSrc(v, kind) {
+  if (v[kind]) return v[kind];                       // precomputed (artifact data URIs)
+  if (kind === 'poster') return 'videos/thumb/' + v.name + '.jpg';
+  return v.base + '.' + kind;                         // 'webm' | 'mp4'
+}
 const mback = document.getElementById('mback');
 const mpanel = document.getElementById('mpanel');
 const mbody = document.getElementById('mbody');
@@ -613,20 +647,41 @@ function openModal(id) {
   const srcArt = document.querySelector('.tile[data-m="' + id + '"] .tile-art');
   mportrait.innerHTML = srcArt ? srcArt.innerHTML : '';
   mbody.innerHTML = '';
-  const vsrc = M_VIDEO[id];
-  if (vsrc) {
-    const wrap = document.createElement('div');
-    wrap.className = 'mvid';
-    wrap.innerHTML = '<span class="tagv">🎬 Clip</span>' +
-      '<video autoplay muted loop playsinline controls preload="metadata">' +
-      '<source src="' + vsrc + '.webm" type="video/webm">' +
-      '<source src="' + vsrc + '.mp4" type="video/mp4"></video>';
-    mbody.appendChild(wrap);
-    const v = wrap.querySelector('video');
-    v.play && v.play().catch(() => {});
-  }
+  // remove any leftover clip UI from a previous open
+  mpanel.querySelectorAll('.clip-chip, .clip-stage').forEach(n => n.remove());
   mbody.appendChild(tpl.content.cloneNode(true));
   mbody.scrollTop = 0;
+
+  const vsrc = M_VIDEO[id];
+  if (vsrc) {
+    const poster = videoSrc(vsrc, 'poster');
+    // small clip button at the modal edge
+    const chip = document.createElement('button');
+    chip.className = 'clip-chip pulse';
+    chip.setAttribute('aria-label', 'Play clip');
+    chip.innerHTML = '<img src="' + poster + '" alt="">' +
+      '<span class="cplay"><b>▶</b></span><span class="clab">🎬 Play clip</span>';
+    // expandable stage that grows out of the chip
+    const stage = document.createElement('div');
+    stage.className = 'clip-stage';
+    stage.innerHTML = '<div class="frame"><button class="clip-x" aria-label="Close clip">✕</button>' +
+      '<video playsinline controls preload="metadata" poster="' + poster + '">' +
+      '<source src="' + videoSrc(vsrc, 'webm') + '" type="video/webm">' +
+      '<source src="' + videoSrc(vsrc, 'mp4') + '" type="video/mp4"></video></div>';
+    mpanel.appendChild(chip);
+    mpanel.appendChild(stage);
+    const vid = stage.querySelector('video');
+    chip.addEventListener('click', () => {
+      chip.classList.remove('pulse');
+      stage.classList.add('on');
+      vid.muted = false; vid.currentTime = 0;
+      vid.play && vid.play().catch(() => {});
+    });
+    const collapse = () => { stage.classList.remove('on'); vid.pause(); };
+    stage.querySelector('.clip-x').addEventListener('click', collapse);
+    stage.addEventListener('click', e => { if (e.target === stage) collapse(); });
+  }
+
   mback.classList.add('open');
   document.body.classList.add('locked');
   document.getElementById('mclose').focus();
@@ -634,8 +689,7 @@ function openModal(id) {
 function closeModal() {
   mback.classList.remove('open');
   document.body.classList.remove('locked');
-  const v = mbody.querySelector('video');
-  if (v) { v.pause(); }
+  mpanel.querySelectorAll('video').forEach(v => v.pause());
   if (lastFocus) lastFocus.focus();
 }
 const RMOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
