@@ -715,6 +715,20 @@ document.querySelectorAll('[data-m]').forEach(el => el.addEventListener('click',
   if (wait) setTimeout(() => openModal(el.dataset.m), wait);
   else openModal(el.dataset.m);
 }));
+
+/* hover / focus a character tile -> tint the 3D mind-world in that emotion's colour */
+const MOOD = { joy:0xffd54f, sad:0x4aa3e8, ang:0xe8452c, dis:0x7ed957, fear:0xb57ae0, riley:0xff8ac2 };
+window.__mood = null;
+document.querySelectorAll('.tile[data-m]').forEach(t => {
+  const c = MOOD[t.dataset.m];
+  if (c == null) return;                       // Plot / The End keep the world neutral
+  const on  = () => { window.__mood = c; };
+  const off = () => { window.__mood = null; };
+  t.addEventListener('mouseenter', on);
+  t.addEventListener('mouseleave', off);
+  t.addEventListener('focus', on);
+  t.addEventListener('blur', off);
+});
 document.getElementById('mclose').addEventListener('click', closeModal);
 mback.addEventListener('click', e => { if (e.target === mback) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && mback.classList.contains('open')) closeModal(); });
@@ -1233,10 +1247,32 @@ try {
     computeTops();
   });
 
+  /* ---------- mood tint: hovering a character button recolours the world ---------- */
+  const BASE_BG  = scene.background.clone();
+  const BASE_FOG = scene.fog.color.clone();
+  const BASE_HQ  = hqLight.color.clone();
+  const moodCol  = new THREE.Color();
+  let moodStrength = 0;
+
   let last = performance.now();
   render3d = function(now) {
     const dt = Math.max(0, Math.min(0.05, (now-last)/1000)); last = now;
     const t = now/1000;
+
+    /* ease the world's colour toward the hovered emotion (or back to normal) */
+    const mood = window.__mood;
+    if (mood != null) moodCol.set(mood);
+    const wantS = (mood != null) ? 1 : 0;
+    moodStrength += (wantS - moodStrength) * (1 - Math.pow(0.006, dt));
+    if (moodStrength > 0.001) {
+      scene.background.copy(BASE_BG).lerp(moodCol, moodStrength * 0.42);
+      scene.fog.color.copy(BASE_FOG).lerp(moodCol, moodStrength * 0.55);
+      hqLight.color.copy(BASE_HQ).lerp(moodCol, moodStrength * 0.75);
+    } else {
+      scene.background.copy(BASE_BG);
+      scene.fog.color.copy(BASE_FOG);
+      hqLight.color.copy(BASE_HQ);
+    }
 
     const tgt = poseAt();
     if (!RM && tgt.f < 0.6) {
