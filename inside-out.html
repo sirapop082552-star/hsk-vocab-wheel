@@ -445,11 +445,11 @@
           <span class="tap">TAP</span>
           <span class="lbl">The End</span>
         </button>
-        <button class="tile reveal yt" data-href="https://youtu.be/nEUzQ7yL9A0" style="--tc:#ff3b3b;">
+        <a class="tile reveal yt" href="https://youtu.be/nEUzQ7yL9A0" target="_blank" rel="noopener" style="--tc:#ff3b3b; text-decoration:none;">
           <span class="tile-art"><svg viewBox="0 0 200 240" aria-hidden="true"><defs><linearGradient id="gyt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a0f12"/><stop offset="1" stop-color="#160a0c"/></linearGradient></defs><rect width="200" height="240" fill="url(#gyt)"/><rect x="46" y="78" width="108" height="76" rx="18" fill="#ff2d2d"/><path d="M90 100 L124 116 L90 132 Z" fill="#fff"/><text x="100" y="182" text-anchor="middle" font-family="'Baloo 2',cursive" font-size="15" font-weight="800" fill="#ffd54f" letter-spacing="1">YOUTUBE</text><text x="100" y="204" text-anchor="middle" font-family="'Baloo 2',cursive" font-size="12" font-weight="700" fill="#c9bfea">watch the clip</text></svg></span>
           <span class="tap">LINK ↗</span>
           <span class="lbl">▶ Watch on YouTube</span>
-        </button>
+        </a>
       </div>
     </div>
   </div>
@@ -749,12 +749,10 @@ document.querySelectorAll('[data-m]').forEach(el => el.addEventListener('click',
   else openModal(el.dataset.m);
 }));
 
-/* external-link tiles (YouTube) open in a new tab after the tap animation */
-document.querySelectorAll('.tile[data-href]').forEach(t => {
-  t.addEventListener('click', ev => {
-    const wait = animateTap(t, ev);
-    setTimeout(() => window.open(t.dataset.href, '_blank', 'noopener'), wait || 0);
-  });
+/* external-link tiles (YouTube): real <a target="_blank"> so it works inside
+   the sandboxed artifact frame too — just add the tap ripple, let the link navigate */
+document.querySelectorAll('a.tile').forEach(t => {
+  t.addEventListener('click', ev => { animateTap(t, ev); });
 });
 
 /* hover / focus a character tile -> tint the 3D mind-world in that emotion's colour */
