@@ -1,0 +1,986 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>KOILET</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: product-studio stage on the left, a white spec rail on the right (stacks under the stage on phones).
+   Single deliberate look: seamless light studio like a product photo, ink-black type, the screen's blue glow as the one accent. */
+:root{
+  --bg:#e7e9ec;
+  --panel:#ffffff;
+  --field:#f3f4f6;
+  --line:#dde0e5;
+  --ink:#14161a;
+  --muted:#5c6370;
+  --accent:#1f8fff;
+  --accent-ink:#0a63c9;
+  --accent-soft:#e3f0ff;
+  --chip:rgba(255,255,255,.9);
+  --f-display:"Bai Jamjuree","IBM Plex Sans Thai",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);overflow:hidden}
+.app{height:100%;display:grid;grid-template-columns:minmax(0,1fr) 390px}
+.stage{position:relative;min-width:0;min-height:0;overflow:hidden;background:var(--bg)}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none}
+.tags{position:absolute;inset:0;pointer-events:none}
+.tag{position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;display:flex;align-items:center;gap:6px;border:0;
+  background:var(--chip);color:var(--ink);font:500 12px/1 var(--f-body);padding:3px;border-radius:999px;white-space:nowrap;will-change:transform;
+  box-shadow:0 2px 10px rgba(20,22,26,.16)}
+.tag b{display:inline-grid;place-items:center;width:21px;height:21px;border-radius:50%;background:var(--ink);color:#fff;font:600 11px/1 var(--f-mono)}
+.tag span{display:none;padding-right:7px}
+.tag.on{background:var(--accent);color:#fff}
+.tag.on b{background:#fff;color:var(--accent-ink)}
+.tag.on span,.tag:hover span,.tag:focus-visible span{display:inline}
+.modes{position:absolute;top:12px;left:max(14px,env(safe-area-inset-left,0px));display:flex;flex-wrap:wrap;gap:2px;padding:3px;border-radius:12px;background:var(--chip);
+  box-shadow:0 6px 20px rgba(20,22,26,.12);max-width:calc(100% - 28px)}
+.modes button{cursor:pointer;border:0;background:transparent;color:var(--muted);font:600 13px/1 var(--f-body);padding:9px 12px;border-radius:9px}
+.modes button[aria-pressed=true]{background:var(--ink);color:#fff}
+.hint{position:absolute;left:max(16px,env(safe-area-inset-left,0px));bottom:14px;margin:0;font-size:12.5px;color:var(--muted);
+  background:var(--chip);padding:6px 12px;border-radius:12px;pointer-events:none;max-width:calc(100% - 32px)}
+.hint b{color:var(--ink)}
+.rail{min-height:0;overflow-y:auto;background:var(--panel);border-left:1px solid var(--line);
+  padding-block:26px 30px;padding-left:max(22px,env(safe-area-inset-left,0px));padding-right:max(22px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:26px}
+.eyebrow{margin:0;font:600 11px/1.4 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{margin:4px 0 6px;font:700 46px/1 var(--f-display);letter-spacing:.06em}
+h1 i{font-style:normal;color:var(--accent)}
+.lede{margin:0;color:var(--muted);font-size:14px;max-width:36ch}
+section{display:flex;flex-direction:column;gap:12px}
+h2{margin:0;font:600 12px/1.3 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.act{display:flex;align-items:center;gap:10px;text-align:left;cursor:pointer;background:var(--field);color:var(--ink);border:1px solid var(--line);border-radius:10px;
+  padding:9px 10px;font:500 13.5px/1.25 var(--f-body);min-height:48px}
+.act:hover{border-color:#b9c0ca}
+.act svg{flex:none;width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.act small{display:block;color:var(--muted);font-size:11.5px}
+.act[aria-pressed=true]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink)}
+.act[aria-pressed=true] small{color:var(--accent-ink)}
+.act:disabled{opacity:.45;cursor:not-allowed}
+.act.wide{grid-column:1/-1}
+.meter{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;font-size:13px}
+.meter output{font:600 13px var(--f-mono);font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.bar{height:8px;border-radius:4px;background:var(--field);border:1px solid var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:80%}
+.mini{cursor:pointer;background:transparent;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font:500 12.5px var(--f-body);color:var(--ink)}
+.status{margin:0;font:500 12.5px/1.45 var(--f-mono);color:var(--muted);min-height:1.45em}
+.card{background:var(--field);border:1px solid var(--line);border-radius:12px;padding:14px 15px 15px}
+.card .pnum{margin:0;font:600 11px/1.3 var(--f-mono);letter-spacing:.1em;color:var(--accent-ink);text-transform:uppercase}
+.card h3{margin:3px 0 10px;font:600 20px/1.3 var(--f-display)}
+.card dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:7px 12px}
+.card dt{font:600 12px/1.6 var(--f-body);color:var(--muted);white-space:nowrap}
+.card dd{margin:0;font-size:14px;line-height:1.6}
+.parts{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.parts button{width:100%;display:flex;gap:8px;align-items:center;text-align:left;cursor:pointer;background:transparent;color:var(--ink);
+  border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:500 12.5px/1.3 var(--f-body);min-height:38px}
+.parts button b{flex:none;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;font:600 11px/1 var(--f-mono)}
+.parts button.extra b{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.parts button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+.parts button[aria-pressed=true] b{background:#fff;color:var(--accent-ink);border-color:#fff}
+.note{margin:0;font-size:12.5px;color:var(--muted)}
+.view{flex-direction:row;flex-wrap:wrap;gap:8px 16px;align-items:center;border-top:1px solid var(--line);padding-top:18px}
+.check{display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer}
+.check input{accent-color:var(--accent);width:16px;height:16px}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:760px){
+  .app{grid-template-columns:1fr;grid-template-rows:minmax(320px,56%) minmax(0,1fr)}
+  .rail{border-left:0;border-top:1px solid var(--line);padding-block:20px 28px;gap:22px}
+  h1{font-size:40px}
+  .modes button{padding:8px 9px;font-size:12px}
+  .hint{font-size:11.5px;bottom:10px}
+}
+</style>
+
+<div class="app">
+  <div class="stage" id="stage">
+    <canvas id="gl" aria-label="3D model of the KOILET portable smart toilet. Drag to rotate, scroll or pinch to zoom."></canvas>
+    <div class="tags" id="tags"></div>
+    <div class="modes" role="group" aria-label="มุมมอง">
+      <button type="button" data-mode="assembled" aria-pressed="true">ประกอบ</button>
+      <button type="button" data-mode="half" aria-pressed="false">ผ่าครึ่ง</button>
+      <button type="button" data-mode="explode" aria-pressed="false">แยกชิ้น</button>
+      <button type="button" data-mode="fold" aria-pressed="false">พับเก็บ</button>
+    </div>
+    <p class="hint" id="hint">ลากเพื่อหมุน · ซูมได้ · แตะชิ้นส่วนหรือตัวเลขเพื่อดูว่าทำอะไร</p>
+  </div>
+
+  <aside class="rail">
+    <header>
+      <p class="eyebrow">3D model · portable smart toilet</p>
+      <h1>KOIL<i>E</i>T</h1>
+      <p class="lede">สุขภัณฑ์พกพาที่มีล้อ ถังน้ำ สายฉีดชำระ และผ้ากั้นในตัว พับเก็บเป็นแผ่นแบนใส่กระเป๋าได้ ลองกดใช้งานแต่ละฟังก์ชันได้เลย</p>
+    </header>
+
+    <section>
+      <h2>ลองใช้งาน</h2>
+      <div class="acts">
+        <button class="act" id="aLid" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 17h16M6 17c0-5 3-8 6-8s6 3 6 8M8 6l-3-2"/></svg><span><span id="lidLbl">เปิดฝาชั้นนอก</span><small>ฝาปิดสองชั้น</small></span></button>
+        <button class="act" id="aSpray" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M9 21v-7l-3-3V6h6v5l-3 3M15 6l4-2M15 9h5M15 12l4 2"/></svg><span>ฉีดชำระ<small>สายฉีด + ปั๊มน้ำ</small></span></button>
+        <button class="act" id="aDrawer" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M3 9h18v11H3zM9 14h6M5 9l2-5h10l2 5"/></svg><span>เปิดช่องถุง<small>ลิ้นชักถุงของเสีย</small></span></button>
+        <button class="act" id="aMusic" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12M9 18a3 3 0 1 1-3-3 3 3 0 0 1 3 3zM19 16a3 3 0 1 1-3-3 3 3 0 0 1 3 3z"/></svg><span>เปิดเพลง<small>ลำโพง · Beethoven</small></span></button>
+        <button class="act" id="aCurtain" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 3h16M6 3v18M18 3v18M6 3c2 6 2 12 0 18M18 3c-2 6-2 12 0 18"/></svg><span>กางผ้ากั้น<small>ฉากกั้นส่วนตัว</small></span></button>
+        <button class="act" id="aRoll" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><circle cx="7" cy="18" r="2.5"/><circle cx="17" cy="18" r="2.5"/><path d="M4 14h16V6H4zM2 10h2"/></svg><span>เข็นเครื่อง<small>ล้อ 4 ล้อ</small></span></button>
+        <button class="act wide" id="aDemo" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M12 4c1.5 1.5 1 3 0 3.5 3 0 4 2 3 3.5 3 .5 3.5 3.5 1.5 5 2 1 1.5 4-1.5 4H9c-3 0-3.5-3-1.5-4-2-1.5-1.5-4.5 1.5-5-1-1.5 0-3.5 3-3.5"/></svg><span>สาธิตการขับถ่าย<small>ผ่าครึ่งให้ดูว่าของเสียลงถุงยังไง</small></span></button>
+      </div>
+      <div class="meter"><label for="temp">อุณหภูมิฝารองนั่ง</label><input type="range" id="temp" min="30" max="40" step="1" value="36"><output id="tempOut" for="temp">36°C</output></div>
+      <div class="meter"><span>น้ำในถัง</span><div class="bar" aria-hidden="true"><i id="waterBar"></i></div><output id="waterOut">80%</output></div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="mini" id="refill" type="button">เติมน้ำให้เต็ม</button><p class="status" id="status" aria-live="polite"></p></div>
+    </section>
+
+    <section>
+      <h2>ส่วนประกอบและกลไก</h2>
+      <article class="card" id="partCard" aria-live="polite"></article>
+      <ol class="parts" id="partList"></ol>
+      <p class="note">หมายเลข 1–11 ตรงกับตารางฟังก์ชัน ส่วน 12–13 เป็นชิ้นส่วนภายในที่ช่วยให้ทุกฟังก์ชันทำงาน ตัวเลขสเปกเป็นค่าสมมติของคอนเซ็ปต์</p>
+    </section>
+
+    <section class="view">
+      <label class="check"><input type="checkbox" id="showTags" checked> ป้ายหมายเลข</label>
+      <label class="check"><input type="checkbox" id="autoRot"> หมุนอัตโนมัติ</label>
+      <button class="mini" id="resetView" type="button">มุมเริ่มต้น</button>
+    </section>
+  </aside>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/geometries/RoundedBoxGeometry.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
+<script>
+(() => {
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = id => document.getElementById(id);
+const V3 = (x=0,y=0,z=0) => new THREE.Vector3(x,y,z);
+const D = Math.PI/180;
+const stage = $('stage'), canvas = $('gl');
+
+/* ---------- parts ---------- */
+const PARTS = [
+  { id:'seat', th:'ฝารองนั่ง', en:'Seat', short:'นั่งขับถ่ายได้สะดวก',
+    job:'ที่นั่งสำหรับขับถ่าย ทรงวงแหวนรับสรีระ ขนาดใกล้เคียงชักโครกทั่วไป',
+    how:'วางล็อกอยู่บนขอบบนของตัวเครื่อง ใต้ฝามีลวดความร้อนฝังอยู่ ผิวพลาสติกเรียบทำความสะอาดง่าย ตรงกลางเป็นรูที่ต่อกับกรวยลงถุงของเสีย',
+    link:'ระบบปรับอุณหภูมิ · ฝาปิดสองชั้น · ช่องใส่ถุง' },
+  { id:'lids', th:'ฝาปิดสองชั้น', en:'Double lid', short:'ช่วยกักเก็บกลิ่น',
+    job:'ปิดสองชั้นเพื่อกักกลิ่นไม่ให้ออกมาข้างนอก',
+    how:'ชั้นนอกเป็นฝาแข็งกันฝุ่นและกันกระแทก ชั้นในมีขอบยางซิลิโคนกดปิดสนิทและแผ่นกรองคาร์บอนดูดซับกลิ่น บานพับสปริงอยู่ด้านหลัง เปิดได้ทีละชั้น',
+    link:'ฝารองนั่ง' },
+  { id:'heater', th:'ระบบปรับอุณหภูมิ', en:'Seat heater', short:'ปรับอุณหภูมิฝารองนั่งได้',
+    job:'อุ่นฝารองนั่งให้อุณหภูมิพอดีตัว ตั้งได้ 30–40°C',
+    how:'ลวดความร้อนสีทองแดงฝังอยู่ในฝารองนั่ง มีเซนเซอร์วัดอุณหภูมิ บอร์ดควบคุมจ่ายไฟเป็นจังหวะเพื่อให้ความร้อนคงที่ ลองเลื่อนแถบอุณหภูมิแล้วดูลวดเปลี่ยนสี',
+    link:'จอทัชสกรีน · แผงวงจร · แบตเตอรี่' },
+  { id:'tank', th:'ถังบรรจุน้ำ', en:'Water tank', short:'เก็บน้ำสำหรับใช้งาน',
+    job:'เก็บน้ำสะอาดสำหรับสายฉีดชำระ ความจุประมาณ 2 ลิตร',
+    how:'ถังใสตั้งอยู่ด้านซ้ายในตัวเครื่อง มองระดับน้ำได้จากหน้าต่างข้างเครื่อง ปั๊มไฟฟ้าใต้ถังดูดน้ำส่งไปที่รอกสายฉีด เติมน้ำทางฝาด้านบนของถัง',
+    link:'สายฉีดชำระ · แผงวงจร' },
+  { id:'sprayer', th:'สายฉีดชำระ', en:'Handheld sprayer', short:'ใช้ทำความสะอาดหลังขับถ่าย',
+    job:'หัวฉีดแบบถือ ใช้ทำความสะอาดหลังขับถ่าย',
+    how:'หัวฉีดเสียบอยู่ที่ที่แขวนข้างเครื่อง ดึงออกมาใช้ได้ สายม้วนเก็บอัตโนมัติด้วยรอกสปริงข้างใน กดไกแล้วปั๊มดันน้ำจากถังออกหัวฉีด',
+    link:'ถังบรรจุน้ำ · ปั๊มน้ำ' },
+  { id:'drawer', th:'ช่องใส่ถุงของเสีย', en:'Waste-bag drawer', short:'ใส่และเปลี่ยนถุงเก็บของเสีย',
+    job:'เก็บของเสียในถุงที่ถอดเปลี่ยนได้',
+    how:'ของเสียตกผ่านกรวยลงถุงที่ครอบถังรองไว้ในลิ้นชักด้านหน้า ดึงลิ้นชักออก มัดปากถุง แล้วใส่ถุงใหม่ได้โดยไม่ต้องสัมผัสของเสีย',
+    link:'ฝารองนั่ง · ฝาปิดสองชั้น' },
+  { id:'speaker', th:'ลำโพง', en:'Speaker', short:'ใช้เปิดเสียง',
+    job:'เปิดเพลงหรือเสียงธรรมชาติเพื่อกลบเสียงและให้ผ่อนคลาย',
+    how:'ลำโพงบลูทูธอยู่หลังตะแกรงกลมด้านซ้าย สั่งเปิดปิดจากจอ ลองกดปุ่ม "เปิดเพลง" แล้วจะได้ยินเสียงจริง',
+    link:'จอทัชสกรีน · แผงวงจร' },
+  { id:'screen', th:'จอทัชสกรีน', en:'Touch screen', short:'ใช้ควบคุมฟังก์ชันต่าง ๆ',
+    job:'ควบคุมทุกฟังก์ชันของเครื่องจากจอเดียว',
+    how:'จอกลมมีวงแสงสีฟ้า แสดงอุณหภูมิ ระดับน้ำ แบตเตอรี่ และสถานะเพลง แตะเพื่อปรับอุณหภูมิ สั่งฉีดน้ำ หรือเปิดเพลง จอต่อกับแผงวงจรที่อยู่ด้านหลัง',
+    link:'แผงวงจร · ทุกฟังก์ชัน' },
+  { id:'wheels', th:'ล้อ', en:'Casters', short:'ช่วยเคลื่อนย้ายผลิตภัณฑ์',
+    job:'เข็นเครื่องไปห้องไหนก็ได้',
+    how:'ล้อหมุนรอบตัว 4 ล้อใต้ฐาน มีเบรกล็อกกันเลื่อนตอนนั่ง เวลาพับเก็บ ล้อจะหดเข้าในฐาน',
+    link:'ระบบพับเก็บ' },
+  { id:'curtain', th:'ผ้ากั้นส่วนตัว', en:'Privacy curtain', short:'กางเป็นฉากกั้นเพื่อความเป็นส่วนตัว',
+    job:'กางเป็นห้องเล็ก ๆ รอบตัวเครื่องเพื่อความเป็นส่วนตัว',
+    how:'เสายืดหดซ่อนอยู่ด้านหลังตัวเครื่อง ยืดขึ้นได้สูงราว 1.5 เมตร ห่วงสปริงด้านบนกางออก แล้วผ้ากันน้ำทิ้งตัวลงรอบเครื่อง ด้านหน้าเว้นช่องเป็นประตู',
+    link:'ระบบพับเก็บ' },
+  { id:'fold', th:'ระบบพับเก็บ', en:'Collapsible body', short:'พับเก็บให้พกพาง่าย',
+    job:'ยุบตัวเครื่องให้แบนเพื่อพกพาและเก็บ',
+    how:'ตัวเครื่องเป็นวงแหวนหลายชั้น (ดูรอยต่อสีเทา) ยุบซ้อนกันลงเป็นแผ่นแบน ล้อหดเข้า คลิปล็อกสองข้างยึดไว้ มีหูหิ้วด้านบน ใส่กระเป๋าถือได้ ลองกด "พับเก็บ" ด้านบน',
+    link:'ล้อ · ผ้ากั้นส่วนตัว' },
+  { id:'pcb', th:'แผงวงจรควบคุม', en:'Control board', short:'สมองของเครื่อง', extra:true,
+    job:'รับคำสั่งจากจอแล้วสั่งทุกส่วนทำงาน',
+    how:'อยู่ด้านหลังจอ คุมปั๊มน้ำ ลวดความร้อน ลำโพง และอ่านค่าจากเซนเซอร์ระดับน้ำกับอุณหภูมิ',
+    link:'จอทัชสกรีน · ทุกฟังก์ชันไฟฟ้า' },
+  { id:'battery', th:'แบตเตอรี่ + USB-C', en:'Battery', short:'จ่ายไฟให้ทั้งเครื่อง', extra:true,
+    job:'จ่ายไฟให้ทุกส่วน ใช้งานได้โดยไม่ต้องเสียบปลั๊ก',
+    how:'แบตเตอรี่ลิเธียมอยู่ด้านหลังลิ้นชัก ชาร์จผ่านพอร์ต USB-C ด้านข้างตัวเครื่อง',
+    link:'แผงวงจร · ปั๊ม · ลวดความร้อน · ลำโพง' },
+];
+PARTS.forEach((p,i)=>p.num = i+1);
+const partById = Object.fromEntries(PARTS.map(p=>[p.id,p]));
+
+/* ---------- renderer / scene ---------- */
+if (THREE.ColorManagement) THREE.ColorManagement.legacyMode = false;
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const maxAniso = renderer.capabilities.getMaxAnisotropy();
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xe7e9ec);
+scene.fog = new THREE.Fog(0xe7e9ec, 18, 45);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
+
+const camera = new THREE.PerspectiveCamera(35, 1, 0.05, 120);
+const VIEWS = {
+  assembled:{ pos:V3(3.5,3.3,5.6), tgt:V3(0,1.3,0) },
+  half:     { pos:V3(4.6,3.2,3.6), tgt:V3(0,1.35,0) },
+  explode:  { pos:V3(6.4,5.6,8.8), tgt:V3(0,2.3,0) },
+  fold:     { pos:V3(2.1,1.7,3.0), tgt:V3(0,0.35,0) },
+  tent:     { pos:V3(9.5,7.2,14.5), tgt:V3(0,3.6,0.4) },
+  spray:    { pos:V3(2.6,4.0,3.4), tgt:V3(0.1,2.55,0.2) },
+  screen:   { pos:V3(1.55,2.3,2.25), tgt:V3(0.5,1.95,0.7) },
+};
+camera.position.copy(VIEWS.assembled.pos);
+const controls = new THREE.OrbitControls(camera, canvas);
+controls.target.copy(VIEWS.assembled.tgt);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.minDistance = 1.6; controls.maxDistance = 26;
+controls.maxPolarAngle = Math.PI*0.495; controls.autoRotateSpeed = 0.8;
+controls.update();
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb9bec7, 0.55));
+const key = new THREE.DirectionalLight(0xffffff, 1.5);
+key.position.set(5, 11, 7); key.target.position.set(0,1,0);
+key.castShadow = true; key.shadow.mapSize.set(2048,2048);
+Object.assign(key.shadow.camera, { left:-8, right:8, top:9, bottom:-8, near:1, far:40 });
+key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02; key.shadow.radius = 6;
+scene.add(key, key.target);
+const fill = new THREE.DirectionalLight(0xdfe8ff, 0.45); fill.position.set(-6,4,3); scene.add(fill);
+const floor = new THREE.Mesh(new THREE.CircleGeometry(40,72), new THREE.MeshStandardMaterial({ color:0xe2e5e9, roughness:0.95 }));
+floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
+
+/* ---------- materials & helpers ---------- */
+const clear = (c,o)=>{ const m = new THREE.MeshPhysicalMaterial({ color:c, roughness:0.05, transparent:true, opacity:o, depthWrite:false }); m.userData.keep = true; return m; };
+const M = {
+  white: new THREE.MeshPhysicalMaterial({ color:0xf3f4f6, roughness:0.38, clearcoat:0.5, clearcoatRoughness:0.3, side:THREE.DoubleSide }),
+  black: new THREE.MeshPhysicalMaterial({ color:0x17181b, roughness:0.42, clearcoat:0.45, clearcoatRoughness:0.35, side:THREE.DoubleSide }),
+  matte: new THREE.MeshStandardMaterial({ color:0x1d1e22, roughness:0.62, side:THREE.DoubleSide }),
+  charcoal: new THREE.MeshStandardMaterial({ color:0x34363c, roughness:0.6, side:THREE.DoubleSide }),
+  cutW:  new THREE.MeshStandardMaterial({ color:0xc5cbd3, roughness:0.8, side:THREE.DoubleSide }),
+  cutB:  new THREE.MeshStandardMaterial({ color:0x4a4d55, roughness:0.8, side:THREE.DoubleSide }),
+  grey:  new THREE.MeshStandardMaterial({ color:0xb7bcc4, roughness:0.5 }),
+  liner: new THREE.MeshStandardMaterial({ color:0xe4e7eb, roughness:0.45, side:THREE.DoubleSide }),
+  chrome:new THREE.MeshStandardMaterial({ color:0xeef1f4, roughness:0.14, metalness:1 }),
+  rubber:new THREE.MeshStandardMaterial({ color:0x121315, roughness:0.7 }),
+  seam:  new THREE.MeshStandardMaterial({ color:0x9aa1ab, roughness:0.6 }),
+  copper:new THREE.MeshStandardMaterial({ color:0xc8743f, roughness:0.3, metalness:1, emissive:0xff5a1a, emissiveIntensity:0.3 }),
+  tube:  new THREE.MeshPhysicalMaterial({ color:0x6fb6ff, roughness:0.25, transparent:true, opacity:0.85, clearcoat:0.6 }),
+  hose:  new THREE.MeshStandardMaterial({ color:0x2b2d32, roughness:0.5 }),
+  acrylic: clear(0xeaf4ff, 0.22),
+  water: new THREE.MeshPhysicalMaterial({ color:0x3d9bff, roughness:0.1, transparent:true, opacity:0.6, emissive:0x0b4ea8, emissiveIntensity:0.25, depthWrite:false }),
+  bag:   new THREE.MeshStandardMaterial({ color:0xb9bec5, roughness:0.75, transparent:true, opacity:0.9, side:THREE.DoubleSide }),
+  pcb:   new THREE.MeshStandardMaterial({ color:0x1b6b45, roughness:0.55 }),
+  chip:  new THREE.MeshStandardMaterial({ color:0x17181d, roughness:0.4 }),
+  glow:  new THREE.MeshStandardMaterial({ color:0x0a2a55, emissive:0x2f9bff, emissiveIntensity:1.6 }),
+};
+function box(w,h,d,mat,r=0.01,seg=2){ const g = r>0 ? new THREE.RoundedBoxGeometry(w,h,d,seg,r) : new THREE.BoxGeometry(w,h,d); const m = new THREE.Mesh(g,mat); m.castShadow = m.receiveShadow = true; return m; }
+function cyl(rt,rb,h,mat,seg=32,open=false){ const m = new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg,1,open),mat); m.castShadow = m.receiveShadow = true; return m; }
+function at(o,x,y,z){ o.position.set(x,y,z); return o; }
+function mulberry(a){ return () => { a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const statics = [];
+function canvasTex(w,h,draw,dynamic=false){ const c = document.createElement('canvas'); c.width=w; c.height=h; const ctx = c.getContext('2d');
+  const tex = new THREE.CanvasTexture(c); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = maxAniso;
+  const api = { ctx, tex, redraw(){ ctx.clearRect(0,0,w,h); draw(ctx,w,h); tex.needsUpdate = true; } }; api.redraw(); if (!dynamic) statics.push(api); return api; }
+const F_DISP = '"Bai Jamjuree", system-ui, sans-serif', F_MONO = '"JetBrains Mono", ui-monospace, monospace', F_BODY = '"IBM Plex Sans Thai", system-ui, sans-serif';
+// a point on the body surface: phi in degrees (0 = front, +90 = right)
+function surf(o, phi, y, r){ o.position.set(r*Math.sin(phi*D), y, r*Math.cos(phi*D)); o.rotation.y = phi*D; return o; }
+// a curved patch that hugs the cylinder
+function patch(r, phi, width, y, h, mat){ const th = width/r; const g = new THREE.CylinderGeometry(r,r,h,24,1,true,phi*D-th/2,th); const m = new THREE.Mesh(g,mat); m.position.y = y; return m; }
+
+/* ---------- product root ---------- */
+const product = new THREE.Group(); scene.add(product);
+const movers = [];
+function mv(obj, modes={}){ const m = { obj, p0:obj.position.clone(), s0:obj.scale.clone(), modes }; movers.push(m); return m; }
+function targetOf(m, mode){
+  const c = m.modes[mode] || {};
+  const p = m.p0.clone(); if (c.dp) p.add(V3(...c.dp)); if (c.p) p.set(...c.p);
+  const s = c.s ? V3(...c.s) : m.s0.clone();
+  return { p, s, hide:!!c.hide };
+}
+const TINY = 1e-4, Z = [TINY,TINY,TINY];
+
+// shell ring split into a left and a right half, each with section caps on the cut plane (x = 0)
+function halfLathe(profile, mat, cutMat, phiStart){
+  const grp = new THREE.Group();
+  const pts = profile.map(([r,y])=>new THREE.Vector2(r,y));
+  const geo = new THREE.LatheGeometry([...pts, pts[0].clone()], 64, phiStart, Math.PI);
+  const m = new THREE.Mesh(geo, mat); m.castShadow = m.receiveShadow = true; grp.add(m);
+  const sg = new THREE.ShapeGeometry(new THREE.Shape(pts));
+  const c1 = new THREE.Mesh(sg, cutMat); c1.rotation.y = -Math.PI/2;
+  const c2 = new THREE.Mesh(sg, cutMat); c2.rotation.y = Math.PI/2;
+  grp.add(c1, c2); return grp;
+}
+function piece(y0, profile, mat, cutMat){
+  const g = new THREE.Group(); g.position.y = y0; product.add(g);
+  const L = halfLathe(profile, mat, cutMat, Math.PI), R = halfLathe(profile, mat, cutMat, 0);
+  g.add(L, R); return { g, L, R };
+}
+const wall = (h, ro=1.0, t=0.045) => [[ro-t,0],[ro-0.006,0],[ro,0.008],[ro,h-0.008],[ro-0.006,h],[ro-t,h]];
+
+/* base, white rings, black band, seat */
+const base = piece(0.30, [[0,0],[0.97,0],[1.0,0.02],[1.0,0.06],[0,0.06]], M.white, M.cutW);
+const W1 = piece(0.36, wall(0.42), M.white, M.cutW);
+const W2 = piece(0.78, wall(0.44), M.white, M.cutW);
+const W3 = piece(1.22, wall(0.43), M.white, M.cutW);
+const B1 = piece(1.65, wall(0.38), M.black, M.cutB);
+const B2 = piece(2.03, [[0.95,0],[0.994,0],[1.0,0.008],[1.0,0.33],[0.985,0.365],[0.86,0.37],[0.86,0.34],[0.95,0.34]], M.black, M.cutB);
+const seat = piece(2.40, [[0.40,0.0],[0.86,0.0],[0.885,0.035],[0.87,0.085],[0.82,0.1],[0.46,0.1],[0.415,0.08],[0.40,0.04]], M.black, M.cutB);
+for (const [p,y] of [[W2,0],[W3,0],[B1,0]]){ // fold seams
+  for (const half of [p.L,p.R]){ const t = new THREE.Mesh(new THREE.TorusGeometry(1.0,0.006,6,64,Math.PI), M.seam); t.rotation.x = Math.PI/2; t.rotation.z = half===p.L ? Math.PI/2 : -Math.PI/2; t.position.y = y; half.add(t); }
+}
+const shellPieces = [base, W1, W2, W3, B1, B2, seat];
+const FOLD = { base:[0.02,1], W1:[0.08,0.09/0.42], W2:[0.17,0.09/0.44], W3:[0.26,0.09/0.43], B1:[0.35,0.09/0.38], B2:[0.44,0.09/0.37], seat:[0.53,0.6] };
+const EXPL = { base:0, W1:0, W2:0, W3:0, B1:0.75, B2:0.75, seat:1.55 };
+[['base',base],['W1',W1],['W2',W2],['W3',W3],['B1',B1],['B2',B2],['seat',seat]].forEach(([n,p])=>{
+  const [fy, fs] = FOLD[n];
+  mv(p.g, { explode:{ dp:[0,EXPL[n],0] }, fold:{ p:[0,fy,0], s:[1,fs,1] } });
+  const split = ['W1','W2','W3','B1','B2'].includes(n);
+  mv(p.R, { half:{ dp:[2.8,0,0], hide:true }, explode:{ dp:[split?1.55:0,0,0] } });
+  mv(p.L, { explode:{ dp:[split?-1.55:0,0,0] } });
+});
+const bodyAll = [W1.g,W2.g,W3.g,B1.g,B2.g];
+
+/* ---------- 1 · seat details + 3 · heater ---------- */
+const heater = new THREE.Group(); heater.position.y = 2.455; product.add(heater);
+{
+  const pts = []; const N = 360;
+  for (let i=0;i<=N;i++){ const a = i/N*Math.PI*2, r = 0.64 + 0.13*Math.sin(a*36); pts.push(V3(r*Math.sin(a), 0, r*Math.cos(a))); }
+  const coil = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts,true), 900, 0.007, 6, true), M.copper);
+  heater.add(coil);
+  const sensor = box(0.06,0.02,0.04,M.chip,0.005); heater.add(at(sensor,0,0,-0.64));
+}
+mv(heater, { explode:{ dp:[0,1.95,0] }, fold:{ s:Z } });
+
+/* ---------- 2 · double lid ---------- */
+const innerPivot = new THREE.Group(); innerPivot.position.set(0,2.50,-0.84); product.add(innerPivot);
+const lidPivot = new THREE.Group(); lidPivot.position.set(0,2.536,-0.87); product.add(lidPivot);
+const innerLid = new THREE.Group(); innerLid.position.z = 0.84; innerPivot.add(innerLid);
+const outerLid = new THREE.Group(); outerLid.position.z = 0.87; lidPivot.add(outerLid);
+const inL = halfLathe([[0,0],[0.84,0],[0.85,0.018],[0.84,0.036],[0,0.036]], M.charcoal, M.cutB, Math.PI);
+const inR = halfLathe([[0,0],[0.84,0],[0.85,0.018],[0.84,0.036],[0,0.036]], M.charcoal, M.cutB, 0);
+innerLid.add(inL, inR);
+{
+  const mesh = canvasTex(256,256,(ctx,w,h)=>{ ctx.fillStyle='#1a1b1f'; ctx.fillRect(0,0,w,h); ctx.strokeStyle='#4b4f58'; ctx.lineWidth=2;
+    for (let i=-w;i<w*2;i+=10){ ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i+h,h); ctx.stroke(); ctx.beginPath(); ctx.moveTo(i,h); ctx.lineTo(i+h,0); ctx.stroke(); } });
+  mesh.tex.wrapS = mesh.tex.wrapT = THREE.RepeatWrapping; mesh.tex.repeat.set(4,4);
+  const filt = new THREE.Mesh(new THREE.RingGeometry(0.42,0.72,64), new THREE.MeshStandardMaterial({ map:mesh.tex, roughness:0.8, side:THREE.DoubleSide }));
+  filt.rotation.x = Math.PI/2; filt.position.y = -0.004; innerLid.add(filt);
+  const gasket = new THREE.Mesh(new THREE.TorusGeometry(0.79,0.016,10,72), new THREE.MeshStandardMaterial({ color:0x6b7380, roughness:0.85 }));
+  gasket.rotation.x = Math.PI/2; gasket.position.y = -0.008; innerLid.add(gasket);
+}
+const loL = halfLathe([[0,0],[0.9,0],[0.912,0.035],[0.885,0.075],[0.6,0.08],[0,0.08]], M.matte, M.cutB, Math.PI);
+const loR = halfLathe([[0,0],[0.9,0],[0.912,0.035],[0.885,0.075],[0.6,0.08],[0,0.08]], M.matte, M.cutB, 0);
+outerLid.add(loL, loR);
+{ const ring = new THREE.Mesh(new THREE.TorusGeometry(0.6,0.006,6,72), M.charcoal); ring.rotation.x = Math.PI/2; ring.position.y = 0.081; outerLid.add(ring); }
+for (const x of [-0.35,0.35]){ const h = cyl(0.03,0.03,0.16,M.charcoal,16); h.rotation.z = Math.PI/2; product.add(at(h,x,2.52,-0.88)); }
+mv(innerPivot, { explode:{ dp:[0,2.35,0] }, fold:{ p:[0,0.59,-0.84] } });
+mv(lidPivot,   { explode:{ dp:[0,2.8,0] },  fold:{ p:[0,0.625,-0.87] } });
+mv(inR, { half:{ dp:[2.8,0,0], hide:true } }); mv(loR, { half:{ dp:[2.8,0,0], hide:true } });
+
+/* ---------- internal parts ---------- */
+const internal = new THREE.Group(); product.add(internal);
+// funnel / bowl liner
+const funnel = new THREE.Group(); internal.add(funnel);
+{
+  const prof = [[0.405,2.40],[0.418,2.40],[0.378,0.86],[0.366,0.86]];
+  const L = halfLathe(prof, M.liner, M.cutW, Math.PI), R = halfLathe(prof, M.liner, M.cutW, 0);
+  funnel.add(L, R); mv(R, { half:{ dp:[2.8,0,0], hide:true } });
+}
+mv(funnel, { explode:{ dp:[0,0.35,0] } });
+
+// 4 · water tank + pump
+const tank = new THREE.Group(); tank.position.set(-0.54,1.05,0.38); internal.add(tank);
+const waterMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.185,0.185,1,32), M.water);
+{
+  const sh = cyl(0.2,0.2,1.0,M.acrylic,32); sh.castShadow = false; tank.add(at(sh,0,0.5,0));
+  tank.add(at(cyl(0.205,0.205,0.04,M.grey,32),0,1.0,0), at(cyl(0.205,0.205,0.03,M.grey,32),0,0.0,0));
+  tank.add(at(cyl(0.07,0.07,0.06,M.chrome,20),0.06,1.04,-0.05));
+  tank.add(waterMesh); waterMesh.renderOrder = 1;
+  const pump = new THREE.Group(); pump.position.set(0,-0.1,0);
+  pump.add(cyl(0.09,0.09,0.12,M.grey,24), at(cyl(0.05,0.05,0.08,M.chrome,16),0,-0.08,0));
+  tank.add(pump);
+}
+mv(tank, { explode:{ dp:[-0.9,0.4,0.6] }, fold:{ s:Z } });
+
+// spring hose reel
+const reel = new THREE.Group(); reel.position.set(0.58,1.42,0.12); internal.add(reel);
+const reelDrum = new THREE.Group();
+{
+  const d = cyl(0.15,0.15,0.13,M.charcoal,28); d.rotation.z = Math.PI/2; reelDrum.add(d);
+  for (let i=0;i<4;i++){ const t = new THREE.Mesh(new THREE.TorusGeometry(0.155,0.014,8,32), M.hose); t.rotation.y = Math.PI/2; t.position.x = -0.045+i*0.03; reelDrum.add(t); }
+  reel.add(reelDrum);
+}
+mv(reel, { explode:{ dp:[0.9,0.3,0.4] }, fold:{ s:Z } });
+// fixed tubes inside: tank -> pump -> reel
+{
+  const c = new THREE.CatmullRomCurve3([V3(-0.54,0.93,0.38),V3(-0.3,0.88,0.52),V3(0.2,0.9,0.5),V3(0.5,1.1,0.25),V3(0.58,1.27,0.12)]);
+  const t = new THREE.Mesh(new THREE.TubeGeometry(c,60,0.016,8), M.tube); internal.add(t);
+  mv(t, { explode:{ s:Z }, fold:{ s:Z } });
+}
+
+// 12 · control board (behind the screen)
+const pcb = new THREE.Group(); surf(pcb, 35, 2.02, 0.86); internal.add(pcb);
+{
+  const tex = canvasTex(256,180,(ctx,w,h)=>{ ctx.fillStyle='#1b6b45'; ctx.fillRect(0,0,w,h); const r = mulberry(4); ctx.strokeStyle='rgba(150,235,170,.4)'; ctx.lineWidth=2;
+    for (let i=0;i<40;i++){ let x=r()*w,y=r()*h; ctx.beginPath(); ctx.moveTo(x,y); for (let k=0;k<3;k++){ if (r()<.5) x+=(r()-.5)*w*.5; else y+=(r()-.5)*h*.5; ctx.lineTo(x,y);} ctx.stroke(); }
+    ctx.fillStyle='#dcb653'; for (let i=0;i<60;i++) ctx.fillRect(r()*w,r()*h,4,4); ctx.fillStyle='#f2f2ea'; ctx.font=`600 15px ${F_MONO}`; ctx.fillText('KOILET CTRL v2', 12, h-12); });
+  pcb.add(box(0.42,0.3,0.018,M.pcb,0.004,1));
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(0.41,0.29), new THREE.MeshStandardMaterial({ map:tex.tex, roughness:0.6 })); face.rotation.y = Math.PI; face.position.z = -0.0095; pcb.add(face);
+  pcb.add(at(box(0.11,0.11,0.02,M.chip,0.004,1),0.05,0.03,-0.02), at(box(0.06,0.05,0.015,M.chip,0.003,1),-0.12,0.07,-0.017), at(box(0.12,0.04,0.02,M.chip,0.004,1),-0.08,-0.09,-0.02));
+}
+mv(pcb, { explode:{ dp:[1.5,1.2,1.0] }, fold:{ s:Z } });
+
+// 13 · battery
+const battery = new THREE.Group(); battery.position.set(0,0.53,-0.64); internal.add(battery);
+{
+  battery.add(box(0.74,0.28,0.24,new THREE.MeshStandardMaterial({ color:0x2a2c31, roughness:0.5 }),0.02));
+  const lt = canvasTex(256,96,(ctx,w,h)=>{ ctx.fillStyle='#e9edf2'; ctx.fillRect(0,0,w,h); ctx.fillStyle='#14161a'; ctx.font=`600 22px ${F_MONO}`; ctx.fillText('Li-ion 12V', 14, 36);
+    for (let i=0;i<5;i++){ ctx.fillStyle = i<4 ? '#1f8fff' : '#c8d0da'; ctx.fillRect(14+i*44,54,36,26); } });
+  battery.add(at(new THREE.Mesh(new THREE.PlaneGeometry(0.42,0.16), new THREE.MeshStandardMaterial({ map:lt.tex })),0,0,0.121));
+}
+mv(battery, { explode:{ dp:[0,0,-1.5] }, fold:{ s:Z } });
+
+/* ---------- 6 · waste-bag drawer ---------- */
+const drawer = new THREE.Group(); product.add(drawer);
+{
+  const tray = new THREE.Group(); tray.position.set(0,0.39,0.36);
+  const tm = M.matte;
+  tray.add(at(box(0.84,0.02,1.24,tm,0.006,1),0,0.01,0), at(box(0.02,0.38,1.24,tm,0.006,1),-0.41,0.19,0), at(box(0.02,0.38,1.24,tm,0.006,1),0.41,0.19,0), at(box(0.84,0.38,0.02,tm,0.006,1),0,0.19,-0.61));
+  drawer.add(tray);
+  const face = box(0.86,0.36,0.06,M.black,0.02,3); drawer.add(at(face,0,0.585,1.02));
+  drawer.add(at(box(0.42,0.05,0.02,M.rubber,0.008,1),0,0.5,1.052));
+  const bmat = new THREE.MeshStandardMaterial({ color:0x9ca3ad, roughness:0.5, side:THREE.DoubleSide });
+  drawer.add(at(cyl(0.34,0.34,0.01,bmat,40),0,0.42,0));
+  const prof = []; for (let i=0;i<=14;i++){ const t=i/14; prof.push(new THREE.Vector2(0.3+0.065*t+0.012*Math.sin(t*40), 0.43+0.35*t)); }
+  prof.push(new THREE.Vector2(0.39,0.79), new THREE.Vector2(0.395,0.72));
+  for (const start of [Math.PI, 0]){
+    const half = new THREE.Group();
+    const bk = new THREE.Mesh(new THREE.CylinderGeometry(0.37,0.34,0.36,40,1,true,start,Math.PI), bmat); bk.position.y = 0.6; bk.castShadow = true; half.add(bk);
+    half.add(new THREE.Mesh(new THREE.LatheGeometry(prof, 32, start, Math.PI), M.bag));
+    drawer.add(half); if (start === 0) mv(half, { half:{ dp:[2.8,0,0], hide:true } });
+  }
+  const knot = new THREE.Mesh(new THREE.SphereGeometry(0.04,12,8), M.bag); drawer.add(at(knot,0.32,0.8,0.12));
+}
+mv(drawer, { explode:{ dp:[0,0,1.6] }, fold:{ s:Z } });
+
+/* ---------- 8 · touch screen (on the band, right) ---------- */
+let tempC = 36, tankLevel = 0.8, musicOn = false, spraying = false;
+const screenTex = canvasTex(512,512,(ctx,w,h)=>{
+  const g = ctx.createRadialGradient(w/2,h/2,40,w/2,h/2,w/2); g.addColorStop(0,'#0e1a2e'); g.addColorStop(1,'#020407');
+  ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle = '#2f9bff'; ctx.lineWidth = 10; ctx.shadowColor = '#2f9bff'; ctx.shadowBlur = 24;
+  const k = (tempC-30)/10; ctx.beginPath(); ctx.arc(w/2,h/2,210,Math.PI*0.75,Math.PI*0.75+Math.PI*1.5*k); ctx.stroke();
+  ctx.shadowBlur = 0; ctx.strokeStyle = 'rgba(80,140,220,.25)'; ctx.beginPath(); ctx.arc(w/2,h/2,210,Math.PI*0.75+Math.PI*1.5*k,Math.PI*2.25); ctx.stroke();
+  ctx.textAlign = 'center';
+  if (musicOn){ // now-playing screen: piece title + live bars
+    ctx.fillStyle = '#7fb8ff'; ctx.font = `600 20px ${F_MONO}`; ctx.letterSpacing = '4px'; ctx.fillText('NOW PLAYING', w/2+2, 96); ctx.letterSpacing = '0px';
+    const cx = w/2, cy = 196, r = 86;
+    const gg = ctx.createRadialGradient(cx,cy,10,cx,cy,r); gg.addColorStop(0,'#16345e'); gg.addColorStop(1,'#0a1426');
+    ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#2f9bff'; ctx.lineWidth = 5; ctx.shadowColor = '#2f9bff'; ctx.shadowBlur = 14; ctx.beginPath(); ctx.arc(cx,cy,r+4,0,Math.PI*2); ctx.stroke(); ctx.shadowBlur = 0;
+    ctx.fillStyle = '#ffffff'; ctx.font = `600 110px ${F_BODY}`; ctx.textBaseline = 'middle'; ctx.fillText('♫', cx, cy+6); ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = '#ffffff'; ctx.font = `700 42px ${F_DISP}`; ctx.fillText('Für Elise', w/2, 326);
+    ctx.fillStyle = '#8fa3bf'; ctx.font = `500 20px ${F_MONO}`; ctx.fillText('L. van Beethoven', w/2, 352);
+    const lv = musicLevel();
+    for (let i=0;i<9;i++){ const hgt = 8 + 34*Math.abs(Math.sin(performance.now()/180 + i*1.7))*(0.35+0.65*lv); ctx.fillStyle = '#2f9bff'; ctx.fillRect(w/2-90+i*20, 396-hgt, 12, hgt); }
+    ctx.fillStyle = '#cfe4ff'; ctx.font = `600 22px ${F_MONO}`; ctx.fillText(`${tempC}°C  ·  💧${Math.round(tankLevel*100)}%`, w/2, 436);
+    return;
+  }
+  ctx.fillStyle = '#8fa3bf'; ctx.font = `600 26px ${F_DISP}`; ctx.letterSpacing = '8px'; ctx.fillText('KOILET', w/2+4, 128); ctx.letterSpacing = '0px';
+  ctx.fillStyle = '#ffffff'; ctx.font = `600 132px ${F_DISP}`; ctx.fillText(`${tempC}°`, w/2+14, 290);
+  ctx.fillStyle = '#7fb8ff'; ctx.font = `500 24px ${F_MONO}`; ctx.fillText(spraying ? 'SPRAYING' : 'SEAT TEMP', w/2, 334);
+  ctx.font = `600 26px ${F_MONO}`; ctx.fillStyle = tankLevel < 0.2 ? '#ff7a7a' : '#cfe4ff';
+  ctx.fillText(`💧${Math.round(tankLevel*100)}%`, w/2-92, 404);
+  ctx.fillStyle = '#cfe4ff'; ctx.fillText('▮ 86%', w/2+30, 404);
+  ctx.fillStyle = musicOn ? '#2f9bff' : '#46536a'; ctx.font = `600 34px ${F_BODY}`; ctx.fillText('♪', w/2+128, 406);
+}, true);
+const screenG = new THREE.Group(); surf(screenG, 35, 0.37, 1.0); B1.R.add(screenG);
+{
+  const bez = cyl(0.225,0.225,0.05,M.black,48); bez.rotation.x = Math.PI/2; screenG.add(at(bez,0,0,0.012));
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.212,0.008,10,64), M.glow); screenG.add(at(ring,0,0,0.038));
+  const disp = new THREE.Mesh(new THREE.CircleGeometry(0.2,64), new THREE.MeshBasicMaterial({ map:screenTex.tex, toneMapped:false })); screenG.add(at(disp,0,0,0.0385));
+  const gl = new THREE.Mesh(new THREE.CircleGeometry(0.2,64), clear(0xffffff,0.08)); screenG.add(at(gl,0,0,0.04));
+}
+mv(screenG, { fold:{ s:Z } });
+
+/* ---------- 7 · speaker (on the band, left) ---------- */
+const speakerG = new THREE.Group(); surf(speakerG, -35, 0.2, 1.0); B1.L.add(speakerG);
+const cone = new THREE.Group();
+{
+  const gt = canvasTex(256,256,(ctx,w,h)=>{ ctx.fillStyle='#202227'; ctx.beginPath(); ctx.arc(w/2,h/2,w/2,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#0a0b0d';
+    for (let y=14;y<h;y+=17) for (let x=14;x<w;x+=17){ if (Math.hypot(x-w/2,y-h/2)<w/2-14){ ctx.beginPath(); ctx.arc(x,y,5,0,Math.PI*2); ctx.fill(); } } });
+  const rim = cyl(0.17,0.17,0.03,M.black,48); rim.rotation.x = Math.PI/2; speakerG.add(at(rim,0,0,0.008));
+  speakerG.add(at(new THREE.Mesh(new THREE.CircleGeometry(0.155,48), new THREE.MeshStandardMaterial({ map:gt.tex, roughness:0.7, transparent:true })),0,0,0.024));
+  const c = new THREE.Mesh(new THREE.ConeGeometry(0.12,0.08,32,1,true), new THREE.MeshStandardMaterial({ color:0x2a2c31, roughness:0.8, side:THREE.DoubleSide }));
+  c.rotation.x = -Math.PI/2; cone.add(c); cone.add(at(cyl(0.05,0.05,0.04,M.chrome,20).rotateX(Math.PI/2),0,0,-0.06)); cone.position.z = -0.06; speakerG.add(cone);
+}
+mv(speakerG, { fold:{ s:Z } });
+
+/* ---------- 4 · water-level window (left, white body) ---------- */
+const winG = new THREE.Group(); W2.L.add(winG);
+const levelBar = new THREE.Mesh(new THREE.CylinderGeometry(1.012,1.012,1,16,1,true,-55*D-0.07,0.14), new THREE.MeshBasicMaterial({ color:0x2f9bff, toneMapped:false, transparent:true, opacity:0.85 }));
+{
+  winG.add(patch(1.006,-55,0.26,0.47,0.42,M.black));
+  winG.add(patch(1.009,-55,0.2,0.47,0.36,new THREE.MeshStandardMaterial({ color:0x0d1420, roughness:0.2 })));
+  winG.add(levelBar);
+}
+mv(winG, { fold:{ s:Z } });
+
+/* ---------- 5 · sprayer holder + handheld sprayer ---------- */
+const holder = new THREE.Group(); surf(holder, 80, 0.11, 1.0); B1.R.add(holder);
+const dockAnchor = new THREE.Object3D(); dockAnchor.position.set(0,0.14,0.075); holder.add(dockAnchor);
+const hosePort = new THREE.Object3D(); hosePort.position.set(0,-0.05,0.02); holder.add(hosePort);
+{
+  holder.add(at(box(0.12,0.1,0.05,M.black,0.015),0,0,0.02));
+  const clip = new THREE.Mesh(new THREE.TorusGeometry(0.045,0.01,8,24,Math.PI*1.5), M.chrome); clip.rotation.x = Math.PI/2; clip.rotation.z = -Math.PI*0.25; holder.add(at(clip,0,0.05,0.075));
+  holder.add(at(cyl(0.025,0.025,0.04,M.rubber,16),0,-0.06,0.03));
+}
+mv(holder, { fold:{ s:Z } });
+const sprayer = new THREE.Group(); product.add(sprayer);
+const nozzleLocal = V3(0,0.19,0.05);
+{
+  const handle = new THREE.Mesh(new THREE.CapsuleGeometry(0.03,0.2,6,16), M.chrome); handle.castShadow = true; sprayer.add(handle);
+  const head = cyl(0.055,0.05,0.07,M.chrome,32); head.rotation.x = Math.PI/2; sprayer.add(at(head,0,0.17,0.02));
+  const ft = canvasTex(128,128,(ctx,w,h)=>{ ctx.fillStyle='#2b2e35'; ctx.beginPath(); ctx.arc(64,64,64,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#0b0c0e';
+    for (let i=0;i<3;i++) for (let j=0;j<12;j++){ const a=j/12*Math.PI*2, r=14+i*14; ctx.beginPath(); ctx.arc(64+Math.cos(a)*r,64+Math.sin(a)*r,3,0,Math.PI*2); ctx.fill(); } });
+  sprayer.add(at(new THREE.Mesh(new THREE.CircleGeometry(0.048,32), new THREE.MeshStandardMaterial({ map:ft.tex })),0,0.17,0.056));
+  const trig = box(0.025,0.09,0.03,M.charcoal,0.008); trig.rotation.x = 0.25; sprayer.add(at(trig,0,0.07,-0.035));
+}
+sprayer.traverse(o=>{ o.userData.part = 'sprayer'; });
+const hoseMesh = new THREE.Mesh(new THREE.BufferGeometry(), M.hose); hoseMesh.castShadow = true; product.add(hoseMesh);
+
+/* ---------- 9 · casters ---------- */
+const wheels = new THREE.Group(); product.add(wheels);
+const wheelSpins = [];
+for (const a of [45,135,225,315]){
+  const c = new THREE.Group(); c.position.set(0.72*Math.sin(a*D), 0, 0.72*Math.cos(a*D));
+  c.add(at(cyl(0.075,0.075,0.03,M.charcoal,24),0,0.285,0));
+  c.add(at(box(0.03,0.16,0.07,M.charcoal,0.008),-0.065,0.2,0), at(box(0.03,0.16,0.07,M.charcoal,0.008),0.065,0.2,0));
+  const spin = new THREE.Group(); spin.position.y = 0.12;
+  const w = cyl(0.12,0.12,0.08,M.rubber,32); w.rotation.z = Math.PI/2; spin.add(w);
+  const hub = cyl(0.05,0.05,0.085,M.grey,20); hub.rotation.z = Math.PI/2; spin.add(hub);
+  for (let i=0;i<4;i++){ const sp = box(0.088,0.012,0.09,M.grey,0,1); sp.rotation.x = i*Math.PI/4; spin.add(sp); }
+  c.add(spin); wheelSpins.push(spin); wheels.add(c);
+}
+mv(wheels, { explode:{ dp:[0,-0.0,0] }, fold:{ p:[0,0.25,0], s:Z } });
+
+/* ---------- 10 · privacy curtain ---------- */
+const curtain = new THREE.Group(); product.add(curtain);
+const POLE = { z:-1.07, low:2.35, high:7.6 };
+const poleSegs = [];
+const hoopG = new THREE.Group(), fabricG = new THREE.Group();
+{
+  curtain.add(at(cyl(0.058,0.058,1.9,M.black,24),0,1.4,POLE.z));
+  curtain.add(at(box(0.12,0.06,0.1,M.black,0.015),0,0.8,POLE.z+0.05), at(box(0.12,0.06,0.1,M.black,0.015),0,2.05,POLE.z+0.05));
+  curtain.add(at(cyl(0.064,0.064,0.04,M.charcoal,24),0,2.36,POLE.z));
+  [0.048,0.04,0.032].forEach((r,i)=>{ const s = cyl(r,r,1.9,i%2?M.chrome:M.matte,20); s.position.set(0,1.4,POLE.z); curtain.add(s); poleSegs.push(s); });
+  hoopG.position.set(0,POLE.high,0.45); curtain.add(hoopG);
+  const hoop = new THREE.Mesh(new THREE.TorusGeometry(2.6,0.028,10,128), M.matte); hoop.rotation.x = Math.PI/2; hoopG.add(hoop);
+  const arm = box(0.05,0.05,1.12,M.matte,0.01); hoopG.add(arm);
+  arm.position.set(0,0,(POLE.z-0.45 + (-2.6))/2); arm.scale.z = Math.abs((POLE.z-0.45) - (-2.6))/1.12;
+  const H = POLE.high - 0.18;
+  const geo = new THREE.CylinderGeometry(2.6,2.6,H,160,8,true,0.42,Math.PI*2-0.84);
+  const p = geo.attributes.position, v = V3();
+  for (let i=0;i<p.count;i++){ v.fromBufferAttribute(p,i); const a = Math.atan2(v.x,v.z); const k = 1 + 0.028*Math.sin(a*30); p.setXYZ(i, v.x*k, v.y, v.z*k); }
+  geo.computeVertexNormals(); geo.translate(0,-H/2,0);
+  const ft = canvasTex(256,256,(ctx,w,h)=>{ ctx.fillStyle='#d6d1c8'; ctx.fillRect(0,0,w,h); ctx.strokeStyle='rgba(120,110,95,.12)'; ctx.lineWidth=1;
+    for (let i=0;i<w;i+=4){ ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,h); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(w,i); ctx.stroke(); } });
+  ft.tex.wrapS = ft.tex.wrapT = THREE.RepeatWrapping; ft.tex.repeat.set(12,6);
+  const fab = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map:ft.tex, roughness:0.95, side:THREE.DoubleSide, transparent:true, opacity:0.94 }));
+  fab.castShadow = true; fabricG.add(fab);
+  for (const s of [-1,1]){ const roll = cyl(0.07,0.07,H*0.92,new THREE.MeshStandardMaterial({ color:0xc9c3b8, roughness:0.95 }),16); roll.position.set(2.62*Math.sin(s*0.42), -H*0.46, 2.62*Math.cos(s*0.42)); fabricG.add(roll); }
+  hoopG.add(fabricG);
+  hoopG.visible = false;
+}
+mv(curtain, { explode:{ dp:[0,0,-1.3] }, fold:{ s:Z } });
+
+/* ---------- 11 · fold latches + strap (shown when folded) ---------- */
+const latches = new THREE.Group(); product.add(latches);
+{
+  for (const a of [0,180]){ const l = new THREE.Group(); surf(l, a, 0.34, 1.02); l.add(box(0.12,0.62,0.05,M.black,0.015)); l.add(at(box(0.08,0.06,0.03,M.chrome,0.008),0,0.1,0.03)); latches.add(l); }
+  const strap = new THREE.Mesh(new THREE.TorusGeometry(0.3,0.02,8,32,Math.PI), M.black); strap.position.set(0,0.72,0); latches.add(strap);
+}
+latches.scale.setScalar(TINY);
+mv(latches, { assembled:{ s:Z }, half:{ s:Z }, explode:{ s:Z }, fold:{ s:[1,1,1] } });
+
+/* ---------- brand + usb-c ---------- */
+{
+  const bt = canvasTex(512,96,(ctx,w,h)=>{ ctx.fillStyle='#3a3d44'; ctx.font=`600 54px ${F_DISP}`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.letterSpacing='14px'; ctx.fillText('KOILET', w/2+7, h/2+2); ctx.letterSpacing='0px'; });
+  const brand = patch(1.004, 32, 0.42, 0.18, 0.08, new THREE.MeshStandardMaterial({ map:bt.tex, transparent:true, roughness:0.5 })); W2.R.add(brand);
+  mv(brand, { fold:{ s:Z } });
+  const usb = new THREE.Group(); surf(usb, 112, 0.22, 1.0); W1.R.add(usb);
+  usb.add(at(box(0.07,0.03,0.02,M.rubber,0.012),0,0,0.005)); mv(usb, { fold:{ s:Z } });
+}
+
+mv(internal, { fold:{ s:Z } });
+
+/* ---------- reflections ---------- */
+{ const seen = new Set(); scene.traverse(o=>{ const ms = Array.isArray(o.material)?o.material:[o.material]; for (const m of ms){ if (!m || seen.has(m) || m.envMapIntensity===undefined || m.userData.keep) continue; seen.add(m); m.envMapIntensity = m===M.chrome ? 1.0 : m===floor.material ? 0.1 : 0.55; } }); }
+
+/* ---------- part lookup ---------- */
+const partObjs = { seat:seat.g, lids:lidPivot, heater, tank, sprayer, drawer, speaker:speakerG, screen:screenG, wheels, curtain, fold:B1.g, pcb, battery };
+const TAGPOS = { seat:[0.62,0.12,0.42], lids:[0,0.1,0.87+0.3], heater:[-0.62,0.02,0.2], tank:[0,0.75,0.2], sprayer:[0,0.28,0], drawer:[0.3,0.62,1.06],
+  speaker:[0,0.2,0.05], screen:[0,0.26,0.05], wheels:[0.55,0.12,0.55], curtain:[0,2.5,-1.07], fold:[-0.72,0.0,0.72], pcb:[0,0.2,0], battery:[0,0.2,0] };
+const TAGOBJ = partObjs;
+for (const [id,o] of Object.entries(partObjs)) o.traverse(c=>{ if (!c.userData.part) c.userData.part = id; });
+for (const p of [W1,W2,W3,B2,base]) p.g.traverse(c=>{ if (!c.userData.part) c.userData.part = 'fold'; });
+innerPivot.traverse(c=>{ c.userData.part = 'lids'; });
+
+/* ---------- tweening ---------- */
+const tweens = [];
+const ease = k => k<0.5 ? 4*k*k*k : 1-Math.pow(-2*k+2,3)/2;
+function animate(ms, fn){ ms = RM ? ms*0.35 : ms; return new Promise(res=>tweens.push({ s:performance.now(), ms, fn, res })); }
+function runTweens(now){ for (let i=tweens.length-1;i>=0;i--){ const t=tweens[i]; const k=Math.min(1,(now-t.s)/t.ms); t.fn(ease(k)); if (k>=1){ tweens.splice(i,1); t.res(); } } }
+const wait = ms => new Promise(r=>setTimeout(r, RM?ms*0.4:ms));
+function camTo(v, ms=1300){ const p0 = camera.position.clone(), t0 = controls.target.clone(); controls.autoRotate = false; $('autoRot').checked = false;
+  return animate(ms, k=>{ camera.position.lerpVectors(p0,v.pos,k); controls.target.lerpVectors(t0,v.tgt,k); }); }
+
+/* ---------- state ---------- */
+let mode = 'assembled', busy = false, lidState = 0, drawerOpen = false, curtainK = 0, curtainOpen = false;
+let docked = true, sprayPose = null;
+const statusEl = $('status');
+function say(t){ statusEl.textContent = t; }
+function syncButtons(){
+  $('lidLbl').textContent = lidState===0 ? 'เปิดฝาชั้นนอก' : lidState===1 ? 'เปิดฝาชั้นใน' : 'ปิดฝาทั้งสองชั้น';
+  $('aLid').setAttribute('aria-pressed', String(lidState>0));
+  $('aDrawer').setAttribute('aria-pressed', String(drawerOpen));
+  $('aCurtain').setAttribute('aria-pressed', String(curtainOpen));
+  $('aMusic').setAttribute('aria-pressed', String(musicOn));
+  $('aSpray').setAttribute('aria-pressed', String(!docked));
+  const folded = mode === 'fold';
+  ['aLid','aSpray','aDrawer','aCurtain','aRoll','aDemo'].forEach(id=>$(id).disabled = folded);
+  document.querySelectorAll('.modes button').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.mode===mode)));
+}
+function setWater(){ $('waterBar').style.width = `${Math.round(tankLevel*100)}%`; $('waterOut').textContent = `${Math.round(tankLevel*100)}%`;
+  waterMesh.scale.y = Math.max(0.001, tankLevel*0.92); waterMesh.position.y = 0.03 + waterMesh.scale.y/2;
+  levelBar.scale.y = Math.max(0.001, tankLevel*0.34); levelBar.position.y = 0.3 + levelBar.scale.y/2; }
+setWater();
+
+async function setLid(target){
+  const outer = target>=1 ? -1.66 : 0, inner = target>=2 ? -1.56 : 0;
+  const o0 = lidPivot.rotation.x, i0 = innerPivot.rotation.x;
+  lidState = target; syncButtons();
+  if (target < 2 && i0 !== 0) await animate(700, k=>innerPivot.rotation.x = i0*(1-k));
+  await animate(800, k=>lidPivot.rotation.x = o0+(outer-o0)*k);
+  if (target === 2) await animate(700, k=>innerPivot.rotation.x = i0+(inner-i0)*k);
+}
+async function setDrawer(open){ drawerOpen = open; syncButtons(); const z0 = drawer.position.z, z1 = open ? 1.05 : 0; await animate(900, k=>drawer.position.z = z0+(z1-z0)*k); }
+function applyCurtain(k){
+  curtainK = k;
+  const pk = Math.min(1,k/0.4), hk = Math.max(0,Math.min(1,(k-0.35)/0.25)), dk = Math.max(0,Math.min(1,(k-0.55)/0.45));
+  const top = POLE.low + pk*(POLE.high-POLE.low);
+  poleSegs.forEach((s,i)=>{ const t = POLE.low + pk*(POLE.high-POLE.low)*(i+1)/3; s.position.y = Math.max(1.4, t-0.95); });
+  hoopG.visible = hk > 0.001; hoopG.position.y = top;
+  const sc = 0.05 + 0.95*hk; hoopG.scale.set(sc,1,sc);
+  fabricG.scale.y = Math.max(0.001, dk); fabricG.visible = dk > 0.001;
+}
+applyCurtain(0);
+async function setCurtain(open){
+  curtainOpen = open; syncButtons();
+  const k0 = curtainK, k1 = open ? 1 : 0;
+  if (open) camTo(VIEWS.tent, 2200); else camTo(VIEWS[mode], 2000);
+  await animate(2200, k=>applyCurtain(k0+(k1-k0)*k));
+}
+
+// sprayer poses (in product space)
+const dockPose = () => { product.updateMatrixWorld(true); const p = product.worldToLocal(dockAnchor.getWorldPosition(V3())); const q = dockAnchor.getWorldQuaternion(new THREE.Quaternion()); return { p, q }; };
+const aimDummy = new THREE.Object3D(); product.add(aimDummy);
+function usePose(){ aimDummy.position.set(0.22,3.05,0.66); product.updateMatrixWorld(true); aimDummy.lookAt(product.localToWorld(V3(0,2.1,-0.05))); return { p:aimDummy.position.clone(), q:aimDummy.quaternion.clone() }; }
+async function moveSprayer(from, to, ms){
+  await animate(ms, k=>{ sprayer.position.lerpVectors(from.p,to.p,k); sprayer.position.y += Math.sin(Math.PI*k)*0.35; sprayer.quaternion.slerpQuaternions(from.q,to.q,k); });
+}
+async function spray(){
+  if (busy || mode==='fold') return; busy = true;
+  try {
+    if (mode !== 'assembled') await setMode('assembled', true);
+    if (curtainOpen) await setCurtain(false);
+    if (lidState < 2){ say('เปิดฝาทั้งสองชั้นก่อนฉีด…'); await setLid(2); }
+    if (tankLevel < 0.03){ say('น้ำในถังหมด กด "เติมน้ำให้เต็ม" ก่อน'); return; }
+    docked = false; syncButtons(); say('ดึงหัวฉีดออกจากที่แขวน สายคลายออกจากรอก…'); camTo(VIEWS.spray, 1000);
+    const up = usePose(); await moveSprayer(dockPose(), up, 1100);
+    spraying = true; say('ปั๊มดันน้ำจากถังออกหัวฉีด');
+    await wait(3200);
+    spraying = false; say('ปล่อยไก รอกสปริงม้วนสายกลับ');
+    await moveSprayer({ p:sprayer.position.clone(), q:sprayer.quaternion.clone() }, dockPose(), 1100);
+    docked = true; syncButtons(); say(''); camTo(VIEWS.assembled, 1000);
+  } finally { busy = false; }
+}
+async function roll(){
+  if (busy || mode==='fold') return; busy = true; $('aRoll').setAttribute('aria-pressed','true');
+  try {
+    if (mode !== 'assembled') await setMode('assembled', true);
+    if (curtainOpen) await setCurtain(false);
+    say('ล้อหมุนรอบตัว เข็นไปข้างหน้า…');
+    const path = (k)=>Math.sin(k*Math.PI)*1.6;
+    let last = 0;
+    await animate(2600, k=>{ const z = path(k); const d = z-last; last = z; product.position.z = z; wheelSpins.forEach(w=>w.rotation.x += d/0.12); });
+    product.position.z = 0; say('');
+  } finally { busy = false; $('aRoll').setAttribute('aria-pressed','false'); }
+}
+
+/* ---------- excretion demo ---------- */
+const poopMat = new THREE.MeshPhysicalMaterial({ color:0x6e4220, roughness:0.35, clearcoat:0.6, clearcoatRoughness:0.3 });
+function makePoop(){
+  const g = new THREE.Group();
+  [[0.11,0.045,0],[0.085,0.04,0.06],[0.06,0.034,0.115]].forEach(([r,tube,y])=>{ const t = new THREE.Mesh(new THREE.TorusGeometry(r,tube,12,32), poopMat); t.rotation.x = Math.PI/2; t.position.y = y; t.castShadow = true; g.add(t); });
+  const tip = new THREE.Mesh(new THREE.ConeGeometry(0.045,0.09,16), poopMat); tip.position.y = 0.16; tip.rotation.z = 0.35; g.add(tip);
+  g.add(at(new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.06,24), poopMat),0,0.02,0));
+  return g;
+}
+const poops = [];
+const splash = Array.from({length:18}, ()=>{ const m = new THREE.Mesh(new THREE.SphereGeometry(0.014,6,4), new THREE.MeshBasicMaterial({ color:0xd8e8f5, transparent:true, opacity:0.8 })); m.visible = false; drawer.add(m); return { m, v:V3() }; });
+async function demo(){
+  if (busy || mode==='fold') return; busy = true; $('aDemo').setAttribute('aria-pressed','true');
+  try {
+    if (curtainOpen) await setCurtain(false);
+    if (drawerOpen) await setDrawer(false);
+    if (poops.length >= 4){ say('ถุงเต็มแล้ว กด "เปิดช่องถุง" เพื่อเปลี่ยนถุงใหม่ก่อน'); return; }
+    if (mode !== 'half') await setMode('half', true);
+    if (lidState < 2){ say('เปิดฝาทั้งสองชั้น…'); await setLid(2); }
+    say('ของเสียตกผ่านรูฝารองนั่ง ลงกรวย…');
+    const p = makePoop(); p.position.set(0, 3.0, 0); p.rotation.y = Math.random()*6; drawer.add(p);
+    const restY = 0.45 + poops.length*0.07, x1 = (Math.random()-0.5)*0.12, z1 = (Math.random()-0.5)*0.12;
+    await animate(380, k=>{ p.position.y = 3.0 - 0.45*k; });
+    const y0 = p.position.y, fallMs = 1100;
+    await new Promise(res=>{ const s0 = performance.now(); tweens.push({ s:s0, ms:RM?fallMs*0.35:fallMs, fn:k=>{ const kk = k*k; p.position.y = y0 + (restY-y0)*kk; p.position.x = x1*kk; p.position.z = z1*kk; p.rotation.x = Math.sin(k*7)*0.12; }, res }); });
+    p.rotation.x = 0; poops.push(p);
+    splash.forEach(s=>{ s.m.visible = !RM; s.m.position.set(p.position.x, restY+0.05, p.position.z); s.v.set((Math.random()-.5)*1.4, 0.8+Math.random()*1.2, (Math.random()-.5)*1.4); });
+    splashT = 0.6;
+    say(`ลงถุงเรียบร้อย (ถุงใช้ไป ${poops.length}/4) ปิดฝาแล้วขอบยางกับแผ่นกรองคาร์บอนกักกลิ่น`);
+    await wait(900);
+    await setLid(0);
+    await wait(500);
+    await setMode('assembled', true);
+  } finally { busy = false; $('aDemo').setAttribute('aria-pressed','false'); }
+}
+let splashT = 0;
+function stepSplash(dt){ if (splashT <= 0) return; splashT -= dt; for (const s of splash){ if (!s.m.visible) continue; s.v.y -= 6*dt; s.m.position.addScaledVector(s.v, dt); if (splashT <= 0) s.m.visible = false; } }
+
+/* ---------- view modes ---------- */
+async function setMode(m, internalCall=false){
+  if (m === mode) return;
+  if (!internalCall && busy) return;
+  const was = busy; busy = true;
+  try {
+    if (m === 'fold'){
+      if (curtainOpen) await setCurtain(false);
+      await Promise.all([ lidState ? setLid(0) : null, drawerOpen ? setDrawer(false) : null ]);
+    }
+    const prev = mode; mode = m; syncButtons();
+    const from = movers.map(x=>({ p:x.obj.position.clone(), s:x.obj.scale.clone() }));
+    const to = movers.map(x=>targetOf(x,m));
+    movers.forEach((x,i)=>{ if (!to[i].hide) x.obj.visible = true; });
+    camTo(VIEWS[m], 1400);
+    await animate(1400, k=>{ movers.forEach((x,i)=>{ x.obj.position.lerpVectors(from[i].p,to[i].p,k); x.obj.scale.lerpVectors(from[i].s,to[i].s,k); }); });
+    movers.forEach((x,i)=>{ if (to[i].hide) x.obj.visible = false; });
+    internal.visible = m !== 'fold';
+    say(m==='fold' ? 'พับเก็บแล้ว: วงแหวนยุบซ้อนกัน ล้อหดเข้า คลิปล็อกสองข้าง หิ้วใส่กระเป๋าได้' : m==='half' ? 'ผ่าครึ่ง: เห็นถังน้ำ กรวย ถุงของเสีย ลวดความร้อน และแผงวงจร' : m==='explode' ? 'แยกชิ้น: แตะชิ้นไหนก็ได้เพื่อดูหน้าที่และกลไก' : '');
+  } finally { busy = internalCall ? was : false; }
+}
+document.querySelectorAll('.modes button').forEach(b=>b.onclick = () => setMode(b.dataset.mode));
+
+/* ---------- actions ---------- */
+$('aLid').onclick = async () => { if (busy || mode==='fold') return; busy = true; try { await setLid((lidState+1)%3); say(lidState===1 ? 'ฝาชั้นนอกเปิดแล้ว ฝาชั้นในยังปิดกันกลิ่นอยู่' : lidState===2 ? 'เปิดครบสองชั้น เห็นฝารองนั่ง' : 'ปิดฝาแล้ว ขอบยางกดแน่นกันกลิ่น'); } finally { busy = false; } };
+$('aDrawer').onclick = async () => { if (busy || mode==='fold') return; busy = true; try { if (mode!=='assembled' && mode!=='half') await setMode('assembled', true); await setDrawer(!drawerOpen); if (drawerOpen){ say(poops.length ? 'ดึงลิ้นชักออกแล้ว มัดปากถุงแล้วยกออก…' : 'ดึงลิ้นชักออก มัดปากถุงแล้วเปลี่ยนถุงใหม่ได้'); if (poops.length){ await wait(900); poops.splice(0).forEach(p=>drawer.remove(p)); say('เปลี่ยนถุงใหม่แล้ว'); } } else say(''); } finally { busy = false; } };
+$('aCurtain').onclick = async () => { if (busy || mode==='fold') return; busy = true; try { if (mode!=='assembled') await setMode('assembled', true); await setCurtain(!curtainOpen); say(curtainOpen ? 'เสายืดขึ้น ห่วงสปริงกางออก ผ้าทิ้งตัวลงเป็นห้องส่วนตัว' : ''); } finally { busy = false; } };
+$('aSpray').onclick = spray;
+$('aRoll').onclick = roll;
+$('aDemo').onclick = demo;
+$('temp').oninput = e => { tempC = +e.target.value; $('tempOut').textContent = `${tempC}°C`; screenTex.redraw(); };
+$('refill').onclick = () => { const l0 = tankLevel; animate(1200, k=>{ tankLevel = l0+(1-l0)*k; setWater(); }).then(()=>screenTex.redraw()); say('เติมน้ำผ่านฝาด้านบนของถัง'); };
+
+// speaker: Beethoven, Für Elise (opening theme), pre-rendered to an audio file.
+// A plain audio element is used so it also plays on iPhone/iPad with the silent switch on.
+const ELISE_STEPS = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46];
+const STEP = 0.15, LOOP = 52, START = 0.05;
+const track = new Audio('fur-elise.mp3'); track.loop = true; track.preload = 'auto'; track.setAttribute('playsinline','');
+$('aMusic').onclick = () => {
+  musicOn = !musicOn;
+  if (musicOn){
+    track.currentTime = 0;
+    const p = track.play();
+    say('ลำโพงกำลังเล่น Für Elise ของ Beethoven · ดูจอได้เลย');
+    if (p && p.catch) p.catch(()=>{ musicOn = false; syncButtons(); screenTex.redraw(); say('เล่นเสียงไม่ได้ ลองกดอีกครั้ง หรือเช็กว่าเปิดเสียงเครื่องอยู่'); });
+  } else { track.pause(); say(''); }
+  if (musicOn && mode==='assembled' && !curtainOpen && !busy) camTo(VIEWS.screen, 1100);
+  syncButtons(); screenTex.redraw();
+};
+// beat level from the score itself: how recently a note started
+function musicLevel(){
+  if (!musicOn || track.paused) return 0;
+  const t = (track.currentTime - START) % (LOOP*STEP);
+  let best = 99; for (const st of ELISE_STEPS){ const d = t - st*STEP; if (d >= 0 && d < best) best = d; }
+  return Math.exp(-best*7);
+}
+
+/* ---------- parts UI + highlight ---------- */
+const card = $('partCard'), plist = $('partList'), hint = $('hint'), tagsBox = $('tags');
+const hb = new THREE.Box3(), tb = new THREE.Box3();
+const hl = new THREE.Box3Helper(hb, 0x1f8fff); hl.material.depthTest = false; hl.material.transparent = true; hl.renderOrder = 10; scene.add(hl);
+function visBox(obj){ hb.makeEmpty(); obj.updateWorldMatrix(true,true);
+  obj.traverse(o=>{ if (o.isMesh && o.geometry && isShown(o)){ if (!o.geometry.boundingBox) o.geometry.computeBoundingBox(); tb.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld); hb.union(tb); } });
+  hl.visible = !hb.isEmpty(); }
+let selected = null;
+const tagEls = new Map();
+for (const p of PARTS){
+  const li = document.createElement('li'); const b = document.createElement('button');
+  b.type='button'; b.dataset.part = p.id; if (p.extra) b.className = 'extra'; b.innerHTML = `<b>${p.num}</b>${p.th}`; b.onclick = () => selected === p.id ? clearSelection() : selectPart(p.id, false);
+  li.appendChild(b); plist.appendChild(li);
+  const t = document.createElement('button'); t.type='button'; t.className='tag'; t.innerHTML = `<b>${p.num}</b><span>${p.th}</span>`; t.setAttribute('aria-label', `${p.num} ${p.th}`);
+  t.onclick = () => selectPart(p.id, true); tagsBox.appendChild(t); tagEls.set(p.id, t);
+}
+function selectPart(id, fromModel){
+  selected = id; const p = partById[id];
+  card.innerHTML = `<p class="pnum">${String(p.num).padStart(2,'0')} · ${p.en}</p><h3>${p.th}</h3>
+    <dl><dt>ความสามารถ</dt><dd>${p.short}</dd><dt>หน้าที่</dt><dd>${p.job}</dd><dt>กลไก</dt><dd>${p.how}</dd><dt>ทำงานร่วมกับ</dt><dd>${p.link}</dd></dl>`;
+  plist.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.part===id)));
+  tagEls.forEach((el,k)=>el.classList.toggle('on', k===id));
+  if (fromModel) hint.innerHTML = `<b>${p.num}. ${p.th}</b> — ${p.short}`;
+}
+const HINT0 = hint.innerHTML;
+function clearSelection(){
+  selected = null; hl.visible = false;
+  card.innerHTML = `<p class="pnum">13 parts</p><h3>แตะชิ้นส่วนเพื่อดูรายละเอียด</h3><dl><dt>วิธีใช้</dt><dd>แตะชิ้นส่วนในโมเดล ตัวเลขบนโมเดล หรือรายการด้านล่าง แล้วจะมีกรอบสีฟ้าบอกตำแหน่ง แตะที่ว่างบนจอเพื่อเอากรอบออก</dd></dl>`;
+  plist.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed','false'));
+  tagEls.forEach(el=>el.classList.remove('on'));
+  hint.innerHTML = HINT0;
+}
+clearSelection();
+
+/* ---------- picking ---------- */
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+function pick(ev){
+  const r = canvas.getBoundingClientRect();
+  ndc.set(((ev.clientX-r.left)/r.width)*2-1, -((ev.clientY-r.top)/r.height)*2+1);
+  ray.setFromCamera(ndc, camera);
+  for (const h of ray.intersectObject(product, true)){
+    let o = h.object, vis = true; for (let q=o; q; q=q.parent) if (!q.visible) { vis = false; break; }
+    if (!vis) continue;
+    const mat = Array.isArray(o.material) ? o.material[0] : o.material;
+    if (mat && mat.transparent && mat.opacity < 0.3) continue;
+    while (o && !o.userData.part) o = o.parent;
+    return o ? o.userData.part : null;
+  }
+  return null;
+}
+let down = null;
+canvas.addEventListener('pointerdown', e=>{ down = { x:e.clientX, y:e.clientY }; });
+canvas.addEventListener('pointerup', e=>{ if (!down || Math.hypot(e.clientX-down.x,e.clientY-down.y) > 6){ down = null; return; } down = null; const id = pick(e); if (id) selectPart(id, true); else clearSelection(); });
+let hq = false, lm = null;
+canvas.addEventListener('pointermove', e=>{ lm = e; if (!hq){ hq = true; requestAnimationFrame(()=>{ hq = false; if (e.pointerType==='mouse') canvas.style.cursor = pick(lm) ? 'pointer' : 'grab'; }); } });
+
+/* ---------- water spray particles ---------- */
+const NP = 260;
+const drops = new THREE.InstancedMesh(new THREE.SphereGeometry(0.013,6,4), new THREE.MeshBasicMaterial({ color:0x8fd0ff, transparent:true, opacity:0.85 }), NP);
+drops.instanceMatrix.setUsage(THREE.DynamicDrawUsage); drops.frustumCulled = false; scene.add(drops);
+const P = Array.from({length:NP}, ()=>({ life:0, p:V3(), v:V3() }));
+const dm = new THREE.Matrix4(), dq = new THREE.Quaternion(), tmp = V3(), tmp2 = V3();
+let emitIdx = 0;
+function stepDrops(dt){
+  if (spraying && !RM){
+    const tip = sprayer.localToWorld(nozzleLocal.clone()); sprayer.getWorldQuaternion(dq);
+    const dir = V3(0,0,1).applyQuaternion(dq);
+    for (let n=0;n<7;n++){ const d = P[emitIdx++ % NP]; d.life = 0.55 + Math.random()*0.2; d.p.copy(tip);
+      d.v.copy(dir).multiplyScalar(2.6).add(tmp.set((Math.random()-.5)*0.5,(Math.random()-.5)*0.5,(Math.random()-.5)*0.5)); }
+  }
+  let c = 0;
+  for (const d of P){ if (d.life <= 0) continue; d.life -= dt; d.v.y -= 6*dt; d.p.addScaledVector(d.v, dt);
+    if (d.p.y < 0.9) d.life = 0; if (d.life <= 0) continue; dm.makeTranslation(d.p.x,d.p.y,d.p.z); drops.setMatrixAt(c++, dm); }
+  drops.count = c; drops.instanceMatrix.needsUpdate = true;
+}
+
+/* ---------- tags ---------- */
+let tagsOn = true;
+const tv = V3();
+function isShown(o){ for (let q=o; q; q=q.parent) if (!q.visible || q.scale.x < 0.01) return false; return true; }
+function updateTags(w,h){
+  tagsBox.style.display = tagsOn ? '' : 'none'; if (!tagsOn) return;
+  for (const p of PARTS){
+    const el = tagEls.get(p.id);
+    let obj = TAGOBJ[p.id], local = TAGPOS[p.id];
+    if (p.id === 'curtain' && curtainK > 0.5){ obj = hoopG; local = [2.0,0,1.6]; }
+    const show = mode === 'fold' ? p.id === 'fold' : isShown(partObjs[p.id]);
+    if (!show){ el.style.display = 'none'; continue; }
+    if (p.id === 'fold' && mode === 'fold'){ obj = latches; local = [0,0.75,0]; }
+    tv.set(...local); obj.localToWorld(tv); tv.project(camera);
+    if (tv.z > 1){ el.style.display = 'none'; continue; }
+    el.style.display = '';
+    el.style.transform = `translate(${((tv.x+1)/2*w-12).toFixed(1)}px,${((1-tv.y)/2*h-13).toFixed(1)}px)`;
+  }
+}
+$('showTags').onchange = e => { tagsOn = e.target.checked; };
+$('autoRot').onchange = e => { controls.autoRotate = e.target.checked; };
+$('resetView').onclick = () => camTo(curtainOpen ? VIEWS.tent : VIEWS[mode], 900);
+
+/* ---------- sizing ---------- */
+let SWp = 1, SHp = 1;
+function resize(){ SWp = stage.clientWidth||1; SHp = stage.clientHeight||1; renderer.setSize(SWp,SHp,false);
+  const a = SWp/SHp; camera.aspect = a; camera.fov = Math.min(66, a < 1.3 ? THREE.MathUtils.radToDeg(2*Math.atan(0.41/a)) : 35); camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(stage); resize();
+if (document.fonts && document.fonts.load){
+  Promise.all(['600 20px "Bai Jamjuree"','600 20px "JetBrains Mono"','500 20px "JetBrains Mono"','600 20px "IBM Plex Sans Thai"'].map(f=>document.fonts.load(f))).catch(()=>{}).then(()=>{ statics.forEach(s=>s.redraw()); screenTex.redraw(); });
+}
+syncButtons();
+
+/* ---------- loop ---------- */
+let last = performance.now(), lastScreen = 0, hoseDirty = true;
+const hq0 = V3(), hq1 = V3(), hup = V3();
+function loop(now){
+  requestAnimationFrame(loop);
+  const t = now/1000, dt = Math.min(0.05,(now-last)/1000); last = now;
+  runTweens(now); controls.update();
+  // sprayer follows its holder while docked
+  if (docked){ const d = dockPose(); sprayer.position.copy(d.p); sprayer.quaternion.copy(d.q); }
+  sprayer.visible = mode !== 'fold' && (docked ? isShown(holder) : true);
+  // hose
+  if (!docked && sprayer.visible){
+    hosePort.getWorldPosition(hq0); product.worldToLocal(hq0);
+    hq1.copy(sprayer.localToWorld(V3(0,-0.16,0))); product.worldToLocal(hq1);
+    hup.set(0,1,0).applyQuaternion(sprayer.quaternion);
+    const out = V3(Math.sin(80*D),0,Math.cos(80*D));
+    const mid = hq0.clone().lerp(hq1,0.5).add(V3(0.25,-0.25,0));
+    const curve = new THREE.CatmullRomCurve3([hq0.clone(), hq0.clone().addScaledVector(out,0.15), mid, hq1.clone().addScaledVector(hup,-0.2), hq1.clone()]);
+    hoseMesh.geometry.dispose(); hoseMesh.geometry = new THREE.TubeGeometry(curve, 48, 0.017, 8); hoseMesh.visible = true;
+    if (!RM) reelDrum.rotation.x += dt*3;
+  } else hoseMesh.visible = false;
+  stepDrops(dt);
+  if (spraying){ tankLevel = Math.max(0, tankLevel - dt*0.018); setWater(); }
+  // heater glow follows the set temperature
+  const hk = (tempC-30)/10; M.copper.emissiveIntensity = 0.15 + hk*1.2 + (RM?0:0.08*Math.sin(t*2));
+  // speaker
+  const lv = RM ? 0 : musicLevel(); cone.position.z = -0.06 + 0.014*lv;
+  M.glow.emissiveIntensity = 1.3 + 0.9*lv;
+  stepSplash(dt);
+  if (now - lastScreen > (musicOn ? 90 : 400)){ screenTex.redraw(); lastScreen = now; }
+  if (selected) visBox(partObjs[selected]); else hl.visible = false;
+  renderer.render(scene, camera);
+  updateTags(SWp, SHp);
+}
+requestAnimationFrame(loop);
+})();
+</script>
+
+</body>
+</html>
