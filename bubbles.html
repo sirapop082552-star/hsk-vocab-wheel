@@ -2,710 +2,1108 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ฟองสบู่รากศัพท์จีน HSK</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ฟองสบู่รากศัพท์จีน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700;900&family=Noto+Sans+Thai:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&family=Noto+Sans+SC:wght@500;700;900&display=swap');
   :root {
-    --bg0:#0b0e1d;
-    --card:rgba(255,255,255,.05);
-    --card-border:rgba(255,255,255,.1);
-    --text:#e8ecf8; --muted:#8b93b8; --gold:#ffd54f;
+    --bg:#05060f; --glass:rgba(16,20,44,.62); --glass-2:rgba(255,255,255,.07);
+    --line:rgba(255,255,255,.12); --text:#eef1ff; --muted:#97a0c8; --accent:#7fe7ff; --gold:#ffe08a;
   }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html, body { background:var(--bg0); }
-  body {
-    font-family:"Noto Sans Thai","Segoe UI",sans-serif;
-    color:var(--text); min-height:100vh; overflow-x:hidden;
-    display:flex; flex-direction:column; align-items:center;
-    padding:18px 16px 24px;
-  }
-  .han { font-family:"Noto Sans SC","Microsoft YaHei","PingFang SC",sans-serif; }
-  .bg-blob { position:fixed; border-radius:50%; filter:blur(110px); opacity:.45; pointer-events:none; z-index:-1; }
-  .b1 { width:520px; height:520px; background:#2b2070; top:-170px; left:-130px; }
-  .b2 { width:480px; height:480px; background:#0e4a5e; bottom:-170px; right:-110px; }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; background:var(--bg); overflow:hidden; }
+  body { font-family:"Noto Sans Thai","Segoe UI",sans-serif; color:var(--text); }
+  .han { font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif; }
+  #gl { position:fixed; inset:0; width:100%; height:100%; display:block; touch-action:none; outline:none; }
 
-  header { text-align:center; width:100%; max-width:1200px; position:relative; }
-  h1 {
-    font-size:clamp(1.4rem,4vw,2rem); font-weight:800;
-    background:linear-gradient(90deg,#7fe7ff,#c39bff,#ff9bd2);
+  .glass {
+    background:var(--glass); border:1px solid var(--line);
+    backdrop-filter:blur(18px) saturate(140%); -webkit-backdrop-filter:blur(18px) saturate(140%);
+    box-shadow:0 18px 50px -20px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+
+  /* ===== top ===== */
+  #top { position:fixed; top:0; left:0; right:0; padding:14px 16px 0; display:flex; flex-direction:column; align-items:center; gap:10px; pointer-events:none; z-index:10; }
+  #top > * { pointer-events:auto; }
+  .row1 { display:flex; align-items:center; gap:10px; width:100%; max-width:1100px; }
+  .pill { color:var(--muted); text-decoration:none; font-size:.82rem; padding:7px 13px; border-radius:99px; white-space:nowrap; }
+  .pill:hover { color:var(--text); }
+  .brand { flex:1; text-align:center; font-weight:800; font-size:clamp(1.05rem,2.6vw,1.5rem); letter-spacing:.3px; }
+  .brand b {
+    background:linear-gradient(90deg,#8ff0ff,#c6a4ff 45%,#ffa6d8 80%,#ffe08a);
     -webkit-background-clip:text; background-clip:text; color:transparent;
+    background-size:200% 100%; animation:sheen 8s ease-in-out infinite;
   }
-  .subtitle { color:var(--muted); margin-top:4px; font-size:.88rem; }
-  .home-link {
-    position:absolute; left:0; top:4px; color:var(--muted); text-decoration:none; font-size:.85rem;
-    padding:6px 12px; border-radius:99px; border:1px solid var(--card-border); background:var(--card);
-  }
-  .home-link:hover { color:var(--text); }
-  @media (max-width:640px){
-    body { padding:12px 12px 16px; }
-    .home-link { position:static; display:inline-block; margin-bottom:6px; padding:4px 10px; font-size:.78rem; }
-    .subtitle { font-size:.76rem; }
-    .controls { gap:6px; margin:10px 0 8px; }
-    .chip { padding:5px 10px; font-size:.78rem; gap:5px; }
-    .search { padding:6px 12px; font-size:.82rem; }
-    .btn { padding:6px 11px; font-size:.78rem; }
-    .info { font-size:.74rem; }
-    .stage { border-radius:20px; }
-  }
-
-  /* ===== controls ===== */
-  .controls { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; align-items:center; margin:14px 0 10px; max-width:1200px; }
+  @keyframes sheen { 50% { background-position:100% 0; } }
+  .brand small { display:block; font-size:.72rem; font-weight:400; color:var(--muted); margin-top:1px; }
+  .spacer { width:110px; }
+  .chips { display:flex; gap:7px; padding:6px; border-radius:99px; max-width:100%; overflow-x:auto; scrollbar-width:none; }
+  .chips::-webkit-scrollbar { display:none; }
   .chip {
-    display:flex; align-items:center; gap:7px; padding:7px 14px; border-radius:99px; cursor:pointer;
-    font-weight:600; font-size:.85rem; background:var(--card); border:1px solid var(--card-border);
-    color:var(--muted); transition:all .18s; user-select:none; font-family:inherit;
+    flex-shrink:0; display:flex; align-items:center; gap:7px; padding:7px 14px; border-radius:99px; cursor:pointer;
+    font:600 .82rem "Noto Sans Thai",sans-serif; color:var(--muted); background:transparent; border:1px solid transparent; transition:.2s;
   }
-  .chip::before { content:""; width:9px; height:9px; border-radius:50%; background:var(--c,#888); box-shadow:0 0 9px var(--c,#888); opacity:.35; }
-  .chip:hover { color:var(--text); transform:translateY(-1px); }
-  .chip.on { color:var(--text); border-color:var(--c,#888); box-shadow:0 0 18px -6px var(--c,#888); }
-  .chip.on::before { opacity:1; }
-  .chip .cnt { font-weight:400; font-size:.74rem; opacity:.7; }
-  .chip.plain::before { display:none; }
-  .search {
-    padding:8px 14px; border-radius:99px; border:1px solid var(--card-border); background:rgba(255,255,255,.06);
-    color:var(--text); font-family:inherit; font-size:.88rem; width:min(260px,100%); outline:none;
-  }
-  .search:focus { border-color:#7fe7ff; }
-  .toggle { display:flex; align-items:center; gap:6px; color:var(--muted); font-size:.82rem; cursor:pointer; user-select:none; }
-  .toggle input { accent-color:#7fe7ff; }
+  .chip i { width:8px; height:8px; border-radius:50%; background:var(--c); box-shadow:0 0 10px var(--c); opacity:.45; }
+  .chip span { font-weight:400; font-size:.7rem; opacity:.6; }
+  .chip:hover { color:var(--text); }
+  .chip.on { color:#fff; background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.04)); border-color:var(--c); box-shadow:0 0 22px -6px var(--c); }
+  .chip.on i { opacity:1; }
+  .row3 { display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center; }
+  .search { width:min(300px,62vw); padding:9px 16px 9px 38px; border-radius:99px; color:var(--text); outline:none; font:inherit; font-size:.86rem;
+    background:var(--glass) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2397a0c8' stroke-width='2'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='M11 11l4 4'/%3E%3C/svg%3E") no-repeat 14px center; }
+  .search:focus { border-color:var(--accent); }
+  .toggle { display:flex; gap:7px; align-items:center; font-size:.8rem; color:var(--muted); padding:8px 13px; border-radius:99px; cursor:pointer; user-select:none; }
+  .toggle input { accent-color:var(--accent); }
+  .toggle.off { opacity:.4; pointer-events:none; }
 
-  /* ===== stage ===== */
-  .stage {
-    position:relative; width:100%; max-width:1200px; height:max(440px, calc(100vh - 210px));
-    border-radius:26px; border:1px solid var(--card-border); background:rgba(255,255,255,.025);
-    overflow:hidden; touch-action:manipulation;
-  }
-  .stage svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
-  .bar {
-    position:absolute; left:12px; right:12px; top:10px; display:flex; justify-content:space-between; align-items:center;
-    gap:8px; z-index:5; pointer-events:none; flex-wrap:wrap;
-  }
-  .bar > * { pointer-events:auto; }
-  .btn {
-    padding:7px 14px; border-radius:99px; border:1px solid var(--card-border); background:rgba(20,24,48,.75);
-    color:var(--text); font-family:inherit; font-size:.84rem; cursor:pointer; backdrop-filter:blur(8px);
-  }
-  .btn:hover { border-color:#7fe7ff; }
-  .btn:disabled { opacity:.35; cursor:default; }
-  .info { color:var(--muted); font-size:.8rem; background:rgba(20,24,48,.6); padding:5px 12px; border-radius:99px; }
-  .hint { position:absolute; bottom:12px; left:0; right:0; text-align:center; color:var(--muted); font-size:.8rem; pointer-events:none; z-index:4; padding:0 12px; }
-  .empty { position:absolute; inset:0; display:none; align-items:center; justify-content:center; color:var(--muted); text-align:center; padding:20px; }
+  /* ===== dock ===== */
+  #dock { position:fixed; left:50%; bottom:calc(14px + env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:10;
+    display:flex; align-items:center; gap:6px; padding:6px; border-radius:99px; max-width:calc(100vw - 24px); }
+  .btn { border:0; background:transparent; color:var(--text); font:600 .8rem "Noto Sans Thai",sans-serif; padding:8px 13px; border-radius:99px; cursor:pointer; white-space:nowrap; transition:.15s; }
+  .btn:hover:not(:disabled) { background:var(--glass-2); }
+  .btn:disabled { opacity:.3; cursor:default; }
+  .btn.round { width:36px; height:36px; padding:0; font-size:1rem; }
+  #info { font-size:.76rem; color:var(--muted); padding:0 8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:42vw; }
+  .sep { width:1px; height:20px; background:var(--line); }
 
-  /* ===== soap bubble ===== */
-  .bubble {
-    position:absolute; left:0; top:0; border-radius:50%; cursor:pointer; user-select:none;
-    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
-    background:
-      radial-gradient(circle at 32% 26%, rgba(255,255,255,.75) 0 4%, rgba(255,255,255,0) 11%),
-      radial-gradient(circle at 70% 78%, rgba(255,255,255,.18) 0 3%, rgba(255,255,255,0) 9%),
-      radial-gradient(circle at 50% 50%, rgba(255,255,255,0) 55%, rgba(140,220,255,.12) 70%, rgba(220,150,255,.28) 86%, rgba(255,255,255,.5) 100%);
-    box-shadow:
-      inset 0 0 16px rgba(255,255,255,.14),
-      inset -10px -12px 26px rgba(150,90,255,.22),
-      inset 10px 12px 24px rgba(60,220,255,.16),
-      0 0 0 1px rgba(255,255,255,.12),
-      0 8px 30px -10px rgba(0,0,0,.6);
-    will-change:transform;
-    transition:filter .2s;
-  }
-  .bubble::before {
-    content:""; position:absolute; inset:0; border-radius:50%; pointer-events:none;
-    background:conic-gradient(from var(--rot,0deg), rgba(255,120,200,.55), rgba(255,230,120,.45), rgba(120,255,200,.45), rgba(110,190,255,.55), rgba(200,130,255,.55), rgba(255,120,200,.55));
-    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 1px));
-            mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 1px));
-    opacity:.7; animation:spin 9s linear infinite;
-  }
-  .bubble::after {
-    content:""; position:absolute; inset:0; border-radius:50%; pointer-events:none;
-    box-shadow:0 0 22px -4px var(--lc,transparent), inset 0 0 0 2px var(--lc,transparent);
-    opacity:.55;
-  }
-  @keyframes spin { to { transform:rotate(360deg); } }
-  .bubble:hover { filter:brightness(1.25); }
-  .bubble .zh { font-weight:700; line-height:1.05; text-shadow:0 2px 10px rgba(0,0,0,.55); white-space:nowrap; position:relative; z-index:1; }
-  .bubble .py { font-size:.72rem; color:#bfeaff; line-height:1.15; margin-bottom:2px; display:none; position:relative; z-index:1; }
-  .bubble .th { font-size:.68rem; color:#ffe9a8; line-height:1.15; display:none; max-width:86%; position:relative; z-index:1;
-                overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .bubble .badge { position:absolute; bottom:12%; font-size:.6rem; color:var(--muted); z-index:1; }
-  .bubble.reveal .py, .bubble.reveal .th { display:block; }
-  .bubble.reveal { background-color:rgba(20,30,70,.35); }
-  .bubble.picked { filter:brightness(1.35); }
-  .bubble.picked::after { opacity:1; }
-  .bubble.center { cursor:pointer; }
-  .bubble.center .zh { color:#fff; }
-  .bubble.in { animation:popin .55s cubic-bezier(.2,1.6,.4,1) both; }
-  @keyframes popin { from { opacity:0; } to { opacity:1; } }
+  #hint { position:fixed; left:0; right:0; bottom:calc(72px + env(safe-area-inset-bottom)); text-align:center; color:var(--muted); font-size:.8rem; pointer-events:none; z-index:5; transition:opacity .6s; padding:0 16px; text-shadow:0 2px 10px #000; }
+  #tip { position:fixed; z-index:15; pointer-events:none; padding:5px 11px; border-radius:10px; font-size:.78rem; opacity:0; transition:opacity .15s; white-space:nowrap; }
+  #credit { position:fixed; right:10px; bottom:4px; font-size:.62rem; color:rgba(151,160,200,.5); z-index:4; pointer-events:none; }
 
-  .drop { position:absolute; left:0; top:0; width:8px; height:8px; border-radius:50%; pointer-events:none;
-          background:radial-gradient(circle at 35% 35%, #fff, rgba(160,220,255,.6) 60%, transparent 70%); }
-  .ring { position:absolute; left:0; top:0; border-radius:50%; pointer-events:none; border:2px solid rgba(190,230,255,.7); }
+  /* ===== sheet ===== */
+  #sheet { position:fixed; left:50%; bottom:calc(70px + env(safe-area-inset-bottom)); z-index:20; width:min(580px, calc(100vw - 24px));
+    border-radius:24px; padding:18px 20px 16px; transform:translate(-50%, 30px) scale(.96); opacity:0; pointer-events:none;
+    transition:transform .35s cubic-bezier(.2,1.3,.4,1), opacity .25s; }
+  #sheet.show { transform:translate(-50%,0) scale(1); opacity:1; pointer-events:auto; }
+  #sheet::before { content:""; position:absolute; inset:-1px; border-radius:24px; padding:1px; pointer-events:none;
+    background:linear-gradient(120deg,rgba(143,240,255,.6),rgba(198,164,255,.4),rgba(255,166,216,.5),rgba(255,224,138,.4));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
+  .s-row { display:flex; gap:16px; align-items:center; }
+  .s-zh { font-size:2.6rem; font-weight:900; line-height:1; text-shadow:0 0 24px rgba(143,240,255,.35); }
+  .s-meta { flex:1; min-width:0; }
+  .s-py { color:var(--accent); font-weight:700; font-size:1.12rem; }
+  .s-th { color:var(--gold); font-size:1.02rem; margin-top:2px; line-height:1.4; }
+  .s-th.none { color:var(--muted); font-size:.85rem; font-style:italic; }
+  .s-en { color:var(--muted); font-size:.8rem; margin-top:4px; line-height:1.35; }
+  .tags { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+  .tag { font-size:.7rem; padding:2px 9px; border-radius:99px; border:1px solid var(--c,var(--line)); color:var(--c,var(--muted)); }
+  .s-actions { display:flex; flex-direction:column; gap:8px; align-self:flex-start; margin-right:20px; }
+  .icon { width:42px; height:42px; border-radius:50%; border:1px solid var(--line); background:var(--glass-2); color:var(--text); font-size:1.1rem; cursor:pointer; }
+  .icon:hover { border-color:var(--accent); }
+  .x { position:absolute; top:8px; right:8px; width:30px; height:30px; font-size:.85rem; border:0; background:transparent; color:var(--muted); cursor:pointer; border-radius:50%; }
+  .x:hover { color:var(--text); background:var(--glass-2); }
+  .s-foot { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:12px; font-size:.78rem; color:var(--muted); }
+  .cbtn { font-size:1.15rem; padding:3px 12px; border-radius:12px; border:1px solid rgba(127,231,255,.35); background:rgba(127,231,255,.08); color:var(--text); cursor:pointer; }
+  .cbtn:hover { background:rgba(127,231,255,.22); }
+  .cbtn.cur { opacity:.35; cursor:default; }
+  .ai { margin-left:auto; font:600 .78rem "Noto Sans Thai",sans-serif; padding:6px 12px; border-radius:99px; cursor:pointer; color:#fff; border:1px solid rgba(198,164,255,.5); background:linear-gradient(135deg,rgba(198,164,255,.25),rgba(255,166,216,.2)); }
+  .ai:disabled { opacity:.5; cursor:wait; }
 
-  /* ===== detail sheet ===== */
-  .sheet {
-    position:fixed; left:50%; bottom:16px; transform:translate(-50%, 140%);
-    width:min(560px, calc(100vw - 32px)); z-index:20;
-    background:rgba(18,22,46,.92); border:1px solid var(--card-border); border-radius:22px;
-    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
-    padding:16px 18px; box-shadow:0 24px 60px -18px rgba(0,0,0,.8);
-    transition:transform .35s cubic-bezier(.2,1.2,.4,1);
+  /* ===== loader ===== */
+  #loader { position:fixed; inset:0; z-index:50; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; background:radial-gradient(circle at 50% 40%, #141a3a, #05060f 70%); transition:opacity .6s; }
+  #loader.done { opacity:0; pointer-events:none; }
+  .ld-b { width:70px; height:70px; border-radius:50%; position:relative; animation:float 2.2s ease-in-out infinite;
+    background:radial-gradient(circle at 32% 28%, rgba(255,255,255,.9) 0 5%, transparent 12%), radial-gradient(circle, transparent 56%, rgba(143,240,255,.25) 72%, rgba(255,166,216,.5) 90%, rgba(255,255,255,.7));
+    box-shadow:0 0 40px rgba(143,240,255,.25); }
+  @keyframes float { 50% { transform:translateY(-14px) scale(1.04); } }
+  #loader p { color:var(--muted); font-size:.9rem; text-align:center; padding:0 20px; }
+
+  @media (max-width:640px) {
+    #top { padding:10px 10px 0; gap:7px; }
+    .spacer { display:none; }
+    .brand { text-align:left; }
+    .brand small { display:none; }
+    .chip { padding:6px 11px; font-size:.76rem; }
+    .search { width:min(220px,56vw); padding:7px 12px 7px 34px; font-size:.8rem; }
+    .toggle { padding:6px 10px; font-size:.72rem; }
+    .btn { padding:7px 10px; font-size:.74rem; }
+    .btn.round { width:32px; height:32px; }
+    #info { max-width:30vw; font-size:.7rem; }
+    .s-zh { font-size:2.1rem; }
+    .s-row { gap:12px; }
+    #sheet { padding:14px 14px 12px; }
   }
-  .sheet.show { transform:translate(-50%, 0); }
-  .sheet .row { display:flex; align-items:center; gap:14px; }
-  .sheet .big { font-size:2.4rem; font-weight:800; line-height:1; }
-  .sheet .meta { flex:1; min-width:0; }
-  .sheet .spy { color:#7fe7ff; font-size:1.1rem; font-weight:600; }
-  .sheet .sth { color:#ffe9a8; font-size:1rem; margin-top:2px; }
-  .sheet .tags { display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
-  .tag { font-size:.72rem; padding:2px 9px; border-radius:99px; border:1px solid var(--c,var(--card-border)); color:var(--c,var(--muted)); }
-  .icon-btn { width:42px; height:42px; border-radius:50%; border:1px solid var(--card-border); background:rgba(255,255,255,.06); color:var(--text); font-size:1.15rem; cursor:pointer; flex-shrink:0; }
-  .icon-btn:hover { border-color:#7fe7ff; }
-  .close { position:absolute; top:8px; right:10px; width:30px; height:30px; font-size:.9rem; }
-  .chars { margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; color:var(--muted); font-size:.8rem; }
-  .char-btn { font-size:1.15rem; padding:4px 12px; border-radius:12px; border:1px solid rgba(127,231,255,.35); background:rgba(127,231,255,.08); color:var(--text); cursor:pointer; }
-  .char-btn:hover { background:rgba(127,231,255,.2); }
-  .char-btn.cur { opacity:.4; cursor:default; }
 </style>
 </head>
 <body>
-<div class="bg-blob b1"></div>
-<div class="bg-blob b2"></div>
+<canvas id="gl" tabindex="0"></canvas>
 
-<header>
-  <a class="home-link" href="index.html">← วงล้อคำศัพท์</a>
-  <h1>🫧 ฟองสบู่รากศัพท์จีน</h1>
-  <div class="subtitle">แตะฟองเพื่อให้แตกออกเป็นคำศัพท์ที่มีตัวอักษรนั้น · แตะคำเพื่อดูพินอินและคำแปล</div>
-</header>
-
-<div class="controls">
-  <div id="levelChips" style="display:contents"></div>
-  <label class="toggle" title="รวมคำศัพท์ของระดับที่ต่ำกว่าด้วย"><input type="checkbox" id="cumu"> รวมระดับที่ต่ำกว่า</label>
-  <input class="search han" id="search" placeholder="ค้นหา: 不 / bu / ไม่" autocomplete="off">
-</div>
-
-<div class="stage" id="stage">
-  <svg id="lines"></svg>
-  <div class="bar" id="bar">
-    <div style="display:flex;gap:8px;align-items:center">
-      <button class="btn" id="backBtn" style="display:none">← ฟองทั้งหมด</button>
-      <span class="info" id="info"></span>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn" id="revealAll" style="display:none">👁 แสดงคำแปลทั้งหมด</button>
-      <button class="btn" id="prevBtn">‹</button>
-      <button class="btn" id="nextBtn">ชุดถัดไป ›</button>
-    </div>
+<div id="top">
+  <div class="row1">
+    <a class="pill glass" href="index.html">← วงล้อคำศัพท์</a>
+    <div class="brand">🫧 <b>ฟองสบู่รากศัพท์จีน</b><small id="total">กำลังโหลด…</small></div>
+    <div class="spacer"></div>
   </div>
-  <div class="empty" id="empty">ไม่พบรากศัพท์ที่ตรงกับคำค้นหา</div>
-  <div class="hint" id="hint">แตะฟองสบู่เพื่อให้มันแตก 💥</div>
+  <div class="chips glass" id="chips"></div>
+  <div class="row3">
+    <input class="search glass han" id="search" placeholder="ค้นหา: 不 / bu / ไม่ / not" autocomplete="off" enterkeyhint="search">
+    <label class="toggle glass" id="cumuWrap" title="รวมคำศัพท์ของระดับก่อนหน้าด้วย"><input type="checkbox" id="cumu"> รวมระดับต่ำกว่า</label>
+  </div>
 </div>
 
-<div class="sheet" id="sheet">
-  <button class="icon-btn close" id="closeSheet" aria-label="ปิด">✕</button>
-  <div class="row">
-    <div class="big han" id="sZh"></div>
-    <div class="meta">
-      <div class="spy" id="sPy"></div>
-      <div class="sth" id="sTh"></div>
+<div id="dock" class="glass">
+  <button class="btn" id="back" style="display:none">← กลับ</button>
+  <span id="info"></span>
+  <div class="sep"></div>
+  <button class="btn round" id="prev" aria-label="ก่อนหน้า">‹</button>
+  <button class="btn round" id="next" aria-label="ถัดไป">›</button>
+  <button class="btn" id="revealAll" style="display:none">👁 คำแปล</button>
+  <button class="btn round" id="mute" aria-label="เสียง">🔊</button>
+</div>
+
+<div id="hint"></div>
+<div id="tip" class="glass han"></div>
+<div id="credit">ความหมายภาษาอังกฤษ: CC-CEDICT (CC BY-SA 4.0)</div>
+
+<div id="sheet" class="glass">
+  <button class="x" id="closeSheet" aria-label="ปิด">✕</button>
+  <div class="s-row">
+    <div class="s-zh han" id="sZh"></div>
+    <div class="s-meta">
+      <div class="s-py" id="sPy"></div>
+      <div class="s-th" id="sTh"></div>
+      <div class="s-en" id="sEn"></div>
       <div class="tags" id="sTags"></div>
     </div>
-    <button class="icon-btn" id="speakBtn" aria-label="ฟังเสียง" style="margin-right:26px">🔊</button>
+    <div class="s-actions"><button class="icon" id="speak" aria-label="ฟังเสียง">🔊</button></div>
   </div>
-  <div class="chars" id="sChars"></div>
+  <div class="s-foot" id="sFoot"></div>
 </div>
 
-<script src="vocab-data.js"></script>
-<script>
+<div id="loader"><div class="ld-b"></div><p>กำลังเป่าฟองสบู่…</p></div>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+
+const $ = id => document.getElementById(id);
+const isHan = c => /\p{Script=Han}/u.test(c);
+const plain = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z]/gi, "").toLowerCase();
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const coarse = matchMedia("(pointer:coarse)").matches;
+
 const LEVELS = {
-  1:{label:"HSK1", color:"#4dd0a0"},
-  2:{label:"HSK2", color:"#00bcd4"},
-  3:{label:"HSK3", color:"#5c9dfa"},
-  4:{label:"HSK4", color:"#ffa502"},
-  5:{label:"HSK5", color:"#f06292"},
+  1: { label: "HSK1", color: "#4dd0a0" }, 2: { label: "HSK2", color: "#22c8e6" }, 3: { label: "HSK3", color: "#6aa4ff" },
+  4: { label: "HSK4", color: "#ffad33" }, 5: { label: "HSK5", color: "#f472b6" },
+  6: { label: "คำพบบ่อย", color: "#b69cff" }, 7: { label: "คำทั่วไป", color: "#ffd75e" }, 8: { label: "คำขั้นสูง", color: "#ff7b7b" },
 };
 const POS_TH = { "n.":"คำนาม","v.":"คำกริยา","adj.":"คุณศัพท์","adv.":"กริยาวิเศษณ์","m.":"ลักษณนาม","num.":"ตัวเลข",
   "pron.":"สรรพนาม","prep.":"บุพบท","conj.":"คำเชื่อม","part.":"คำช่วย","int.":"คำอุทาน","expr.":"สำนวน/วลี","aux.":"กริยาช่วย",
-  "onom.":"คำเลียนเสียง","pref.":"อุปสรรค","suf.":"ปัจจัย","num.-m.":"ตัวเลข+ลักษณนาม" };
+  "onom.":"คำเลียนเสียง","pref.":"อุปสรรค","suf.":"ปัจจัย" };
 
-const isHan = c => /\p{Script=Han}/u.test(c);
-const plain = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z]/gi,"").toLowerCase();
-const store = {
-  get(k,d){ try { const v = localStorage.getItem(k); return v===null ? d : JSON.parse(v); } catch(e){ return d; } },
-  set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+// ================= data =================
+function loadScript(src) {
+  return new Promise((ok, bad) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = bad; document.head.appendChild(s); });
+}
+try { await loadScript("vocab-data.js"); }
+catch (e) { $("loader").querySelector("p").textContent = "โหลดคำศัพท์ไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้ง"; throw e; }
+const V = window.VOCAB;
+const byChar = new Map();
+const SELF = new Map();
+const levelCount = {};
+V.forEach((w, i) => {
+  levelCount[w[3]] = (levelCount[w[3]] || 0) + 1;
+  if (!SELF.has(w[0])) SELF.set(w[0], w);
+  for (const c of new Set(w[0])) {
+    if (!isHan(c)) continue;
+    let a = byChar.get(c); if (!a) byChar.set(c, a = []);
+    a.push(i);
+  }
+});
+$("total").textContent = `คำศัพท์ ${V.length.toLocaleString()} คำ · ตัวอักษร ${byChar.size.toLocaleString()} ตัว`;
+
+const thCache = store.get("bub_th_v1", {});
+const thaiOf = w => w[2] || thCache[w[0]] || "";
+const shortMean = w => {
+  const t = thaiOf(w);
+  if (t) return t.split(/\s*[\/,;，]\s*/)[0];
+  return (w[5] || "").split(/;/)[0].replace(/^\(.*?\)\s*/, "");
 };
 
-// คำแรกสุดของแต่ละตัวอักษร (ใช้แสดงความหมายของรากศัพท์เอง)
-const SELF = new Map();
-for (const w of VOCAB) if (!SELF.has(w[0]) || w[3] < SELF.get(w[0])[3]) SELF.set(w[0], w);
-
-// ===== state =====
-let level = store.get("bub_level", 1);      // 1..5 หรือ 0 = ทั้งหมด
+let level = store.get("bub_level", 1);
 let cumulative = store.get("bub_cumu", false);
-let roots = [], filtered = [], page = 0;
-let mode = "field";                           // field | branch
-let branch = null;                            // { char, kids, page }
-let bubbles = [];                             // live bubble objects
-let lines = [];
-let revealAll = false;
-let fieldTop = 50;
-const revealLabel = () => (revealAll ? "🙈 " : "👁 ") + (innerWidth < 560 ? "คำแปล" : (revealAll ? "ซ่อนคำแปล" : "แสดงคำแปลทั้งหมด"));
-function fitStage(){
-  const h = Math.max(440, innerHeight - (stage.getBoundingClientRect().top + window.scrollY) - 14);
-  stage.style.height = h + "px";
-}
+let muted = store.get("bub_mute", false);
+let roots = [], filtered = [], fieldPage = 0;
+const inLevel = w => level === 0 || (cumulative ? w[3] <= level : w[3] === level);
 
-const stage = document.getElementById("stage");
-const svg = document.getElementById("lines");
-const $ = id => document.getElementById(id);
-
-function inLevel(w){
-  if (level === 0) return true;
-  return cumulative ? w[3] <= level : w[3] === level;
-}
-
-function buildRoots(){
-  const map = new Map();
-  for (const w of VOCAB) {
-    if (!inLevel(w)) continue;
-    for (const c of new Set([...w[0]].filter(isHan))) {
-      if (!map.has(c)) map.set(c, []);
-      map.get(c).push(w);
-    }
-  }
+function buildRoots() {
   roots = [];
-  for (const [c, list] of map) {
-    const kids = list.filter(w => w[0] !== c);
-    if (kids.length >= 2) roots.push({ c, kids });
+  for (const [c, idx] of byChar) {
+    let n = 0;
+    for (const i of idx) { const w = V[i]; if (w[0] !== c && inLevel(w)) n++; }
+    if (n >= 2) roots.push({ c, n });
   }
-  roots.sort((a,b) => b.kids.length - a.kids.length || a.c.localeCompare(b.c, "zh"));
+  roots.sort((a, b) => b.n - a.n || (byChar.get(b.c).length - byChar.get(a.c).length));
 }
-
-function kidsOf(c){
-  let kids = VOCAB.filter(w => inLevel(w) && w[0] !== c && w[0].includes(c));
-  if (!kids.length) kids = VOCAB.filter(w => w[0] !== c && w[0].includes(c)); // ไม่มีในระดับนี้ → ใช้ทุกระดับ
-  // คำที่ขึ้นต้นด้วยรากศัพท์มาก่อน แล้วเรียงตามระดับ / ความยาว
-  return kids.sort((a,b) => (b[0].startsWith(c) - a[0].startsWith(c)) || a[3]-b[3] || a[0].length-b[0].length);
+function kidsOf(c) {
+  const idx = byChar.get(c) || [];
+  let k = idx.filter(i => V[i][0] !== c && inLevel(V[i]));
+  if (!k.length) k = idx.filter(i => V[i][0] !== c);
+  const starts = k.filter(i => V[i][0].startsWith(c)), rest = k.filter(i => !V[i][0].startsWith(c));
+  return starts.concat(rest).map(i => V[i]);
 }
-
-function applySearch(){
+function applySearch() {
   const q = $("search").value.trim();
   if (!q) { filtered = roots; return; }
-  const hanQ = [...q].filter(isHan);
-  const pq = plain(q);
+  const han = [...q].filter(isHan);
+  const pq = plain(q), lq = q.toLowerCase();
   filtered = roots.filter(r => {
-    if (hanQ.length) return hanQ.includes(r.c);
-    const s = SELF.get(r.c);
-    if (!s) return false;
-    return (pq && plain(s[1]).startsWith(pq)) || s[2].includes(q);
+    if (han.length) return han.includes(r.c);
+    const s = SELF.get(r.c); if (!s) return false;
+    return (pq && plain(s[1]) === pq) || (pq && pq.length > 1 && plain(s[1]).startsWith(pq)) ||
+      thaiOf(s).includes(q) || (lq.length > 2 && (s[5] || "").toLowerCase().includes(lq));
   });
 }
 
-// ===== level chips =====
-function renderChips(){
-  const box = $("levelChips");
-  box.innerHTML = "";
-  const opts = [[1],[2],[3],[4],[5],[0]];
-  for (const [L] of opts) {
+// ================= three.js setup =================
+const canvas = $("gl");
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+} catch (e) {
+  $("loader").querySelector("p").textContent = "อุปกรณ์นี้ไม่รองรับ WebGL (3D) — ลองเปิดด้วย Chrome หรือ Safari รุ่นใหม่";
+  throw e;
+}
+renderer.setPixelRatio(Math.min(devicePixelRatio, coarse ? 1.6 : 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 400);
+camera.position.set(0, 0, 16);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.enablePan = false; controls.rotateSpeed = 0.6; controls.zoomSpeed = 0.7;
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.45, 0.5, 0.8);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+// ---------- background nebula ----------
+const bgMat = new THREE.ShaderMaterial({
+  side: THREE.BackSide, depthWrite: false, uniforms: { uTime: { value: 0 } },
+  vertexShader: `varying vec3 vD; void main(){ vD = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+  fragmentShader: `
+    uniform float uTime; varying vec3 vD;
+    float h(vec3 p){ return fract(sin(dot(p, vec3(12.9898,78.233,37.719))) * 43758.5453); }
+    float n3(vec3 p){ vec3 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
+      return mix(mix(mix(h(i),h(i+vec3(1,0,0)),f.x),mix(h(i+vec3(0,1,0)),h(i+vec3(1,1,0)),f.x),f.y),
+                 mix(mix(h(i+vec3(0,0,1)),h(i+vec3(1,0,1)),f.x),mix(h(i+vec3(0,1,1)),h(i+vec3(1,1,1)),f.x),f.y),f.z); }
+    float fbm(vec3 p){ float a=.5, s=0.; for(int i=0;i<5;i++){ s+=a*n3(p); p*=2.03; a*=.5; } return s; }
+    void main(){
+      vec3 d = normalize(vD);
+      float t = uTime*0.015;
+      vec3 col = mix(vec3(0.004,0.006,0.02), vec3(0.018,0.02,0.07), d.y*0.5+0.5);
+      float a = fbm(d*2.2 + vec3(t, -t*0.7, t*0.4));
+      float b = fbm(d*3.1 + vec3(-t*0.6, t, 2.0));
+      col += vec3(0.20,0.06,0.36) * smoothstep(0.45,0.85,a) * 0.55;
+      col += vec3(0.02,0.20,0.30) * smoothstep(0.5,0.9,b) * 0.55;
+      col += vec3(0.30,0.08,0.20) * smoothstep(0.62,0.95,a*b*1.6) * 0.35;
+      gl_FragColor = vec4(col, 1.0);
+    }`
+});
+const bg = new THREE.Mesh(new THREE.SphereGeometry(200, 32, 16), bgMat);
+bg.renderOrder = -10;
+scene.add(bg);
+
+// ---------- stars / dust ----------
+function dotTexture() {
+  const c = document.createElement("canvas"); c.width = c.height = 64;
+  const g = c.getContext("2d"), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(.25, "rgba(255,255,255,.6)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const DOT = dotTexture();
+let stars;
+{
+  const N = coarse ? 700 : 1400, pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
+  const pal = [new THREE.Color("#8ff0ff"), new THREE.Color("#c6a4ff"), new THREE.Color("#ffffff"), new THREE.Color("#ffa6d8")];
+  for (let i = 0; i < N; i++) {
+    const r = 25 + Math.random() * 90, th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1);
+    pos.set([r * Math.sin(ph) * Math.cos(th), r * Math.cos(ph), r * Math.sin(ph) * Math.sin(th)], i * 3);
+    const c = pal[i % 4]; col.set([c.r, c.g, c.b], i * 3);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  g.setAttribute("color", new THREE.BufferAttribute(col, 3));
+  stars = new THREE.Points(g, new THREE.PointsMaterial({ size: 0.5, map: DOT, vertexColors: true, transparent: true, opacity: .75, depthWrite: false, blending: THREE.AdditiveBlending }));
+  scene.add(stars);
+}
+
+// ---------- soap bubble shader ----------
+const SPHERE = new THREE.SphereGeometry(1, 56, 36);
+const bubbleVS = `
+  varying vec3 vN; varying vec3 vV; varying vec3 vP;
+  void main(){
+    vec4 wp = modelMatrix * vec4(position, 1.0);
+    vP = position; vN = normalize(mat3(modelMatrix) * normal); vV = normalize(cameraPosition - wp.xyz);
+    gl_Position = projectionMatrix * viewMatrix * wp;
+  }`;
+const bubbleFS = `
+  uniform float uTime, uOpacity, uGlow, uSeed; uniform vec3 uTint;
+  varying vec3 vN; varying vec3 vV; varying vec3 vP;
+  void main(){
+    vec3 N = normalize(vN); if (!gl_FrontFacing) N = -N;
+    vec3 V = normalize(vV);
+    float ndv = clamp(dot(N, V), 0.0, 1.0);
+    float fres = pow(1.0 - ndv, 2.2);
+    float swirl = sin(vP.y*3.2 + uTime*0.9 + uSeed) * 0.5 + sin(vP.x*4.1 - uTime*0.55 + vP.z*2.3 + uSeed*1.7) * 0.35;
+    float th = 1.1 + swirl*0.55 + vP.y*0.45 + ndv*1.25;
+    vec3 film = 0.5 + 0.5*cos(6.28318*(th*vec3(1.0, 1.17, 1.37)));
+    vec3 R = reflect(-V, N);
+    float s1 = pow(max(dot(R, normalize(vec3(-0.45, 0.62, 0.64))), 0.0), 110.0);
+    float s1b = pow(max(dot(R, normalize(vec3(-0.30, 0.52, 0.80))), 0.0), 220.0);
+    float s2 = pow(max(dot(R, normalize(vec3(0.62, -0.25, 0.74))), 0.0), 26.0) * 0.32;
+    float sky = smoothstep(-0.1, 1.0, R.y) * 0.16;
+    vec3 col = film * (0.10 + fres*1.35) + uTint*(0.06 + fres*0.75 + uGlow*0.55) + vec3(s1*2.6 + s1b*3.0 + s2) + sky*film;
+    float a = 0.035 + fres*0.85 + s1 + s1b + s2*0.6 + uGlow*0.12;
+    if (!gl_FrontFacing) a *= 0.4;
+    gl_FragColor = vec4(col, clamp(a, 0.0, 1.0) * uOpacity);
+  }`;
+function bubbleMaterial(tint) {
+  return new THREE.ShaderMaterial({
+    vertexShader: bubbleVS, fragmentShader: bubbleFS, transparent: true, depthWrite: false, side: THREE.DoubleSide,
+    uniforms: { uTime: { value: 0 }, uOpacity: { value: 1 }, uGlow: { value: 0 }, uSeed: { value: Math.random() * 10 }, uTint: { value: new THREE.Color(tint) } }
+  });
+}
+const liveMats = new Set();
+
+// ---------- ambient tiny bubbles ----------
+const ambient = [];
+for (let i = 0; i < (coarse ? 14 : 26); i++) {
+  const m = bubbleMaterial("#9fdcff"); m.uniforms.uOpacity.value = .55; liveMats.add(m);
+  const mesh = new THREE.Mesh(SPHERE, m);
+  mesh.scale.setScalar(0.08 + Math.random() * 0.32);
+  mesh.position.set((Math.random() - .5) * 46, (Math.random() - .5) * 30, -8 - Math.random() * 24);
+  mesh.userData.v = 0.15 + Math.random() * 0.35;
+  mesh.userData.ph = Math.random() * 6;
+  scene.add(mesh); ambient.push(mesh);
+}
+
+// ================= labels =================
+const segmenter = (typeof Intl !== "undefined" && Intl.Segmenter) ? new Intl.Segmenter("th", { granularity: "word" }) : null;
+function wrapLines(g, text, maxW, maxLines) {
+  const parts = segmenter ? [...segmenter.segment(text)].map(s => s.segment) : [...text];
+  const lines = []; let cur = "", used = 0;
+  for (const p of parts) {
+    const t = cur + p;
+    if (g.measureText(t).width > maxW && cur) {
+      lines.push(cur.trim()); used += cur.length; cur = p.trimStart();
+      if (lines.length === maxLines) break;
+    } else cur = t;
+  }
+  if (lines.length < maxLines) { if (cur) lines.push(cur.trim()); }
+  else {
+    let last = lines[maxLines - 1];
+    while (last.length > 1 && g.measureText(last + "…").width > maxW) last = last.slice(0, -1);
+    lines[maxLines - 1] = last + "…";
+  }
+  return lines;
+}
+function drawLabel(b) {
+  const S = b.canvas.width, g = b.ctx;
+  g.clearRect(0, 0, S, S);
+  g.textAlign = "center"; g.textBaseline = "middle";
+  const zh = b.text, len = [...zh].length;
+  if (!b.reveal) {
+    const fs = Math.min(S * 0.5, (S * 0.92) / Math.max(1, len));
+    g.font = `900 ${fs}px "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif`;
+    g.shadowColor = b.glow; g.shadowBlur = S * 0.06;
+    g.fillStyle = "#ffffff";
+    g.fillText(zh, S / 2, S * 0.53);
+    g.shadowBlur = S * 0.02; g.shadowColor = "rgba(0,0,0,.8)";
+    g.fillText(zh, S / 2, S * 0.53);
+  } else {
+    const w = b.word;
+    const py = w ? w[1] : "", mean = w ? shortMean(w) : "";
+    const fs = Math.min(S * 0.3, (S * 0.74) / Math.max(1, len));
+    g.shadowColor = "rgba(0,0,0,.85)"; g.shadowBlur = S * 0.025;
+    g.font = `700 ${S * 0.1}px "Noto Sans Thai",sans-serif`;
+    g.fillStyle = "#9ff1ff";
+    let pyT = py; while (pyT.length > 2 && g.measureText(pyT).width > S * 0.8) pyT = pyT.slice(0, -1);
+    g.fillText(pyT, S / 2, S * 0.27);
+    g.font = `900 ${fs}px "Noto Sans SC","PingFang SC",sans-serif`;
+    g.fillStyle = "#ffffff";
+    g.fillText(zh, S / 2, S * 0.47);
+    g.font = `600 ${S * 0.085}px "Noto Sans Thai",sans-serif`;
+    g.fillStyle = w && thaiOf(w) ? "#ffe08a" : "#d9dcf0";
+    wrapLines(g, mean, S * 0.72, 2).forEach((l, i) => g.fillText(l, S / 2, S * (0.66 + i * 0.1)));
+  }
+  b.tex.needsUpdate = true;
+}
+const fontReady = new Map();
+function ensureFont(text) {
+  if (!fontReady.has(text)) {
+    fontReady.set(text, Promise.all([
+      document.fonts.load(`900 64px "Noto Sans SC"`, text),
+      document.fonts.load(`700 32px "Noto Sans Thai"`, "กข")
+    ]).catch(() => {}));
+  }
+  return fontReady.get(text);
+}
+
+// ================= bubbles =================
+const world = new THREE.Group(); scene.add(world);       // หน้าหลัก
+const cluster = new THREE.Group(); scene.add(cluster);   // กลุ่มแตกแขนง
+let bubbles = [];
+let hoverB = null, pickedB = null;
+
+function makeBubble({ text, r, tint = "#9fdcff", glow = "rgba(143,240,255,.9)", word = null, kind = "root", res = 256, parent = world }) {
+  const group = new THREE.Group();
+  const mat = bubbleMaterial(tint); liveMats.add(mat);
+  const mesh = new THREE.Mesh(SPHERE, mat);
+  mesh.renderOrder = 1;
+  group.add(mesh);
+  const cv = document.createElement("canvas"); cv.width = cv.height = res;
+  const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+  sprite.scale.setScalar(1.86); sprite.renderOrder = 5;
+  group.add(sprite);
+  parent.add(group);
+  const b = { group, mesh, mat, sprite, tex, canvas: cv, ctx: cv.getContext("2d"), text, r, word, kind, glow, reveal: false,
+    pos: new THREE.Vector3(), vel: new THREE.Vector3(), home: new THREE.Vector3(), from: new THREE.Vector3(),
+    phase: Math.random() * 10, s: 0, sCur: 1, born: performance.now(), delay: 0, dying: false, hoverK: 0 };
+  mesh.userData.b = b;
+  drawLabel(b);
+  ensureFont(text).then(() => { if (!b.disposed) drawLabel(b); });
+  bubbles.push(b);
+  return b;
+}
+function disposeBubble(b) {
+  if (b.disposed) return;
+  b.disposed = true;
+  b.group.parent && b.group.parent.remove(b.group);
+  b.mat.dispose(); liveMats.delete(b.mat);
+  b.tex.dispose(); b.sprite.material.dispose();
+  bubbles = bubbles.filter(x => x !== b);
+  if (hoverB === b) hoverB = null;
+}
+
+// ================= effects =================
+const effects = [];
+function burst(worldPos, r, color = "#ffffff") {
+  const N = 90, pos = new Float32Array(N * 3), col = new Float32Array(N * 3), vel = [];
+  const c = new THREE.Color();
+  for (let i = 0; i < N; i++) {
+    const d = new THREE.Vector3().randomDirection();
+    const p = worldPos.clone().addScaledVector(d, r * 0.95);
+    pos.set([p.x, p.y, p.z], i * 3);
+    vel.push(d.multiplyScalar(r * (1.6 + Math.random() * 2.6)));
+    c.setHSL(Math.random(), 0.85, 0.72); col.set([c.r, c.g, c.b], i * 3);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  g.setAttribute("color", new THREE.BufferAttribute(col, 3));
+  const m = new THREE.PointsMaterial({ size: r * 0.22 + 0.08, map: DOT, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+  const pts = new THREE.Points(g, m); scene.add(pts);
+  const ringM = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .8, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.975, 1, 96), ringM);
+  ring.position.copy(worldPos); ring.quaternion.copy(camera.quaternion); ring.scale.setScalar(r);
+  scene.add(ring);
+  const flash = new THREE.Sprite(new THREE.SpriteMaterial({ map: DOT, color, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
+  flash.position.copy(worldPos); flash.scale.setScalar(r * 3); scene.add(flash);
+  effects.push({
+    t: 0, dur: 1.0,
+    step(dt, k) {
+      const a = g.attributes.position.array;
+      for (let i = 0; i < N; i++) {
+        vel[i].multiplyScalar(1 - 2.2 * dt); vel[i].y -= 1.4 * dt;
+        a[i * 3] += vel[i].x * dt; a[i * 3 + 1] += vel[i].y * dt; a[i * 3 + 2] += vel[i].z * dt;
+      }
+      g.attributes.position.needsUpdate = true;
+      m.opacity = 1 - k;
+      ring.scale.setScalar(r * (1 + k * 1.6)); ringM.opacity = .8 * (1 - k) * (1 - k);
+      flash.material.opacity = Math.max(0, .9 - k * 3);
+    },
+    end() { scene.remove(pts, ring, flash); g.dispose(); m.dispose(); ring.geometry.dispose(); ringM.dispose(); flash.material.dispose(); }
+  });
+}
+
+// ---------- sound ----------
+let actx = null;
+function ac() { if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } return actx; }
+function popSound() {
+  if (muted) return; const a = ac(); if (!a) return; const t = a.currentTime;
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = "sine"; o.frequency.setValueAtTime(820, t); o.frequency.exponentialRampToValueAtTime(130, t + 0.11);
+  g.gain.setValueAtTime(0.22, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t + 0.15);
+  const len = Math.floor(a.sampleRate * 0.07), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+  const n = a.createBufferSource(), f = a.createBiquadFilter(), ng = a.createGain();
+  n.buffer = buf; f.type = "highpass"; f.frequency.value = 2000; ng.gain.value = 0.16;
+  n.connect(f).connect(ng).connect(a.destination); n.start(t);
+}
+function blip(freq, when = 0, vol = 0.05) {
+  if (muted) return; const a = ac(); if (!a) return; const t = a.currentTime + when;
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = "triangle"; o.frequency.setValueAtTime(freq, t); o.frequency.exponentialRampToValueAtTime(freq * 1.5, t + 0.08);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t + 0.18);
+}
+
+// ================= layout / camera =================
+let W = innerWidth, H = innerHeight, insetTop = 140, insetBottom = 70, Hv = H;
+const tanH = Math.tan(THREE.MathUtils.degToRad(22.5));
+const FIELD_D = 16;
+function measure() {
+  W = innerWidth; H = innerHeight;
+  insetTop = $("top").getBoundingClientRect().bottom + 6;
+  insetBottom = H - $("dock").getBoundingClientRect().top + 6;
+  Hv = H + Math.abs(insetTop - insetBottom);
+  applyView();
+  renderer.setSize(W, H, false);
+  composer.setSize(W, H);
+  bloom.resolution.set(W / 2, H / 2);
+}
+// ขยับ/ซูมกล้องให้ฉากอยู่กลางพื้นที่ว่าง (เว้นแผงคำแปลด้านล่างเมื่อเปิดอยู่)
+let extraBottom = 0, extraTarget = 0;
+function applyView() {
+  const bottom = insetBottom + extraBottom;
+  const delta = insetTop - bottom, hv = H + Math.abs(delta);
+  camera.aspect = W / hv;
+  camera.setViewOffset(W, hv, 0, delta >= 0 ? 0 : -delta, W, H);
+  const full = Math.max(1, H - insetTop - insetBottom), now = Math.max(60, H - insetTop - bottom);
+  camera.zoom = Math.min(1, (now / full) * (Hv / hv));   // ให้ขนาดฉากในพื้นที่ที่เหลือเท่าเดิม
+  camera.updateProjectionMatrix();
+}
+// ครึ่งความกว้าง/สูงของพื้นที่ว่างตรงกลางจอ (หน่วยโลก) ที่ระยะ d
+const regionHalf = d => ({ w: d * tanH * W / Hv, h: d * tanH * (H - insetTop - insetBottom) / Hv });
+function fitDistance(radius) {
+  const kx = tanH * W / Hv, ky = tanH * (H - insetTop - insetBottom) / Hv;
+  return radius * 1.04 / Math.min(kx, ky) + radius * 0.35;
+}
+
+let camTween = null;
+function flyCamera(toPos, toTarget, dur = 1.1, after) {
+  camTween = { t: 0, dur, fp: camera.position.clone(), ft: controls.target.clone(), tp: toPos.clone(), tt: toTarget.clone(), after };
+  controls.enabled = false;
+}
+const ease = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const easeBack = k => { const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); };
+
+function setControlsFor(m) {
+  if (m === "field") {
+    controls.minAzimuthAngle = -0.45; controls.maxAzimuthAngle = 0.45;
+    controls.minPolarAngle = Math.PI / 2 - 0.35; controls.maxPolarAngle = Math.PI / 2 + 0.35;
+    controls.minDistance = FIELD_D * 0.55; controls.maxDistance = FIELD_D * 1.25;
+  } else {
+    controls.minAzimuthAngle = -Infinity; controls.maxAzimuthAngle = Infinity;
+    controls.minPolarAngle = 0.15; controls.maxPolarAngle = Math.PI - 0.15;
+    controls.minDistance = branchD * 0.45; controls.maxDistance = branchD * 1.8;
+  }
+}
+
+// ================= modes =================
+let mode = "field";
+let branch = null;
+let branchD = 20, center = null, revealAll = false;
+let lines = null, pulses = null, halos = [];
+
+const rScale = () => Math.max(0.62, Math.min(1, regionHalf(FIELD_D).w / 7));
+function fieldCapacity() {
+  const R = regionHalf(FIELD_D), rs = rScale();
+  return Math.max(10, Math.min(coarse ? 20 : 28, Math.floor((R.w * R.h * 4) / (Math.PI * Math.pow(0.85 * rs, 2) * 2.6))));
+}
+
+function showField(dir = 1) {
+  const wasBranch = mode === "branch";
+  mode = "field"; branch = null;
+  hideSheet();
+  clearBranch();
+  for (const b of bubbles.filter(b => b.kind === "root" && !b.dying)) killBubble(b, new THREE.Vector3(0, dir * 3, 0));
+  $("back").style.display = "none"; $("revealAll").style.display = "none";
+  setHint("แตะฟองสบู่ให้แตกออกเป็นคำศัพท์ 💥 · ลากเพื่อหมุนมุมมอง");
+  const cap = fieldCapacity();
+  const pages = Math.max(1, Math.ceil(filtered.length / cap));
+  fieldPage = Math.min(fieldPage, pages - 1);
+  const slice = filtered.slice(fieldPage * cap, fieldPage * cap + cap);
+  $("info").textContent = filtered.length ? `รากศัพท์ ${filtered.length.toLocaleString()} ตัว · ชุด ${fieldPage + 1}/${pages}` : "ไม่พบรากศัพท์";
+  $("prev").disabled = fieldPage === 0; $("next").disabled = pages <= 1;
+  const R = regionHalf(FIELD_D), rs = rScale();
+  const maxN = Math.max(3, ...slice.map(r => r.n));
+  const placed = [];
+  slice.forEach((root, i) => {
+    const k = Math.sqrt((root.n - 2) / Math.max(1, maxN - 2));
+    const r = (0.48 + 0.62 * k) * rs;
+    const b = makeBubble({ text: root.c, r, kind: "root", word: SELF.get(root.c) || null });
+    b.root = root;
+    let best = null, bestD = -Infinity;
+    for (let t = 0; t < 40; t++) {
+      const p = new THREE.Vector3((Math.random() * 2 - 1) * (R.w - r), (Math.random() * 2 - 1) * (R.h - r), -3 + Math.random() * 5);
+      let dmin = Infinity; for (const q of placed) dmin = Math.min(dmin, p.distanceTo(q.p) - q.r - r);
+      if (dmin > bestD) { bestD = dmin; best = p; }
+      if (dmin > 0.3) break;
+    }
+    placed.push({ p: best, r });
+    b.home.copy(best);
+    b.from.copy(best).add(new THREE.Vector3((Math.random() - .5) * 2, -dir * (R.h * 2 + 2), -2));
+    b.pos.copy(b.from);
+    b.delay = i * 0.035;
+    b.group.position.copy(b.pos);
+    b.group.scale.setScalar(0.001);
+  });
+  if (wasBranch) flyCamera(new THREE.Vector3(0, 0, FIELD_D), new THREE.Vector3(), 1.0, () => setControlsFor("field"));
+  else if (!camTween) setControlsFor("field");
+}
+
+function killBubble(b, push) {
+  b.dying = true;
+  if (push) b.vel.add(push);
+}
+
+function clearBranch() {
+  for (const b of bubbles.filter(b => b.kind !== "root")) disposeBubble(b);
+  if (lines) { cluster.remove(lines); lines.geometry.dispose(); lines.material.dispose(); lines = null; }
+  if (pulses) { cluster.remove(pulses); pulses.geometry.dispose(); pulses.material.dispose(); pulses = null; }
+  for (const h of halos) { cluster.remove(h); h.geometry.dispose(); h.material.dispose(); }
+  halos = []; center = null;
+}
+
+function enterBranch(c, fromWorld = null, keepPage = false) {
+  const kids = kidsOf(c);
+  if (!branch || branch.char !== c || !keepPage) branch = { char: c, kids, page: 0 };
+  else branch.kids = kids;
+  mode = "branch";
+  hideSheet();
+  for (const b of bubbles.filter(b => b.kind === "root" && !b.dying)) {
+    const away = b.group.position.clone().sub(fromWorld || new THREE.Vector3()).setZ(0);
+    if (away.lengthSq() < 1e-6) away.set(0, 1, 0);
+    killBubble(b, away.normalize().multiplyScalar(6));
+  }
+  clearBranch();
+  cluster.rotation.set(0, 0, 0);
+
+  const small = W < 640;
+  const perPage = small ? 18 : 28;
+  const pages = Math.max(1, Math.ceil(kids.length / perPage));
+  branch.page = Math.min(branch.page, pages - 1); branch.pages = pages;
+  const slice = kids.slice(branch.page * perPage, branch.page * perPage + perPage);
+  const n = slice.length;
+  const R0 = 1.3, r = 0.64;
+  const Rc = Math.max(R0 + r + 0.85, Math.sqrt(n * Math.pow(3.1 * r, 2) / (4 * Math.PI)));
+  const regionAspect = W / Math.max(1, H - insetTop - insetBottom);
+  const ax = small ? 1 : Math.min(1.4, Math.max(1, regionAspect));
+  const ay = small ? Math.min(1.4, Math.max(1, 1 / regionAspect)) : 1;
+  branchD = fitDistance((Rc + r) * Math.max(ax, ay) * 0.92);
+
+  $("back").style.display = ""; $("revealAll").style.display = "";
+  $("info").textContent = `${c} · ${kids.length.toLocaleString()} คำ` + (pages > 1 ? ` · หน้า ${branch.page + 1}/${pages}` : "");
+  $("prev").disabled = branch.page === 0; $("next").disabled = pages <= 1;
+  setHint("แตะคำเพื่อดูพินอินและคำแปล · ลากเพื่อหมุน 360° · แตะฟองกลางเพื่อดูความหมายของ " + c);
+
+  const self = SELF.get(c) || null;
+  center = makeBubble({ text: c, r: R0, kind: "center", word: self, res: 384, parent: cluster, tint: "#ffffff", glow: "rgba(255,255,255,.95)" });
+  center.home.set(0, 0, 0);
+  center.from.copy(fromWorld ? cluster.worldToLocal(fromWorld.clone()) : new THREE.Vector3());
+  center.pos.copy(center.from);
+  center.group.position.copy(center.pos);
+  center.group.scale.setScalar(0.001);
+
+  for (let i = 0; i < 2; i++) {
+    const h = new THREE.Mesh(new THREE.TorusGeometry(R0 * (1.32 + i * 0.16), 0.012, 8, 128),
+      new THREE.MeshBasicMaterial({ color: i ? "#ffa6d8" : "#8ff0ff", transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+    h.rotation.set(Math.PI / 2 + (i ? 0.5 : -0.35), i ? 0.4 : -0.2, 0);
+    h.userData.spin = i ? -0.35 : 0.5;
+    cluster.add(h); halos.push(h);
+  }
+
+  const golden = Math.PI * (3 - Math.sqrt(5));
+  slice.forEach((w, i) => {
+    const y = 1 - (i + 0.5) / n * 2, rad = Math.sqrt(1 - y * y), th = i * golden;
+    const p = new THREE.Vector3(Math.cos(th) * rad * ax, y * ay, Math.sin(th) * rad).multiplyScalar(Rc);
+    const L = LEVELS[w[3]];
+    const b = makeBubble({ text: w[0], r, kind: "kid", word: w, res: 320, parent: cluster, tint: L.color, glow: L.color });
+    b.home.copy(p); b.from.set(0, 0, 0); b.pos.set(0, 0, 0);
+    b.group.position.set(0, 0, 0); b.group.scale.setScalar(0.001);
+    b.delay = 0.35 + i * 0.03;
+    b.level = w[3];
+    if (revealAll) { b.reveal = true; drawLabel(b); }
+  });
+  const kidsB = bubbles.filter(b => b.kind === "kid");
+  const lp = new Float32Array(kidsB.length * 6), lc = new Float32Array(kidsB.length * 6), pc = new Float32Array(kidsB.length * 3);
+  kidsB.forEach((b, i) => {
+    const c1 = new THREE.Color("#ffffff").multiplyScalar(.35), c2 = new THREE.Color(LEVELS[b.level].color);
+    lc.set([c1.r, c1.g, c1.b, c2.r, c2.g, c2.b], i * 6);
+    pc.set([c2.r, c2.g, c2.b], i * 3);
+  });
+  const lg = new THREE.BufferGeometry();
+  lg.setAttribute("position", new THREE.BufferAttribute(lp, 3));
+  lg.setAttribute("color", new THREE.BufferAttribute(lc, 3));
+  lines = new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: .6, blending: THREE.AdditiveBlending, depthWrite: false }));
+  cluster.add(lines);
+  const pg = new THREE.BufferGeometry();
+  pg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(kidsB.length * 3), 3));
+  pg.setAttribute("color", new THREE.BufferAttribute(pc, 3));
+  pulses = new THREE.Points(pg, new THREE.PointsMaterial({ size: 0.22, map: DOT, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+  cluster.add(pulses);
+
+  flyCamera(new THREE.Vector3(0, 0, branchD), new THREE.Vector3(), 1.15, () => setControlsFor("branch"));
+  for (let i = 0; i < Math.min(6, n); i++) blip(520 + i * 90, 0.35 + i * 0.07, 0.035);
+}
+
+function exitBranch() {
+  if (mode !== "branch") return;
+  if (center) { burst(center.group.getWorldPosition(new THREE.Vector3()), center.r * 0.9, "#cfefff"); popSound(); }
+  showField(1);
+}
+
+// ================= sheet =================
+let sheetWord = null;
+let sample = null;
+if (window.claude && typeof window.claude.use === "function") {
+  window.claude.use("sample").then(s => { sample = s; if (sheetWord) renderSheet(); }).catch(() => {});
+}
+function showSheet(w, b) {
+  if (pickedB && pickedB !== b) pickedB.picked = false;
+  pickedB = b; if (b) b.picked = true;
+  sheetWord = w; renderSheet();
+  $("sheet").classList.add("show");
+  const sh = $("sheet");
+  if (W < 760) extraTarget = Math.max(0, (parseFloat(getComputedStyle(sh).bottom) || 70) + sh.offsetHeight + 10 - insetBottom);
+}
+function renderSheet() {
+  const w = sheetWord; if (!w) return;
+  $("sZh").textContent = w[0];
+  $("sPy").textContent = w[1] || "";
+  const th = thaiOf(w);
+  $("sTh").textContent = th || (w[1] ? "ยังไม่มีคำแปลภาษาไทย" : "ตัวอักษรนี้ไม่มีในคลังคำศัพท์แบบคำเดี่ยว");
+  $("sTh").className = "s-th" + (th ? "" : " none");
+  $("sEn").textContent = w[5] ? "EN: " + w[5] : "";
+  const tags = $("sTags"); tags.innerHTML = "";
+  const tag = (txt, color) => { const t = document.createElement("span"); t.className = "tag"; if (color) t.style.setProperty("--c", color); t.textContent = txt; tags.appendChild(t); };
+  if (LEVELS[w[3]]) tag(LEVELS[w[3]].label, LEVELS[w[3]].color);
+  if (w[4]) tag(w[4].split(/[\/,]/).map(p => POS_TH[p.trim()] || p.trim()).join(" / "));
+  if (!w[2] && thCache[w[0]]) tag("แปลไทยโดย AI");
+  const foot = $("sFoot"); foot.innerHTML = "";
+  const chars = [...new Set([...w[0]].filter(isHan))];
+  if (chars.length > 1 || (branch && chars[0] !== branch.char)) {
+    const lab = document.createElement("span"); lab.textContent = "แตกแขนงต่อจาก:"; foot.appendChild(lab);
+    for (const ch of chars) {
+      const btn = document.createElement("button");
+      const cur = branch && ch === branch.char;
+      btn.className = "cbtn han" + (cur ? " cur" : ""); btn.textContent = ch;
+      btn.onclick = () => {
+        if (cur) return;
+        let from = null;
+        if (pickedB) {
+          from = pickedB.group.getWorldPosition(new THREE.Vector3());
+          burst(from, pickedB.group.scale.x, LEVELS[pickedB.level]?.color || "#ffffff"); popSound();
+          disposeBubble(pickedB); pickedB = null;
+        }
+        enterBranch(ch, from);
+      };
+      foot.appendChild(btn);
+    }
+  }
+  if (sample && !th && w[1]) {
+    const ai = document.createElement("button"); ai.className = "ai"; ai.textContent = "🪄 แปลไทยด้วย AI";
+    ai.onclick = () => translateVisible(ai);
+    foot.appendChild(ai);
+  }
+}
+function hideSheet() {
+  $("sheet").classList.remove("show");
+  extraTarget = 0;
+  if (pickedB) pickedB.picked = false;
+  pickedB = null; sheetWord = null;
+}
+async function translateVisible(btn) {
+  const pool = bubbles.filter(b => b.word && b.kind !== "root").map(b => b.word);
+  if (sheetWord) pool.unshift(sheetWord);
+  const seen = new Set(), list = [];
+  for (const w of pool) if (!thaiOf(w) && w[1] && !seen.has(w[0])) { seen.add(w[0]); list.push(w); }
+  if (!list.length) return;
+  btn.disabled = true; btn.textContent = "กำลังแปลทั้งหน้า…";
+  const prompt = "คุณคือพจนานุกรมจีน-ไทยสำหรับผู้เรียนภาษาจีน แปลคำศัพท์ภาษาจีนต่อไปนี้เป็นภาษาไทยที่สั้นและเป็นธรรมชาติ " +
+    "(ไม่เกิน 6 คำต่อความหมาย ถ้ามีหลายความหมายให้คั่นด้วย \" / \" ไม่เกิน 2 ความหมาย) " +
+    "ตอบเป็น JSON object เท่านั้น key คือคำภาษาจีน value คือคำแปลภาษาไทย\n\nคำศัพท์ (คำจีน | พินอิน | ความหมายภาษาอังกฤษ):\n" +
+    list.slice(0, 40).map(w => `${w[0]} | ${w[1]} | ${w[5]}`).join("\n");
+  try {
+    const res = await sample.json(prompt, { modelTier: "quick" });
+    if (res && typeof res === "object") {
+      for (const [k, v] of Object.entries(res)) if (typeof v === "string" && v.trim()) thCache[k] = v.trim().slice(0, 80);
+      store.set("bub_th_v1", thCache);
+    }
+    for (const b of bubbles) if (b.reveal) drawLabel(b);
+    renderSheet();
+  } catch (e) {
+    if (e && e.code === "not_granted") { sample = null; renderSheet(); }
+    else { btn.disabled = false; btn.textContent = e && e.code === "rate_limited" ? "ใช้งานถี่เกินไป ลองใหม่ภายหลัง" : "แปลไม่สำเร็จ ลองอีกครั้ง"; }
+  }
+}
+
+let zhVoice = null;
+function pickVoice() { try { const vs = speechSynthesis.getVoices(); zhVoice = vs.find(v => /zh[-_]CN/i.test(v.lang)) || vs.find(v => /^zh/i.test(v.lang)) || null; } catch (e) {} }
+if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(t) {
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(t); u.lang = "zh-CN"; u.rate = .85; if (zhVoice) u.voice = zhVoice;
+  speechSynthesis.speak(u);
+}
+
+// ================= picking =================
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+function pick(x, y) {
+  const rect = canvas.getBoundingClientRect();
+  ndc.set(((x - rect.left) / rect.width) * 2 - 1, -((y - rect.top) / rect.height) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const meshes = bubbles.filter(b => !b.dying && b.s > 0.5 && (mode === "field" ? b.kind === "root" : b.kind !== "root")).map(b => b.mesh);
+  const hit = ray.intersectObjects(meshes, false)[0];
+  return hit ? hit.object.userData.b : null;
+}
+let down = null;
+canvas.addEventListener("pointerdown", e => { down = { x: e.clientX, y: e.clientY, t: performance.now() }; ac(); });
+canvas.addEventListener("pointermove", e => {
+  if (e.pointerType === "touch") return;
+  const b = pick(e.clientX, e.clientY);
+  hoverB = b;
+  canvas.style.cursor = b ? "pointer" : (down ? "grabbing" : "grab");
+  const tip = $("tip");
+  if (b && b.kind === "root") {
+    tip.textContent = `${b.text} · ${b.root.n} คำ`;
+    tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY + 12) + "px"; tip.style.opacity = 1;
+  } else tip.style.opacity = 0;
+});
+canvas.addEventListener("pointerleave", () => { hoverB = null; $("tip").style.opacity = 0; });
+canvas.addEventListener("pointerup", e => {
+  if (!down) return;
+  const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y), dt = performance.now() - down.t;
+  down = null;
+  if (moved > 8 || dt > 600) return;
+  const b = pick(e.clientX, e.clientY);
+  if (!b) { hideSheet(); return; }
+  if (b.kind === "root") {
+    const wp = b.group.getWorldPosition(new THREE.Vector3());
+    burst(wp, b.group.scale.x, "#bfefff"); popSound();
+    disposeBubble(b);
+    $("tip").style.opacity = 0;
+    enterBranch(b.text, wp);
+  } else if (b.kind === "kid") {
+    if (!b.reveal) { b.reveal = true; drawLabel(b); }
+    blip(880, 0, 0.05);
+    showSheet(b.word, b);
+  } else if (b.kind === "center") {
+    blip(660, 0, 0.05);
+    showSheet(b.word || [b.text, "", "", 0, "", ""], b);
+  }
+});
+
+// ================= UI =================
+function setHint(t) { const h = $("hint"); h.textContent = t; h.style.opacity = 1; clearTimeout(setHint.tm); setHint.tm = setTimeout(() => h.style.opacity = 0, 6000); }
+function renderChips() {
+  const box = $("chips"); box.innerHTML = "";
+  for (const L of [1, 2, 3, 4, 5, 6, 7, 8, 0]) {
     const b = document.createElement("button");
-    b.className = "chip" + (L===level ? " on" : "") + (L===0 ? " plain" : "");
-    if (L) b.style.setProperty("--c", LEVELS[L].color);
-    b.innerHTML = (L ? LEVELS[L].label : "🌐 ทั้งหมด");
+    b.className = "chip" + (L === level ? " on" : "");
+    b.style.setProperty("--c", L ? LEVELS[L].color : "#ffffff");
+    b.innerHTML = `<i></i>${L ? LEVELS[L].label : "ทั้งหมด"} <span>${(L ? levelCount[L] || 0 : V.length).toLocaleString()}</span>`;
     b.onclick = () => { level = L; store.set("bub_level", L); refresh(); };
     box.appendChild(b);
   }
   $("cumu").checked = cumulative;
-  $("cumu").parentElement.style.opacity = level===0 || level===1 ? .4 : 1;
+  $("cumuWrap").classList.toggle("off", level === 0 || level === 1);
+  const on = box.querySelector(".on"); if (on) on.scrollIntoView({ inline: "center", block: "nearest" });
 }
-
-function refresh(){
-  renderChips();
-  buildRoots();
-  applySearch();
-  page = 0;
-  if (mode === "branch" && branch) openBranch(branch.char, false);
-  else showField();
+function refresh() {
+  renderChips(); buildRoots(); applySearch(); fieldPage = 0;
+  if (mode === "branch" && branch) enterBranch(branch.char, null);
+  else showField(1);
 }
-
-// ===== bubble DOM =====
-function makeBubble({ zh, r, py="", th="", lc="", badge="", cls="" }){
-  const el = document.createElement("div");
-  el.className = "bubble han " + cls;
-  el.style.width = el.style.height = (2*r) + "px";
-  el.style.setProperty("--rot", (Math.random()*360|0) + "deg");
-  el.style.animationDelay = "0s";
-  if (lc) el.style.setProperty("--lc", lc);
-  const len = [...zh].length;
-  const fs = Math.min(r*0.9, (r*1.55)/Math.max(1,len));
-  el.innerHTML = `<div class="py"></div><div class="zh" style="font-size:${fs}px"></div><div class="th"></div>` + (badge ? `<div class="badge"></div>` : "");
-  el.querySelector(".zh").textContent = zh;
-  el.querySelector(".py").textContent = py;
-  el.querySelector(".th").textContent = th;
-  if (badge) el.querySelector(".badge").textContent = badge;
-  el.querySelector(".zh").style.textShadow = "0 2px 10px rgba(0,0,0,.6)";
-  stage.appendChild(el);
-  return el;
-}
-
-function clearBubbles(){
-  for (const b of bubbles) b.el.remove();
-  bubbles = [];
-  svg.innerHTML = ""; lines = [];
-}
-
-const stageSize = () => ({ W: stage.clientWidth, H: stage.clientHeight });
-
-// ===== field (main view) =====
-function fieldCapacity(){
-  const { W, H } = stageSize();
-  const avgR = W < 560 ? 34 : 46;
-  return Math.max(8, Math.min(42, Math.floor((W*(H-60)) / (Math.PI*avgR*avgR*3.1))));
-}
-
-function showField(){
-  mode = "field"; branch = null;
-  hideSheet();
-  clearBubbles();
-  $("backBtn").style.display = "none";
-  $("revealAll").style.display = "none";
-  $("hint").textContent = "แตะฟองสบู่เพื่อให้มันแตก 💥  (ฟองใหญ่ = มีคำแตกแขนงเยอะ)";
-  const cap = fieldCapacity();
-  const pages = Math.max(1, Math.ceil(filtered.length / cap));
-  page = Math.min(page, pages-1);
-  const slice = filtered.slice(page*cap, page*cap + cap);
-  $("empty").style.display = filtered.length ? "none" : "flex";
-  $("info").textContent = filtered.length
-    ? `รากศัพท์ ${filtered.length} ตัว · ชุดที่ ${page+1}/${pages}` : "";
-  $("prevBtn").style.display = $("nextBtn").style.display = pages > 1 ? "" : "none";
-  $("prevBtn").disabled = page === 0;
-  $("nextBtn").textContent = page < pages-1 ? "ชุดถัดไป ›" : "เริ่มชุดแรก ↺";
-
-  const { W, H } = stageSize();
-  fieldTop = barBottom();
-  const small = W < 560;
-  const maxK = Math.max(...slice.map(r=>r.kids.length), 2);
-  const minR = small ? 26 : 34, maxR = small ? 46 : 66;
-  slice.forEach((root, i) => {
-    const t = Math.sqrt((root.kids.length-2) / Math.max(1, maxK-2));
-    const r = minR + (maxR-minR)*t;
-    const el = makeBubble({ zh: root.c, r });
-    el.title = `${root.kids.length} คำ`;
-    const b = {
-      el, r, root,
-      x: r + Math.random()*(W-2*r), y: fieldTop + r + Math.random()*Math.max(1,H-fieldTop-30-2*r),
-      vx: (Math.random()-.5)*0.6, vy: (Math.random()-.5)*0.6,
-      phase: Math.random()*Math.PI*2, scale: 0, appear: i*25
-    };
-    el.addEventListener("click", ev => { ev.stopPropagation(); popRoot(b); });
-    bubbles.push(b);
-  });
-}
-
-function popRoot(b){
-  if (b.popping) return;
-  b.popping = true;
-  burst(b.x, b.y, b.r);
-  b.el.style.transition = "opacity .18s, filter .18s";
-  b.el.style.opacity = "0";
-  setTimeout(() => openBranch(b.root.c, true, { x:b.x, y:b.y }), 230);
-}
-
-function burst(x, y, r){
-  const ring = document.createElement("div");
-  ring.className = "ring";
-  ring.style.width = ring.style.height = (2*r)+"px";
-  ring.style.transform = `translate(${x-r}px,${y-r}px) scale(1)`;
-  stage.appendChild(ring);
-  ring.animate([
-    { transform:`translate(${x-r}px,${y-r}px) scale(1)`, opacity:.9 },
-    { transform:`translate(${x-r}px,${y-r}px) scale(1.6)`, opacity:0 }
-  ], { duration:380, easing:"ease-out" }).onfinish = () => ring.remove();
-  const n = 14;
-  for (let i = 0; i < n; i++) {
-    const d = document.createElement("div");
-    d.className = "drop";
-    const a = (i/n)*Math.PI*2 + Math.random()*.3;
-    const dist = r*(1.1 + Math.random()*0.9);
-    const s = 0.5 + Math.random()*1.1;
-    stage.appendChild(d);
-    d.animate([
-      { transform:`translate(${x+Math.cos(a)*r*.8-4}px,${y+Math.sin(a)*r*.8-4}px) scale(${s})`, opacity:1 },
-      { transform:`translate(${x+Math.cos(a)*dist-4}px,${y+Math.sin(a)*dist+12-4}px) scale(${s*.3})`, opacity:0 }
-    ], { duration:480 + Math.random()*200, easing:"cubic-bezier(.1,.8,.3,1)" }).onfinish = () => d.remove();
-  }
-}
-
-// ===== branch view =====
-function ellipseRingPoints(Rx, Ry, count, phase){
-  // จุดห่างเท่ากันตามความยาวเส้นรอบวงรี
-  const N = 360, pts = [], cum = [0];
-  for (let i = 0; i <= N; i++) { const t = i/N*Math.PI*2 + phase; pts.push([Math.cos(t)*Rx, Math.sin(t)*Ry]); }
-  for (let i = 1; i <= N; i++) cum.push(cum[i-1] + Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]));
-  const total = cum[N], out = [];
-  let j = 0;
-  for (let k = 0; k < count; k++) {
-    const target = k/count*total;
-    while (j < N && cum[j+1] < target) j++;
-    out.push(pts[j]);
-  }
-  return { out, total };
-}
-
-const barBottom = () => $("bar").offsetTop + $("bar").offsetHeight + 8;
-function layoutBranch(n, W, H, centerR){
-  const top = barBottom(), bottom = 34;
-  const availH = H - top - bottom;
-  const cy = top + availH/2, cx = W/2;
-  const ax = Math.max(1, Math.min(1.9, W/availH)), ay = Math.max(1, Math.min(2, availH/W));
-  const maxX = W/2 - 6, maxY = availH/2;
-  const rcMin = W < 560 ? 26 : 32;
-  for (let rc = (W < 560 ? 38 : 50); rc >= rcMin; rc -= 2) {
-    const gap = rc < 36 ? 8 : 12, step = 2*rc + gap;
-    const pos = [];
-    let R = centerR + rc + gap + 6, ring = 0;
-    while (true) {
-      if (R*ax + rc > maxX || R*ay + rc > maxY) break;
-      const perim = ellipseRingPoints(R*ax, R*ay, 1, 0).total;
-      const cap = Math.max(1, Math.floor(perim / step));
-      const take = Math.min(cap, n - pos.length);
-      const { out } = ellipseRingPoints(R*ax, R*ay, take, ring*0.55 - Math.PI/2);
-      for (const p of out) pos.push({ x: cx + p[0], y: cy + p[1] });
-      if (pos.length >= n) break;
-      R += step; ring++;
-    }
-    if (pos.length >= n || rc - 2 < rcMin) return { rc, pos, cx, cy };
-  }
-}
-
-function openBranch(c, animate=true, from=null, keepPage=false){
-  const kids = kidsOf(c);
-  if (!branch || branch.char !== c || !keepPage) branch = { char:c, kids, page:0 };
-  else branch.kids = kids;
-  mode = "branch";
-  clearBubbles();
-  hideSheet();
-  $("empty").style.display = "none";
-  $("backBtn").style.display = "";
-  $("revealAll").style.display = "";
-  $("revealAll").textContent = revealLabel();
-  $("hint").textContent = "แตะคำเพื่อดูพินอินและคำแปล · แตะฟองตรงกลางเพื่อดูความหมายของรากศัพท์";
-
-  const { W, H } = stageSize();
-  const small = W < 560;
-  const centerR = small ? 38 : 60;
-  // หาว่าหน้าหนึ่งใส่ได้กี่ฟอง
-  let L = layoutBranch(kids.length, W, H, centerR);
-  const perPage = Math.max(1, L.pos.length);
-  const pages = Math.ceil(kids.length / perPage);
-  branch.page = Math.min(branch.page, pages-1);
-  branch.pages = pages;
-  const slice = kids.slice(branch.page*perPage, branch.page*perPage + perPage);
-  if (slice.length < kids.length) L = layoutBranch(slice.length, W, H, centerR);
-
-  $("info").textContent = `${c} · ${kids.length} คำ` + (pages > 1 ? ` · หน้า ${branch.page+1}/${pages}` : "");
-  $("prevBtn").style.display = $("nextBtn").style.display = pages > 1 ? "" : "none";
-  $("prevBtn").disabled = branch.page === 0;
-  $("nextBtn").textContent = branch.page < pages-1 ? "หน้าถัดไป ›" : "หน้าแรก ↺";
-
-  // ฟองตรงกลาง
-  const self = SELF.get(c);
-  const cel = makeBubble({ zh:c, r:centerR, py: self ? self[1] : "", th: self ? self[2] : "", cls:"center" });
-  const cb = { el:cel, r:centerR, x: from ? from.x : L.cx, y: from ? from.y : L.cy, ax:L.cx, ay:L.cy, phase:0, center:true, scale: animate ? 0 : 1, appear:0, word:self, isRoot:true };
-  cel.addEventListener("click", ev => {
-    ev.stopPropagation();
-    if (self) { cel.classList.add("reveal"); showSheet(self, cb); }
-    else showSheet([c, "", "(ไม่มีคำนี้เดี่ยว ๆ ในคลังคำศัพท์)", 0, ""], cb);
-  });
-  bubbles.push(cb);
-
-  slice.forEach((w, i) => {
-    const lc = LEVELS[w[3]].color;
-    const short = w[2].split(/[\/,;，]/)[0].trim();
-    const el = makeBubble({ zh:w[0], r:L.rc, py:w[1], th:short, lc });
-    if (revealAll) el.classList.add("reveal");
-    const p = L.pos[i];
-    const b = { el, r:L.rc, x:L.cx, y:L.cy, ax:p.x, ay:p.y, phase:Math.random()*Math.PI*2, scale: 0, appear: animate ? 120 + i*28 : 0, word:w };
-    el.addEventListener("click", ev => {
-      ev.stopPropagation();
-      el.classList.add("reveal");
-      showSheet(w, b);
-    });
-    bubbles.push(b);
-    const ln = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    ln.setAttribute("stroke", lc);
-    ln.setAttribute("stroke-opacity", ".28");
-    ln.setAttribute("stroke-width", "1.5");
-    svg.appendChild(ln);
-    lines.push({ ln, b });
-  });
-}
-
-// ===== detail sheet =====
-let sheetWord = null, pickedBubble = null;
-function showSheet(w, b){
-  sheetWord = w;
-  if (pickedBubble) pickedBubble.el.classList.remove("picked");
-  pickedBubble = b; if (b) b.el.classList.add("picked");
-  $("sZh").textContent = w[0];
-  $("sPy").textContent = w[1];
-  $("sTh").textContent = w[2];
-  const tags = $("sTags"); tags.innerHTML = "";
-  if (w[3]) {
-    const t = document.createElement("span"); t.className = "tag";
-    t.style.setProperty("--c", LEVELS[w[3]].color); t.textContent = LEVELS[w[3]].label; tags.appendChild(t);
-  }
-  if (w[4]) {
-    const t = document.createElement("span"); t.className = "tag";
-    t.textContent = w[4].split(/[\/,]/).map(p => POS_TH[p.trim()] || p.trim()).join(" / "); tags.appendChild(t);
-  }
-  const box = $("sChars"); box.innerHTML = "";
-  const chars = [...new Set([...w[0]].filter(isHan))];
-  if (chars.length > 1 || (branch && chars[0] !== branch.char)) {
-    const lab = document.createElement("span"); lab.textContent = "แตกแขนงต่อจาก:"; box.appendChild(lab);
-    for (const ch of chars) {
-      const btn = document.createElement("button");
-      btn.className = "char-btn han" + (branch && ch === branch.char ? " cur" : "");
-      btn.textContent = ch;
-      btn.onclick = () => {
-        if (branch && ch === branch.char) return;
-        const from = b ? { x:b.x, y:b.y } : null;
-        if (b) burst(b.x, b.y, b.r);
-        openBranch(ch, true, from);
-      };
-      box.appendChild(btn);
-    }
-  }
-  $("sheet").classList.add("show");
-}
-function hideSheet(){
-  $("sheet").classList.remove("show");
-  if (pickedBubble) pickedBubble.el.classList.remove("picked");
-  pickedBubble = null;
-}
-
-let zhVoice = null;
-function pickVoice(){
-  try {
-    const vs = speechSynthesis.getVoices();
-    zhVoice = vs.find(v => /zh[-_]CN/i.test(v.lang)) || vs.find(v => /^zh/i.test(v.lang)) || null;
-  } catch(e){}
-}
-if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
-function speak(text){
-  if (!("speechSynthesis" in window)) return;
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = "zh-CN"; u.rate = .85;
-  if (zhVoice) u.voice = zhVoice;
-  speechSynthesis.speak(u);
-}
-
-// ===== animation loop =====
-let last = performance.now(), t0 = last;
-function tick(now){
-  const dt = Math.min(40, now - last) / 16.67; last = now;
-  const t = (now - t0) / 1000;
-  const { W, H } = stageSize();
-  if (mode === "field") {
-    for (const b of bubbles) {
-      if (b.appear > 0) { b.appear -= dt*16.67; continue; }
-      b.scale += (1 - b.scale) * 0.12 * dt;
-      b.vx += (Math.random()-.5)*0.04*dt + Math.sin(t*0.6 + b.phase)*0.004*dt;
-      b.vy += (Math.random()-.5)*0.04*dt - 0.003*dt;   // ลอยขึ้นเบา ๆ
-      b.vx *= Math.pow(.985, dt); b.vy *= Math.pow(.985, dt);
-      const sp = Math.hypot(b.vx, b.vy), maxS = 0.9;
-      if (sp > maxS) { b.vx *= maxS/sp; b.vy *= maxS/sp; }
-    }
-    for (let i = 0; i < bubbles.length; i++) for (let j = i+1; j < bubbles.length; j++) {
-      const a = bubbles[i], c = bubbles[j];
-      const dx = c.x - a.x, dy = c.y - a.y, d = Math.hypot(dx, dy) || 1, min = a.r + c.r + 4;
-      if (d < min) {
-        const push = (min - d) / d * 0.5 * 0.25;
-        a.x -= dx*push; a.y -= dy*push; c.x += dx*push; c.y += dy*push;
-        const rv = ((c.vx - a.vx)*dx + (c.vy - a.vy)*dy) / d;
-        if (rv < 0) { const k = rv/d*0.5; a.vx += k*dx; a.vy += k*dy; c.vx -= k*dx; c.vy -= k*dy; }
-      }
-    }
-    for (const b of bubbles) {
-      b.x += b.vx*dt; b.y += b.vy*dt;
-      const top = fieldTop;
-      if (b.x < b.r) { b.x = b.r; b.vx = Math.abs(b.vx); }
-      if (b.x > W - b.r) { b.x = W - b.r; b.vx = -Math.abs(b.vx); }
-      if (b.y < top + b.r) { b.y = top + b.r; b.vy = Math.abs(b.vy); }
-      if (b.y > H - 26 - b.r) { b.y = H - 26 - b.r; b.vy = -Math.abs(b.vy); }
-      draw(b);
-    }
-  } else {
-    for (const b of bubbles) {
-      if (b.appear > 0) { b.appear -= dt*16.67; draw(b, true); continue; }
-      const wob = b.center ? 3 : 5;
-      const tx = b.ax + Math.sin(t*0.9 + b.phase)*wob, ty = b.ay + Math.cos(t*0.75 + b.phase*1.3)*wob;
-      b.x += (tx - b.x) * 0.1 * dt; b.y += (ty - b.y) * 0.1 * dt;
-      b.scale += (1 - b.scale) * 0.14 * dt;
-      draw(b);
-    }
-    const c = bubbles[0];
-    for (const { ln, b } of lines) {
-      const vis = b.appear > 0 ? 0 : b.scale;
-      const dx = b.x - c.x, dy = b.y - c.y, d = Math.hypot(dx, dy) || 1;
-      ln.setAttribute("x1", c.x + dx/d*c.r*c.scale); ln.setAttribute("y1", c.y + dy/d*c.r*c.scale);
-      ln.setAttribute("x2", b.x - dx/d*b.r*b.scale); ln.setAttribute("y2", b.y - dy/d*b.r*b.scale);
-      ln.style.opacity = vis;
-    }
-  }
-  requestAnimationFrame(tick);
-}
-function draw(b, hidden){
-  const s = hidden ? 0 : b.scale * (b.el.classList.contains("reveal") && !b.center ? 1.18 : 1);
-  b.el.style.transform = `translate3d(${b.x - b.r}px, ${b.y - b.r}px, 0) scale(${s})`;
-  b.el.style.zIndex = b.el.classList.contains("picked") ? 3 : (b.center ? 2 : 1);
-}
-
-// ===== events =====
-$("backBtn").onclick = () => showField();
-$("nextBtn").onclick = () => {
-  if (mode === "field") {
-    const pages = Math.max(1, Math.ceil(filtered.length / fieldCapacity()));
-    page = (page + 1) % pages; showField();
-  } else {
-    branch.page = (branch.page + 1) % branch.pages; openBranch(branch.char, true, null, true);
-  }
+$("back").onclick = exitBranch;
+$("next").onclick = () => {
+  if (mode === "field") { const pages = Math.max(1, Math.ceil(filtered.length / fieldCapacity())); fieldPage = (fieldPage + 1) % pages; showField(1); }
+  else { branch.page = (branch.page + 1) % branch.pages; enterBranch(branch.char, null, true); }
 };
-$("prevBtn").onclick = () => {
-  if (mode === "field") { page = Math.max(0, page-1); showField(); }
-  else { branch.page = Math.max(0, branch.page-1); openBranch(branch.char, true, null, true); }
+$("prev").onclick = () => {
+  if (mode === "field") { fieldPage = Math.max(0, fieldPage - 1); showField(-1); }
+  else { branch.page = Math.max(0, branch.page - 1); enterBranch(branch.char, null, true); }
 };
 $("revealAll").onclick = () => {
   revealAll = !revealAll;
-  $("revealAll").textContent = revealLabel();
-  for (const b of bubbles) if (!b.center) b.el.classList.toggle("reveal", revealAll);
+  $("revealAll").textContent = revealAll ? "🙈 ซ่อน" : "👁 คำแปล";
+  for (const b of bubbles) if (b.kind === "kid") { b.reveal = revealAll; drawLabel(b); }
 };
+$("mute").onclick = () => { muted = !muted; store.set("bub_mute", muted); $("mute").textContent = muted ? "🔇" : "🔊"; };
+$("mute").textContent = muted ? "🔇" : "🔊";
 $("cumu").onchange = e => { cumulative = e.target.checked; store.set("bub_cumu", cumulative); refresh(); };
-$("search").addEventListener("input", () => { applySearch(); page = 0; if (mode === "field") showField(); });
+let searchTm;
+$("search").addEventListener("input", () => {
+  clearTimeout(searchTm);
+  searchTm = setTimeout(() => { applySearch(); fieldPage = 0; if (mode === "field") showField(1); }, 250);
+});
 $("search").addEventListener("keydown", e => {
   if (e.key !== "Enter") return;
-  const hanQ = [...$("search").value].filter(isHan);
-  if (hanQ.length) openBranch(hanQ[0], true);
-  else if (filtered.length) openBranch(filtered[0].c, true);
+  const han = [...$("search").value].filter(isHan);
+  const c = han[0] || (filtered[0] && filtered[0].c);
+  if (c) { $("search").blur(); enterBranch(c, null); }
 });
 $("closeSheet").onclick = hideSheet;
-$("speakBtn").onclick = () => { if (sheetWord) speak(sheetWord[0]); };
-stage.addEventListener("click", () => hideSheet());
+$("speak").onclick = () => sheetWord && speak(sheetWord[0]);
 document.addEventListener("keydown", e => {
-  if (e.key === "Escape") { if ($("sheet").classList.contains("show")) hideSheet(); else if (mode === "branch") showField(); }
+  if (e.target === $("search")) return;
+  if (e.key === "Escape") { if ($("sheet").classList.contains("show")) hideSheet(); else exitBranch(); }
+  if (e.key === "ArrowRight") $("next").click();
+  if (e.key === "ArrowLeft") $("prev").click();
 });
-let resizeTimer, lastW = innerWidth, lastH = innerHeight;
-window.addEventListener("resize", () => {
-  // มือถือยิง resize ตอนแถบ URL ยุบ/ขยาย — จัดใหม่เฉพาะเมื่อขนาดเปลี่ยนจริง
-  if (innerWidth === lastW && Math.abs(innerHeight - lastH) < 120) return;
+let rzTm, lastW = innerWidth, lastH = innerHeight;
+addEventListener("resize", () => {
+  measure();
+  if (innerWidth === lastW && Math.abs(innerHeight - lastH) < 140) return;
   lastW = innerWidth; lastH = innerHeight;
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => { fitStage(); if (mode === "branch") openBranch(branch.char, false, null, true); else showField(); }, 200);
+  clearTimeout(rzTm);
+  rzTm = setTimeout(() => { if (mode === "branch") enterBranch(branch.char, null, true); else showField(1); }, 250);
 });
 
+// ================= loop =================
+const clock = new THREE.Clock();
+const tmpV = new THREE.Vector3(), tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
+const lim = (v, m) => v > m ? (m - v) : v < -m ? (-m - v) : 0;
+function tick() {
+  requestAnimationFrame(tick);
+  const dt = Math.min(clock.getDelta(), 0.05), time = clock.elapsedTime;
+  bgMat.uniforms.uTime.value = time;
+  bg.position.copy(camera.position);
+  stars.rotation.y += dt * 0.006; stars.rotation.x += dt * 0.002;
+  for (const m of liveMats) m.uniforms.uTime.value = time;
+  for (const a of ambient) {
+    a.position.y += a.userData.v * dt;
+    a.position.x += Math.sin(time * .4 + a.userData.ph) * dt * .2;
+    if (a.position.y > 18) a.position.y = -18;
+  }
+
+  if (Math.abs(extraTarget - extraBottom) > 0.5) {
+    extraBottom += (extraTarget - extraBottom) * Math.min(1, dt * 7);
+    applyView();
+  }
+  if (camTween) {
+    camTween.t += dt; const k = ease(Math.min(1, camTween.t / camTween.dur));
+    camera.position.lerpVectors(camTween.fp, camTween.tp, k);
+    controls.target.lerpVectors(camTween.ft, camTween.tt, k);
+    camera.lookAt(controls.target);
+    if (k >= 1) { const f = camTween.after; camTween = null; controls.enabled = true; f && f(); controls.update(); }
+  } else controls.update();
+
+  const R = regionHalf(FIELD_D);
+  const now = performance.now();
+  for (const b of bubbles.slice()) {
+    const age = (now - b.born) / 1000 - b.delay;
+    const hov = (b === hoverB || b.picked) ? 1 : 0;
+    b.hoverK += (hov - b.hoverK) * Math.min(1, dt * 10);
+    b.mat.uniforms.uGlow.value = b.hoverK * 0.9 + (b.reveal ? 0.25 : 0);
+    if (b.dying) {
+      b.pos.addScaledVector(b.vel, dt); b.vel.multiplyScalar(1 - dt);
+      b.s = Math.max(0, b.s - dt * 2.2);
+      b.mat.uniforms.uOpacity.value = b.s;
+      b.sprite.material.opacity = b.s;
+      if (b.s <= 0) { disposeBubble(b); continue; }
+    } else if (age < 0) { b.group.scale.setScalar(0.001); continue; }
+    else if (b.kind === "root" && age < 1.4) {
+      // ลอยขึ้นมาเข้าตำแหน่ง
+      const k = age / 1.4, e = 1 - Math.pow(1 - k, 3);
+      b.pos.lerpVectors(b.from, b.home, e);
+      b.s = Math.min(1, age * 1.8);
+    }
+    else if (b.kind === "root") {
+      b.s = 1;
+      const ph = b.phase;
+      tmpV.set(Math.sin(time * .31 + ph) * .22, Math.cos(time * .27 + ph * 1.7) * .22 + .05, Math.sin(time * .2 + ph * 2.3) * .12);
+      b.vel.addScaledVector(tmpV, dt);
+      b.vel.x += lim(b.pos.x, R.w - b.r) * 3 * dt;
+      b.vel.y += lim(b.pos.y, R.h - b.r) * 3 * dt;
+      b.vel.z += lim(b.pos.z + 0.5, 2.8) * 3 * dt;
+      b.vel.multiplyScalar(1 - Math.min(1, dt * 0.7));
+      b.pos.addScaledVector(b.vel, dt);
+    } else {
+      const k = Math.min(1, age / 0.75), e = easeBack(k);
+      tmpV.copy(b.home);
+      if (k >= 1) tmpV.add(tmpA.set(Math.sin(time * .9 + b.phase) * .06, Math.cos(time * .8 + b.phase * 1.3) * .06, Math.sin(time * .7 + b.phase) * .06));
+      b.pos.lerpVectors(b.from, tmpV, e);
+      b.s = Math.min(1, k * 1.4);
+    }
+    const target = (b.kind === "kid" && b.reveal ? (revealAll && !b.picked ? 1.12 : 1.3) : 1) * (1 + b.hoverK * .12);
+    b.sCur += (target - b.sCur) * Math.min(1, dt * 8);
+    const grow = b.dying ? 1 + (1 - b.s) * .5 : (b.kind === "root" ? easeBack(Math.min(1, b.s)) : Math.max(0.001, b.s));
+    const sc = Math.max(0.001, b.r * b.sCur * grow);
+    b.group.position.copy(b.pos);
+    b.group.scale.set(sc * (1 + Math.sin(time * 2.1 + b.phase) * .025), sc * (1 + Math.cos(time * 1.9 + b.phase) * .025), sc);
+  }
+
+  const rs = bubbles.filter(b => b.kind === "root" && !b.dying && b.s > 0.2);
+  for (let i = 0; i < rs.length; i++) for (let j = i + 1; j < rs.length; j++) {
+    const a = rs[i], c = rs[j];
+    tmpA.subVectors(c.pos, a.pos); const d = tmpA.length() || 1e-3, min = a.r + c.r + 0.12;
+    if (d < min) {
+      tmpA.multiplyScalar((min - d) / d * 0.5 * Math.min(1, dt * 10));
+      a.pos.sub(tmpA); c.pos.add(tmpA);
+      a.vel.addScaledVector(tmpA, -2); c.vel.addScaledVector(tmpA, 2);
+    }
+  }
+
+  if (lines && center) {
+    if (!pickedB && !down && !camTween) cluster.rotation.y += dt * 0.06;
+    const kidsB = bubbles.filter(b => b.kind === "kid");
+    const lp = lines.geometry.attributes.position.array, pp = pulses.geometry.attributes.position.array;
+    const cS = center.group.scale.x;
+    kidsB.forEach((b, i) => {
+      if (i * 6 + 5 >= lp.length) return;
+      tmpA.subVectors(b.pos, center.pos); const d = tmpA.length() || 1e-3; tmpA.divideScalar(d);
+      const ks = b.group.scale.x;
+      tmpB.copy(center.pos).addScaledVector(tmpA, cS);
+      tmpV.copy(b.pos).addScaledVector(tmpA, -ks);
+      if (d < cS + ks) tmpV.copy(tmpB);
+      lp.set([tmpB.x, tmpB.y, tmpB.z, tmpV.x, tmpV.y, tmpV.z], i * 6);
+      tmpB.lerp(tmpV, (time * 0.45 + i * 0.137) % 1);
+      pp.set([tmpB.x, tmpB.y, tmpB.z], i * 3);
+    });
+    lines.geometry.attributes.position.needsUpdate = true;
+    pulses.geometry.attributes.position.needsUpdate = true;
+    for (const h of halos) {
+      h.rotation.z += dt * h.userData.spin;
+      h.material.opacity = Math.min(0.55, h.material.opacity + dt * .6);
+      h.position.copy(center.pos); h.scale.setScalar(Math.max(0.001, center.s));
+    }
+  }
+
+  for (let i = effects.length - 1; i >= 0; i--) {
+    const f = effects[i]; f.t += dt; const k = Math.min(1, f.t / f.dur);
+    f.step(dt, k);
+    if (k >= 1) { f.end(); effects.splice(i, 1); }
+  }
+  composer.render(dt);
+}
+
+// สำหรับทดสอบอัตโนมัติ
+window.__bubbleDebug = { list: () => bubbles, camera, project: b => { const v = b.group.getWorldPosition(new THREE.Vector3()).project(camera); return { x: (v.x + 1) / 2 * W, y: (1 - v.y) / 2 * H }; } };
+
+// ================= start =================
 renderChips();
-fitStage();
-refresh();
-requestAnimationFrame(tick);
+measure();
+buildRoots(); applySearch();
+await Promise.race([ensureFont("不上学"), new Promise(r => setTimeout(r, 2500))]);
+showField(1);
+setControlsFor("field");
+tick();
+setTimeout(() => $("loader").classList.add("done"), 200);
 </script>
 </body>
 </html>
