@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ฟองสบู่รากศัพท์จีน HSK</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;800&family=Noto+Sans+SC:wght@500;700;900&display=swap');
+  :root {
+    --bg0:#0b0e1d;
+    --card:rgba(255,255,255,.05);
+    --card-border:rgba(255,255,255,.1);
+    --text:#e8ecf8; --muted:#8b93b8; --gold:#ffd54f;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { background:var(--bg0); }
+  body {
+    font-family:"Noto Sans Thai","Segoe UI",sans-serif;
+    color:var(--text); min-height:100vh; overflow-x:hidden;
+    display:flex; flex-direction:column; align-items:center;
+    padding:18px 16px 24px;
+  }
+  .han { font-family:"Noto Sans SC","Microsoft YaHei","PingFang SC",sans-serif; }
+  .bg-blob { position:fixed; border-radius:50%; filter:blur(110px); opacity:.45; pointer-events:none; z-index:-1; }
+  .b1 { width:520px; height:520px; background:#2b2070; top:-170px; left:-130px; }
+  .b2 { width:480px; height:480px; background:#0e4a5e; bottom:-170px; right:-110px; }
+
+  header { text-align:center; width:100%; max-width:1200px; position:relative; }
+  h1 {
+    font-size:clamp(1.4rem,4vw,2rem); font-weight:800;
+    background:linear-gradient(90deg,#7fe7ff,#c39bff,#ff9bd2);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .subtitle { color:var(--muted); margin-top:4px; font-size:.88rem; }
+  .home-link {
+    position:absolute; left:0; top:4px; color:var(--muted); text-decoration:none; font-size:.85rem;
+    padding:6px 12px; border-radius:99px; border:1px solid var(--card-border); background:var(--card);
+  }
+  .home-link:hover { color:var(--text); }
+  @media (max-width:640px){
+    body { padding:12px 12px 16px; }
+    .home-link { position:static; display:inline-block; margin-bottom:6px; padding:4px 10px; font-size:.78rem; }
+    .subtitle { font-size:.76rem; }
+    .controls { gap:6px; margin:10px 0 8px; }
+    .chip { padding:5px 10px; font-size:.78rem; gap:5px; }
+    .search { padding:6px 12px; font-size:.82rem; }
+    .btn { padding:6px 11px; font-size:.78rem; }
+    .info { font-size:.74rem; }
+    .stage { border-radius:20px; }
+  }
+
+  /* ===== controls ===== */
+  .controls { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; align-items:center; margin:14px 0 10px; max-width:1200px; }
+  .chip {
+    display:flex; align-items:center; gap:7px; padding:7px 14px; border-radius:99px; cursor:pointer;
+    font-weight:600; font-size:.85rem; background:var(--card); border:1px solid var(--card-border);
+    color:var(--muted); transition:all .18s; user-select:none; font-family:inherit;
+  }
+  .chip::before { content:""; width:9px; height:9px; border-radius:50%; background:var(--c,#888); box-shadow:0 0 9px var(--c,#888); opacity:.35; }
+  .chip:hover { color:var(--text); transform:translateY(-1px); }
+  .chip.on { color:var(--text); border-color:var(--c,#888); box-shadow:0 0 18px -6px var(--c,#888); }
+  .chip.on::before { opacity:1; }
+  .chip .cnt { font-weight:400; font-size:.74rem; opacity:.7; }
+  .chip.plain::before { display:none; }
+  .search {
+    padding:8px 14px; border-radius:99px; border:1px solid var(--card-border); background:rgba(255,255,255,.06);
+    color:var(--text); font-family:inherit; font-size:.88rem; width:min(260px,100%); outline:none;
+  }
+  .search:focus { border-color:#7fe7ff; }
+  .toggle { display:flex; align-items:center; gap:6px; color:var(--muted); font-size:.82rem; cursor:pointer; user-select:none; }
+  .toggle input { accent-color:#7fe7ff; }
+
+  /* ===== stage ===== */
+  .stage {
+    position:relative; width:100%; max-width:1200px; height:max(440px, calc(100vh - 210px));
+    border-radius:26px; border:1px solid var(--card-border); background:rgba(255,255,255,.025);
+    overflow:hidden; touch-action:manipulation;
+  }
+  .stage svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  .bar {
+    position:absolute; left:12px; right:12px; top:10px; display:flex; justify-content:space-between; align-items:center;
+    gap:8px; z-index:5; pointer-events:none; flex-wrap:wrap;
+  }
+  .bar > * { pointer-events:auto; }
+  .btn {
+    padding:7px 14px; border-radius:99px; border:1px solid var(--card-border); background:rgba(20,24,48,.75);
+    color:var(--text); font-family:inherit; font-size:.84rem; cursor:pointer; backdrop-filter:blur(8px);
+  }
+  .btn:hover { border-color:#7fe7ff; }
+  .btn:disabled { opacity:.35; cursor:default; }
+  .info { color:var(--muted); font-size:.8rem; background:rgba(20,24,48,.6); padding:5px 12px; border-radius:99px; }
+  .hint { position:absolute; bottom:12px; left:0; right:0; text-align:center; color:var(--muted); font-size:.8rem; pointer-events:none; z-index:4; padding:0 12px; }
+  .empty { position:absolute; inset:0; display:none; align-items:center; justify-content:center; color:var(--muted); text-align:center; padding:20px; }
+
+  /* ===== soap bubble ===== */
+  .bubble {
+    position:absolute; left:0; top:0; border-radius:50%; cursor:pointer; user-select:none;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+    background:
+      radial-gradient(circle at 32% 26%, rgba(255,255,255,.75) 0 4%, rgba(255,255,255,0) 11%),
+      radial-gradient(circle at 70% 78%, rgba(255,255,255,.18) 0 3%, rgba(255,255,255,0) 9%),
+      radial-gradient(circle at 50% 50%, rgba(255,255,255,0) 55%, rgba(140,220,255,.12) 70%, rgba(220,150,255,.28) 86%, rgba(255,255,255,.5) 100%);
+    box-shadow:
+      inset 0 0 16px rgba(255,255,255,.14),
+      inset -10px -12px 26px rgba(150,90,255,.22),
+      inset 10px 12px 24px rgba(60,220,255,.16),
+      0 0 0 1px rgba(255,255,255,.12),
+      0 8px 30px -10px rgba(0,0,0,.6);
+    will-change:transform;
+    transition:filter .2s;
+  }
+  .bubble::before {
+    content:""; position:absolute; inset:0; border-radius:50%; pointer-events:none;
+    background:conic-gradient(from var(--rot,0deg), rgba(255,120,200,.55), rgba(255,230,120,.45), rgba(120,255,200,.45), rgba(110,190,255,.55), rgba(200,130,255,.55), rgba(255,120,200,.55));
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 1px));
+            mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 1px));
+    opacity:.7; animation:spin 9s linear infinite;
+  }
+  .bubble::after {
+    content:""; position:absolute; inset:0; border-radius:50%; pointer-events:none;
+    box-shadow:0 0 22px -4px var(--lc,transparent), inset 0 0 0 2px var(--lc,transparent);
+    opacity:.55;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .bubble:hover { filter:brightness(1.25); }
+  .bubble .zh { font-weight:700; line-height:1.05; text-shadow:0 2px 10px rgba(0,0,0,.55); white-space:nowrap; position:relative; z-index:1; }
+  .bubble .py { font-size:.72rem; color:#bfeaff; line-height:1.15; margin-bottom:2px; display:none; position:relative; z-index:1; }
+  .bubble .th { font-size:.68rem; color:#ffe9a8; line-height:1.15; display:none; max-width:86%; position:relative; z-index:1;
+                overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .bubble .badge { position:absolute; bottom:12%; font-size:.6rem; color:var(--muted); z-index:1; }
+  .bubble.reveal .py, .bubble.reveal .th { display:block; }
+  .bubble.reveal { background-color:rgba(20,30,70,.35); }
+  .bubble.picked { filter:brightness(1.35); }
+  .bubble.picked::after { opacity:1; }
+  .bubble.center { cursor:pointer; }
+  .bubble.center .zh { color:#fff; }
+  .bubble.in { animation:popin .55s cubic-bezier(.2,1.6,.4,1) both; }
+  @keyframes popin { from { opacity:0; } to { opacity:1; } }
+
+  .drop { position:absolute; left:0; top:0; width:8px; height:8px; border-radius:50%; pointer-events:none;
+          background:radial-gradient(circle at 35% 35%, #fff, rgba(160,220,255,.6) 60%, transparent 70%); }
+  .ring { position:absolute; left:0; top:0; border-radius:50%; pointer-events:none; border:2px solid rgba(190,230,255,.7); }
+
+  /* ===== detail sheet ===== */
+  .sheet {
+    position:fixed; left:50%; bottom:16px; transform:translate(-50%, 140%);
+    width:min(560px, calc(100vw - 32px)); z-index:20;
+    background:rgba(18,22,46,.92); border:1px solid var(--card-border); border-radius:22px;
+    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    padding:16px 18px; box-shadow:0 24px 60px -18px rgba(0,0,0,.8);
+    transition:transform .35s cubic-bezier(.2,1.2,.4,1);
+  }
+  .sheet.show { transform:translate(-50%, 0); }
+  .sheet .row { display:flex; align-items:center; gap:14px; }
+  .sheet .big { font-size:2.4rem; font-weight:800; line-height:1; }
+  .sheet .meta { flex:1; min-width:0; }
+  .sheet .spy { color:#7fe7ff; font-size:1.1rem; font-weight:600; }
+  .sheet .sth { color:#ffe9a8; font-size:1rem; margin-top:2px; }
+  .sheet .tags { display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
+  .tag { font-size:.72rem; padding:2px 9px; border-radius:99px; border:1px solid var(--c,var(--card-border)); color:var(--c,var(--muted)); }
+  .icon-btn { width:42px; height:42px; border-radius:50%; border:1px solid var(--card-border); background:rgba(255,255,255,.06); color:var(--text); font-size:1.15rem; cursor:pointer; flex-shrink:0; }
+  .icon-btn:hover { border-color:#7fe7ff; }
+  .close { position:absolute; top:8px; right:10px; width:30px; height:30px; font-size:.9rem; }
+  .chars { margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; color:var(--muted); font-size:.8rem; }
+  .char-btn { font-size:1.15rem; padding:4px 12px; border-radius:12px; border:1px solid rgba(127,231,255,.35); background:rgba(127,231,255,.08); color:var(--text); cursor:pointer; }
+  .char-btn:hover { background:rgba(127,231,255,.2); }
+  .char-btn.cur { opacity:.4; cursor:default; }
+</style>
+</head>
+<body>
+<div class="bg-blob b1"></div>
+<div class="bg-blob b2"></div>
+
+<header>
+  <a class="home-link" href="index.html">← วงล้อคำศัพท์</a>
+  <h1>🫧 ฟองสบู่รากศัพท์จีน</h1>
+  <div class="subtitle">แตะฟองเพื่อให้แตกออกเป็นคำศัพท์ที่มีตัวอักษรนั้น · แตะคำเพื่อดูพินอินและคำแปล</div>
+</header>
+
+<div class="controls">
+  <div id="levelChips" style="display:contents"></div>
+  <label class="toggle" title="รวมคำศัพท์ของระดับที่ต่ำกว่าด้วย"><input type="checkbox" id="cumu"> รวมระดับที่ต่ำกว่า</label>
+  <input class="search han" id="search" placeholder="ค้นหา: 不 / bu / ไม่" autocomplete="off">
+</div>
+
+<div class="stage" id="stage">
+  <svg id="lines"></svg>
+  <div class="bar" id="bar">
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn" id="backBtn" style="display:none">← ฟองทั้งหมด</button>
+      <span class="info" id="info"></span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" id="revealAll" style="display:none">👁 แสดงคำแปลทั้งหมด</button>
+      <button class="btn" id="prevBtn">‹</button>
+      <button class="btn" id="nextBtn">ชุดถัดไป ›</button>
+    </div>
+  </div>
+  <div class="empty" id="empty">ไม่พบรากศัพท์ที่ตรงกับคำค้นหา</div>
+  <div class="hint" id="hint">แตะฟองสบู่เพื่อให้มันแตก 💥</div>
+</div>
+
+<div class="sheet" id="sheet">
+  <button class="icon-btn close" id="closeSheet" aria-label="ปิด">✕</button>
+  <div class="row">
+    <div class="big han" id="sZh"></div>
+    <div class="meta">
+      <div class="spy" id="sPy"></div>
+      <div class="sth" id="sTh"></div>
+      <div class="tags" id="sTags"></div>
+    </div>
+    <button class="icon-btn" id="speakBtn" aria-label="ฟังเสียง" style="margin-right:26px">🔊</button>
+  </div>
+  <div class="chars" id="sChars"></div>
+</div>
+
+<script src="vocab-data.js"></script>
+<script>
+const LEVELS = {
+  1:{label:"HSK1", color:"#4dd0a0"},
+  2:{label:"HSK2", color:"#00bcd4"},
+  3:{label:"HSK3", color:"#5c9dfa"},
+  4:{label:"HSK4", color:"#ffa502"},
+  5:{label:"HSK5", color:"#f06292"},
+};
+const POS_TH = { "n.":"คำนาม","v.":"คำกริยา","adj.":"คุณศัพท์","adv.":"กริยาวิเศษณ์","m.":"ลักษณนาม","num.":"ตัวเลข",
+  "pron.":"สรรพนาม","prep.":"บุพบท","conj.":"คำเชื่อม","part.":"คำช่วย","int.":"คำอุทาน","expr.":"สำนวน/วลี","aux.":"กริยาช่วย",
+  "onom.":"คำเลียนเสียง","pref.":"อุปสรรค","suf.":"ปัจจัย","num.-m.":"ตัวเลข+ลักษณนาม" };
+
+const isHan = c => /\p{Script=Han}/u.test(c);
+const plain = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z]/gi,"").toLowerCase();
+const store = {
+  get(k,d){ try { const v = localStorage.getItem(k); return v===null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+
+// คำแรกสุดของแต่ละตัวอักษร (ใช้แสดงความหมายของรากศัพท์เอง)
+const SELF = new Map();
+for (const w of VOCAB) if (!SELF.has(w[0]) || w[3] < SELF.get(w[0])[3]) SELF.set(w[0], w);
+
+// ===== state =====
+let level = store.get("bub_level", 1);      // 1..5 หรือ 0 = ทั้งหมด
+let cumulative = store.get("bub_cumu", false);
+let roots = [], filtered = [], page = 0;
+let mode = "field";                           // field | branch
+let branch = null;                            // { char, kids, page }
+let bubbles = [];                             // live bubble objects
+let lines = [];
+let revealAll = false;
+let fieldTop = 50;
+const revealLabel = () => (revealAll ? "🙈 " : "👁 ") + (innerWidth < 560 ? "คำแปล" : (revealAll ? "ซ่อนคำแปล" : "แสดงคำแปลทั้งหมด"));
+function fitStage(){
+  const h = Math.max(440, innerHeight - (stage.getBoundingClientRect().top + window.scrollY) - 14);
+  stage.style.height = h + "px";
+}
+
+const stage = document.getElementById("stage");
+const svg = document.getElementById("lines");
+const $ = id => document.getElementById(id);
+
+function inLevel(w){
+  if (level === 0) return true;
+  return cumulative ? w[3] <= level : w[3] === level;
+}
+
+function buildRoots(){
+  const map = new Map();
+  for (const w of VOCAB) {
+    if (!inLevel(w)) continue;
+    for (const c of new Set([...w[0]].filter(isHan))) {
+      if (!map.has(c)) map.set(c, []);
+      map.get(c).push(w);
+    }
+  }
+  roots = [];
+  for (const [c, list] of map) {
+    const kids = list.filter(w => w[0] !== c);
+    if (kids.length >= 2) roots.push({ c, kids });
+  }
+  roots.sort((a,b) => b.kids.length - a.kids.length || a.c.localeCompare(b.c, "zh"));
+}
+
+function kidsOf(c){
+  let kids = VOCAB.filter(w => inLevel(w) && w[0] !== c && w[0].includes(c));
+  if (!kids.length) kids = VOCAB.filter(w => w[0] !== c && w[0].includes(c)); // ไม่มีในระดับนี้ → ใช้ทุกระดับ
+  // คำที่ขึ้นต้นด้วยรากศัพท์มาก่อน แล้วเรียงตามระดับ / ความยาว
+  return kids.sort((a,b) => (b[0].startsWith(c) - a[0].startsWith(c)) || a[3]-b[3] || a[0].length-b[0].length);
+}
+
+function applySearch(){
+  const q = $("search").value.trim();
+  if (!q) { filtered = roots; return; }
+  const hanQ = [...q].filter(isHan);
+  const pq = plain(q);
+  filtered = roots.filter(r => {
+    if (hanQ.length) return hanQ.includes(r.c);
+    const s = SELF.get(r.c);
+    if (!s) return false;
+    return (pq && plain(s[1]).startsWith(pq)) || s[2].includes(q);
+  });
+}
+
+// ===== level chips =====
+function renderChips(){
+  const box = $("levelChips");
+  box.innerHTML = "";
+  const opts = [[1],[2],[3],[4],[5],[0]];
+  for (const [L] of opts) {
+    const b = document.createElement("button");
+    b.className = "chip" + (L===level ? " on" : "") + (L===0 ? " plain" : "");
+    if (L) b.style.setProperty("--c", LEVELS[L].color);
+    b.innerHTML = (L ? LEVELS[L].label : "🌐 ทั้งหมด");
+    b.onclick = () => { level = L; store.set("bub_level", L); refresh(); };
+    box.appendChild(b);
+  }
+  $("cumu").checked = cumulative;
+  $("cumu").parentElement.style.opacity = level===0 || level===1 ? .4 : 1;
+}
+
+function refresh(){
+  renderChips();
+  buildRoots();
+  applySearch();
+  page = 0;
+  if (mode === "branch" && branch) openBranch(branch.char, false);
+  else showField();
+}
+
+// ===== bubble DOM =====
+function makeBubble({ zh, r, py="", th="", lc="", badge="", cls="" }){
+  const el = document.createElement("div");
+  el.className = "bubble han " + cls;
+  el.style.width = el.style.height = (2*r) + "px";
+  el.style.setProperty("--rot", (Math.random()*360|0) + "deg");
+  el.style.animationDelay = "0s";
+  if (lc) el.style.setProperty("--lc", lc);
+  const len = [...zh].length;
+  const fs = Math.min(r*0.9, (r*1.55)/Math.max(1,len));
+  el.innerHTML = `<div class="py"></div><div class="zh" style="font-size:${fs}px"></div><div class="th"></div>` + (badge ? `<div class="badge"></div>` : "");
+  el.querySelector(".zh").textContent = zh;
+  el.querySelector(".py").textContent = py;
+  el.querySelector(".th").textContent = th;
+  if (badge) el.querySelector(".badge").textContent = badge;
+  el.querySelector(".zh").style.textShadow = "0 2px 10px rgba(0,0,0,.6)";
+  stage.appendChild(el);
+  return el;
+}
+
+function clearBubbles(){
+  for (const b of bubbles) b.el.remove();
+  bubbles = [];
+  svg.innerHTML = ""; lines = [];
+}
+
+const stageSize = () => ({ W: stage.clientWidth, H: stage.clientHeight });
+
+// ===== field (main view) =====
+function fieldCapacity(){
+  const { W, H } = stageSize();
+  const avgR = W < 560 ? 34 : 46;
+  return Math.max(8, Math.min(42, Math.floor((W*(H-60)) / (Math.PI*avgR*avgR*3.1))));
+}
+
+function showField(){
+  mode = "field"; branch = null;
+  hideSheet();
+  clearBubbles();
+  $("backBtn").style.display = "none";
+  $("revealAll").style.display = "none";
+  $("hint").textContent = "แตะฟองสบู่เพื่อให้มันแตก 💥  (ฟองใหญ่ = มีคำแตกแขนงเยอะ)";
+  const cap = fieldCapacity();
+  const pages = Math.max(1, Math.ceil(filtered.length / cap));
+  page = Math.min(page, pages-1);
+  const slice = filtered.slice(page*cap, page*cap + cap);
+  $("empty").style.display = filtered.length ? "none" : "flex";
+  $("info").textContent = filtered.length
+    ? `รากศัพท์ ${filtered.length} ตัว · ชุดที่ ${page+1}/${pages}` : "";
+  $("prevBtn").style.display = $("nextBtn").style.display = pages > 1 ? "" : "none";
+  $("prevBtn").disabled = page === 0;
+  $("nextBtn").textContent = page < pages-1 ? "ชุดถัดไป ›" : "เริ่มชุดแรก ↺";
+
+  const { W, H } = stageSize();
+  fieldTop = barBottom();
+  const small = W < 560;
+  const maxK = Math.max(...slice.map(r=>r.kids.length), 2);
+  const minR = small ? 26 : 34, maxR = small ? 46 : 66;
+  slice.forEach((root, i) => {
+    const t = Math.sqrt((root.kids.length-2) / Math.max(1, maxK-2));
+    const r = minR + (maxR-minR)*t;
+    const el = makeBubble({ zh: root.c, r });
+    el.title = `${root.kids.length} คำ`;
+    const b = {
+      el, r, root,
+      x: r + Math.random()*(W-2*r), y: fieldTop + r + Math.random()*Math.max(1,H-fieldTop-30-2*r),
+      vx: (Math.random()-.5)*0.6, vy: (Math.random()-.5)*0.6,
+      phase: Math.random()*Math.PI*2, scale: 0, appear: i*25
+    };
+    el.addEventListener("click", ev => { ev.stopPropagation(); popRoot(b); });
+    bubbles.push(b);
+  });
+}
+
+function popRoot(b){
+  if (b.popping) return;
+  b.popping = true;
+  burst(b.x, b.y, b.r);
+  b.el.style.transition = "opacity .18s, filter .18s";
+  b.el.style.opacity = "0";
+  setTimeout(() => openBranch(b.root.c, true, { x:b.x, y:b.y }), 230);
+}
+
+function burst(x, y, r){
+  const ring = document.createElement("div");
+  ring.className = "ring";
+  ring.style.width = ring.style.height = (2*r)+"px";
+  ring.style.transform = `translate(${x-r}px,${y-r}px) scale(1)`;
+  stage.appendChild(ring);
+  ring.animate([
+    { transform:`translate(${x-r}px,${y-r}px) scale(1)`, opacity:.9 },
+    { transform:`translate(${x-r}px,${y-r}px) scale(1.6)`, opacity:0 }
+  ], { duration:380, easing:"ease-out" }).onfinish = () => ring.remove();
+  const n = 14;
+  for (let i = 0; i < n; i++) {
+    const d = document.createElement("div");
+    d.className = "drop";
+    const a = (i/n)*Math.PI*2 + Math.random()*.3;
+    const dist = r*(1.1 + Math.random()*0.9);
+    const s = 0.5 + Math.random()*1.1;
+    stage.appendChild(d);
+    d.animate([
+      { transform:`translate(${x+Math.cos(a)*r*.8-4}px,${y+Math.sin(a)*r*.8-4}px) scale(${s})`, opacity:1 },
+      { transform:`translate(${x+Math.cos(a)*dist-4}px,${y+Math.sin(a)*dist+12-4}px) scale(${s*.3})`, opacity:0 }
+    ], { duration:480 + Math.random()*200, easing:"cubic-bezier(.1,.8,.3,1)" }).onfinish = () => d.remove();
+  }
+}
+
+// ===== branch view =====
+function ellipseRingPoints(Rx, Ry, count, phase){
+  // จุดห่างเท่ากันตามความยาวเส้นรอบวงรี
+  const N = 360, pts = [], cum = [0];
+  for (let i = 0; i <= N; i++) { const t = i/N*Math.PI*2 + phase; pts.push([Math.cos(t)*Rx, Math.sin(t)*Ry]); }
+  for (let i = 1; i <= N; i++) cum.push(cum[i-1] + Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]));
+  const total = cum[N], out = [];
+  let j = 0;
+  for (let k = 0; k < count; k++) {
+    const target = k/count*total;
+    while (j < N && cum[j+1] < target) j++;
+    out.push(pts[j]);
+  }
+  return { out, total };
+}
+
+const barBottom = () => $("bar").offsetTop + $("bar").offsetHeight + 8;
+function layoutBranch(n, W, H, centerR){
+  const top = barBottom(), bottom = 34;
+  const availH = H - top - bottom;
+  const cy = top + availH/2, cx = W/2;
+  const ax = Math.max(1, Math.min(1.9, W/availH)), ay = Math.max(1, Math.min(2, availH/W));
+  const maxX = W/2 - 6, maxY = availH/2;
+  const rcMin = W < 560 ? 26 : 32;
+  for (let rc = (W < 560 ? 38 : 50); rc >= rcMin; rc -= 2) {
+    const gap = rc < 36 ? 8 : 12, step = 2*rc + gap;
+    const pos = [];
+    let R = centerR + rc + gap + 6, ring = 0;
+    while (true) {
+      if (R*ax + rc > maxX || R*ay + rc > maxY) break;
+      const perim = ellipseRingPoints(R*ax, R*ay, 1, 0).total;
+      const cap = Math.max(1, Math.floor(perim / step));
+      const take = Math.min(cap, n - pos.length);
+      const { out } = ellipseRingPoints(R*ax, R*ay, take, ring*0.55 - Math.PI/2);
+      for (const p of out) pos.push({ x: cx + p[0], y: cy + p[1] });
+      if (pos.length >= n) break;
+      R += step; ring++;
+    }
+    if (pos.length >= n || rc - 2 < rcMin) return { rc, pos, cx, cy };
+  }
+}
+
+function openBranch(c, animate=true, from=null, keepPage=false){
+  const kids = kidsOf(c);
+  if (!branch || branch.char !== c || !keepPage) branch = { char:c, kids, page:0 };
+  else branch.kids = kids;
+  mode = "branch";
+  clearBubbles();
+  hideSheet();
+  $("empty").style.display = "none";
+  $("backBtn").style.display = "";
+  $("revealAll").style.display = "";
+  $("revealAll").textContent = revealLabel();
+  $("hint").textContent = "แตะคำเพื่อดูพินอินและคำแปล · แตะฟองตรงกลางเพื่อดูความหมายของรากศัพท์";
+
+  const { W, H } = stageSize();
+  const small = W < 560;
+  const centerR = small ? 38 : 60;
+  // หาว่าหน้าหนึ่งใส่ได้กี่ฟอง
+  let L = layoutBranch(kids.length, W, H, centerR);
+  const perPage = Math.max(1, L.pos.length);
+  const pages = Math.ceil(kids.length / perPage);
+  branch.page = Math.min(branch.page, pages-1);
+  branch.pages = pages;
+  const slice = kids.slice(branch.page*perPage, branch.page*perPage + perPage);
+  if (slice.length < kids.length) L = layoutBranch(slice.length, W, H, centerR);
+
+  $("info").textContent = `${c} · ${kids.length} คำ` + (pages > 1 ? ` · หน้า ${branch.page+1}/${pages}` : "");
+  $("prevBtn").style.display = $("nextBtn").style.display = pages > 1 ? "" : "none";
+  $("prevBtn").disabled = branch.page === 0;
+  $("nextBtn").textContent = branch.page < pages-1 ? "หน้าถัดไป ›" : "หน้าแรก ↺";
+
+  // ฟองตรงกลาง
+  const self = SELF.get(c);
+  const cel = makeBubble({ zh:c, r:centerR, py: self ? self[1] : "", th: self ? self[2] : "", cls:"center" });
+  const cb = { el:cel, r:centerR, x: from ? from.x : L.cx, y: from ? from.y : L.cy, ax:L.cx, ay:L.cy, phase:0, center:true, scale: animate ? 0 : 1, appear:0, word:self, isRoot:true };
+  cel.addEventListener("click", ev => {
+    ev.stopPropagation();
+    if (self) { cel.classList.add("reveal"); showSheet(self, cb); }
+    else showSheet([c, "", "(ไม่มีคำนี้เดี่ยว ๆ ในคลังคำศัพท์)", 0, ""], cb);
+  });
+  bubbles.push(cb);
+
+  slice.forEach((w, i) => {
+    const lc = LEVELS[w[3]].color;
+    const short = w[2].split(/[\/,;，]/)[0].trim();
+    const el = makeBubble({ zh:w[0], r:L.rc, py:w[1], th:short, lc });
+    if (revealAll) el.classList.add("reveal");
+    const p = L.pos[i];
+    const b = { el, r:L.rc, x:L.cx, y:L.cy, ax:p.x, ay:p.y, phase:Math.random()*Math.PI*2, scale: 0, appear: animate ? 120 + i*28 : 0, word:w };
+    el.addEventListener("click", ev => {
+      ev.stopPropagation();
+      el.classList.add("reveal");
+      showSheet(w, b);
+    });
+    bubbles.push(b);
+    const ln = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    ln.setAttribute("stroke", lc);
+    ln.setAttribute("stroke-opacity", ".28");
+    ln.setAttribute("stroke-width", "1.5");
+    svg.appendChild(ln);
+    lines.push({ ln, b });
+  });
+}
+
+// ===== detail sheet =====
+let sheetWord = null, pickedBubble = null;
+function showSheet(w, b){
+  sheetWord = w;
+  if (pickedBubble) pickedBubble.el.classList.remove("picked");
+  pickedBubble = b; if (b) b.el.classList.add("picked");
+  $("sZh").textContent = w[0];
+  $("sPy").textContent = w[1];
+  $("sTh").textContent = w[2];
+  const tags = $("sTags"); tags.innerHTML = "";
+  if (w[3]) {
+    const t = document.createElement("span"); t.className = "tag";
+    t.style.setProperty("--c", LEVELS[w[3]].color); t.textContent = LEVELS[w[3]].label; tags.appendChild(t);
+  }
+  if (w[4]) {
+    const t = document.createElement("span"); t.className = "tag";
+    t.textContent = w[4].split(/[\/,]/).map(p => POS_TH[p.trim()] || p.trim()).join(" / "); tags.appendChild(t);
+  }
+  const box = $("sChars"); box.innerHTML = "";
+  const chars = [...new Set([...w[0]].filter(isHan))];
+  if (chars.length > 1 || (branch && chars[0] !== branch.char)) {
+    const lab = document.createElement("span"); lab.textContent = "แตกแขนงต่อจาก:"; box.appendChild(lab);
+    for (const ch of chars) {
+      const btn = document.createElement("button");
+      btn.className = "char-btn han" + (branch && ch === branch.char ? " cur" : "");
+      btn.textContent = ch;
+      btn.onclick = () => {
+        if (branch && ch === branch.char) return;
+        const from = b ? { x:b.x, y:b.y } : null;
+        if (b) burst(b.x, b.y, b.r);
+        openBranch(ch, true, from);
+      };
+      box.appendChild(btn);
+    }
+  }
+  $("sheet").classList.add("show");
+}
+function hideSheet(){
+  $("sheet").classList.remove("show");
+  if (pickedBubble) pickedBubble.el.classList.remove("picked");
+  pickedBubble = null;
+}
+
+let zhVoice = null;
+function pickVoice(){
+  try {
+    const vs = speechSynthesis.getVoices();
+    zhVoice = vs.find(v => /zh[-_]CN/i.test(v.lang)) || vs.find(v => /^zh/i.test(v.lang)) || null;
+  } catch(e){}
+}
+if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(text){
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "zh-CN"; u.rate = .85;
+  if (zhVoice) u.voice = zhVoice;
+  speechSynthesis.speak(u);
+}
+
+// ===== animation loop =====
+let last = performance.now(), t0 = last;
+function tick(now){
+  const dt = Math.min(40, now - last) / 16.67; last = now;
+  const t = (now - t0) / 1000;
+  const { W, H } = stageSize();
+  if (mode === "field") {
+    for (const b of bubbles) {
+      if (b.appear > 0) { b.appear -= dt*16.67; continue; }
+      b.scale += (1 - b.scale) * 0.12 * dt;
+      b.vx += (Math.random()-.5)*0.04*dt + Math.sin(t*0.6 + b.phase)*0.004*dt;
+      b.vy += (Math.random()-.5)*0.04*dt - 0.003*dt;   // ลอยขึ้นเบา ๆ
+      b.vx *= Math.pow(.985, dt); b.vy *= Math.pow(.985, dt);
+      const sp = Math.hypot(b.vx, b.vy), maxS = 0.9;
+      if (sp > maxS) { b.vx *= maxS/sp; b.vy *= maxS/sp; }
+    }
+    for (let i = 0; i < bubbles.length; i++) for (let j = i+1; j < bubbles.length; j++) {
+      const a = bubbles[i], c = bubbles[j];
+      const dx = c.x - a.x, dy = c.y - a.y, d = Math.hypot(dx, dy) || 1, min = a.r + c.r + 4;
+      if (d < min) {
+        const push = (min - d) / d * 0.5 * 0.25;
+        a.x -= dx*push; a.y -= dy*push; c.x += dx*push; c.y += dy*push;
+        const rv = ((c.vx - a.vx)*dx + (c.vy - a.vy)*dy) / d;
+        if (rv < 0) { const k = rv/d*0.5; a.vx += k*dx; a.vy += k*dy; c.vx -= k*dx; c.vy -= k*dy; }
+      }
+    }
+    for (const b of bubbles) {
+      b.x += b.vx*dt; b.y += b.vy*dt;
+      const top = fieldTop;
+      if (b.x < b.r) { b.x = b.r; b.vx = Math.abs(b.vx); }
+      if (b.x > W - b.r) { b.x = W - b.r; b.vx = -Math.abs(b.vx); }
+      if (b.y < top + b.r) { b.y = top + b.r; b.vy = Math.abs(b.vy); }
+      if (b.y > H - 26 - b.r) { b.y = H - 26 - b.r; b.vy = -Math.abs(b.vy); }
+      draw(b);
+    }
+  } else {
+    for (const b of bubbles) {
+      if (b.appear > 0) { b.appear -= dt*16.67; draw(b, true); continue; }
+      const wob = b.center ? 3 : 5;
+      const tx = b.ax + Math.sin(t*0.9 + b.phase)*wob, ty = b.ay + Math.cos(t*0.75 + b.phase*1.3)*wob;
+      b.x += (tx - b.x) * 0.1 * dt; b.y += (ty - b.y) * 0.1 * dt;
+      b.scale += (1 - b.scale) * 0.14 * dt;
+      draw(b);
+    }
+    const c = bubbles[0];
+    for (const { ln, b } of lines) {
+      const vis = b.appear > 0 ? 0 : b.scale;
+      const dx = b.x - c.x, dy = b.y - c.y, d = Math.hypot(dx, dy) || 1;
+      ln.setAttribute("x1", c.x + dx/d*c.r*c.scale); ln.setAttribute("y1", c.y + dy/d*c.r*c.scale);
+      ln.setAttribute("x2", b.x - dx/d*b.r*b.scale); ln.setAttribute("y2", b.y - dy/d*b.r*b.scale);
+      ln.style.opacity = vis;
+    }
+  }
+  requestAnimationFrame(tick);
+}
+function draw(b, hidden){
+  const s = hidden ? 0 : b.scale * (b.el.classList.contains("reveal") && !b.center ? 1.18 : 1);
+  b.el.style.transform = `translate3d(${b.x - b.r}px, ${b.y - b.r}px, 0) scale(${s})`;
+  b.el.style.zIndex = b.el.classList.contains("picked") ? 3 : (b.center ? 2 : 1);
+}
+
+// ===== events =====
+$("backBtn").onclick = () => showField();
+$("nextBtn").onclick = () => {
+  if (mode === "field") {
+    const pages = Math.max(1, Math.ceil(filtered.length / fieldCapacity()));
+    page = (page + 1) % pages; showField();
+  } else {
+    branch.page = (branch.page + 1) % branch.pages; openBranch(branch.char, true, null, true);
+  }
+};
+$("prevBtn").onclick = () => {
+  if (mode === "field") { page = Math.max(0, page-1); showField(); }
+  else { branch.page = Math.max(0, branch.page-1); openBranch(branch.char, true, null, true); }
+};
+$("revealAll").onclick = () => {
+  revealAll = !revealAll;
+  $("revealAll").textContent = revealLabel();
+  for (const b of bubbles) if (!b.center) b.el.classList.toggle("reveal", revealAll);
+};
+$("cumu").onchange = e => { cumulative = e.target.checked; store.set("bub_cumu", cumulative); refresh(); };
+$("search").addEventListener("input", () => { applySearch(); page = 0; if (mode === "field") showField(); });
+$("search").addEventListener("keydown", e => {
+  if (e.key !== "Enter") return;
+  const hanQ = [...$("search").value].filter(isHan);
+  if (hanQ.length) openBranch(hanQ[0], true);
+  else if (filtered.length) openBranch(filtered[0].c, true);
+});
+$("closeSheet").onclick = hideSheet;
+$("speakBtn").onclick = () => { if (sheetWord) speak(sheetWord[0]); };
+stage.addEventListener("click", () => hideSheet());
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") { if ($("sheet").classList.contains("show")) hideSheet(); else if (mode === "branch") showField(); }
+});
+let resizeTimer, lastW = innerWidth, lastH = innerHeight;
+window.addEventListener("resize", () => {
+  // มือถือยิง resize ตอนแถบ URL ยุบ/ขยาย — จัดใหม่เฉพาะเมื่อขนาดเปลี่ยนจริง
+  if (innerWidth === lastW && Math.abs(innerHeight - lastH) < 120) return;
+  lastW = innerWidth; lastH = innerHeight;
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { fitStage(); if (mode === "branch") openBranch(branch.char, false, null, true); else showField(); }, 200);
+});
+
+renderChips();
+fitStage();
+refresh();
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
