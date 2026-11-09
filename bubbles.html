@@ -292,7 +292,7 @@ controls.enablePan = false; controls.rotateSpeed = 0.6; controls.zoomSpeed = 0.7
 
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
-const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.45, 0.5, 0.8);
+const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.28, 0.4, 0.9);
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
 
@@ -426,26 +426,31 @@ function drawLabel(b) {
   if (!b.reveal) {
     const fs = Math.min(S * 0.5, (S * 0.92) / Math.max(1, len));
     g.font = `900 ${fs}px "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif`;
-    g.shadowColor = b.glow; g.shadowBlur = S * 0.06;
+    g.lineJoin = "round";
+    g.shadowColor = b.glow; g.shadowBlur = S * 0.035;
+    g.lineWidth = fs * 0.12; g.strokeStyle = "rgba(8,10,30,.85)";
+    g.strokeText(zh, S / 2, S * 0.53);
+    g.shadowBlur = 0;
     g.fillStyle = "#ffffff";
-    g.fillText(zh, S / 2, S * 0.53);
-    g.shadowBlur = S * 0.02; g.shadowColor = "rgba(0,0,0,.8)";
     g.fillText(zh, S / 2, S * 0.53);
   } else {
     const w = b.word;
     const py = w ? w[1] : "", mean = w ? shortMean(w) : "";
-    const fs = Math.min(S * 0.3, (S * 0.74) / Math.max(1, len));
-    g.shadowColor = "rgba(0,0,0,.85)"; g.shadowBlur = S * 0.025;
-    g.font = `700 ${S * 0.1}px "Noto Sans Thai",sans-serif`;
+    // พื้นมืดโปร่งแสงในฟอง ให้ตัวหนังสืออ่านชัด
+    const gr = g.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S * 0.5);
+    gr.addColorStop(0, "rgba(6,8,26,.78)"); gr.addColorStop(.8, "rgba(6,8,26,.6)"); gr.addColorStop(1, "rgba(6,8,26,0)");
+    g.fillStyle = gr; g.beginPath(); g.arc(S / 2, S / 2, S * 0.5, 0, Math.PI * 2); g.fill();
+    const fs = Math.min(S * 0.27, (S * 0.7) / Math.max(1, len));
+    g.font = `700 ${S * 0.115}px "Noto Sans Thai",sans-serif`;
     g.fillStyle = "#9ff1ff";
     let pyT = py; while (pyT.length > 2 && g.measureText(pyT).width > S * 0.8) pyT = pyT.slice(0, -1);
     g.fillText(pyT, S / 2, S * 0.27);
     g.font = `900 ${fs}px "Noto Sans SC","PingFang SC",sans-serif`;
     g.fillStyle = "#ffffff";
     g.fillText(zh, S / 2, S * 0.47);
-    g.font = `600 ${S * 0.085}px "Noto Sans Thai",sans-serif`;
-    g.fillStyle = w && thaiOf(w) ? "#ffe08a" : "#d9dcf0";
-    wrapLines(g, mean, S * 0.72, 2).forEach((l, i) => g.fillText(l, S / 2, S * (0.66 + i * 0.1)));
+    g.font = `700 ${S * 0.1}px "Noto Sans Thai",sans-serif`;
+    g.fillStyle = w && thaiOf(w) ? "#ffe08a" : "#e3e6f7";
+    wrapLines(g, mean, S * 0.74, 2).forEach((l, i) => g.fillText(l, S / 2, S * (0.67 + i * 0.115)));
   }
   b.tex.needsUpdate = true;
 }
@@ -567,7 +572,7 @@ const FIELD_D = 16;
 function measure() {
   W = innerWidth; H = innerHeight;
   insetTop = $("top").getBoundingClientRect().bottom + 6;
-  insetBottom = H - $("dock").getBoundingClientRect().top + 6;
+  insetBottom = H - $("dock").getBoundingClientRect().top + 30;   // เผื่อที่ให้ข้อความคำแนะนำ
   Hv = H + Math.abs(insetTop - insetBottom);
   applyView();
   renderer.setSize(W, H, false);
@@ -587,10 +592,6 @@ function applyView() {
 }
 // ครึ่งความกว้าง/สูงของพื้นที่ว่างตรงกลางจอ (หน่วยโลก) ที่ระยะ d
 const regionHalf = d => ({ w: d * tanH * W / Hv, h: d * tanH * (H - insetTop - insetBottom) / Hv });
-function fitDistance(radius) {
-  const kx = tanH * W / Hv, ky = tanH * (H - insetTop - insetBottom) / Hv;
-  return radius * 1.04 / Math.min(kx, ky) + radius * 0.35;
-}
 
 let camTween = null;
 function flyCamera(toPos, toTarget, dur = 1.1, after) {
@@ -600,23 +601,18 @@ function flyCamera(toPos, toTarget, dur = 1.1, after) {
 const ease = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
 const easeBack = k => { const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); };
 
-function setControlsFor(m) {
-  if (m === "field") {
-    controls.minAzimuthAngle = -0.45; controls.maxAzimuthAngle = 0.45;
-    controls.minPolarAngle = Math.PI / 2 - 0.35; controls.maxPolarAngle = Math.PI / 2 + 0.35;
-    controls.minDistance = FIELD_D * 0.55; controls.maxDistance = FIELD_D * 1.25;
-  } else {
-    controls.minAzimuthAngle = -Infinity; controls.maxAzimuthAngle = Infinity;
-    controls.minPolarAngle = 0.15; controls.maxPolarAngle = Math.PI - 0.15;
-    controls.minDistance = branchD * 0.45; controls.maxDistance = branchD * 1.8;
-  }
+function setControlsFor() {
+  // เอียงมุมมองได้นิดหน่อยให้รู้สึกเป็น 3D แต่ไม่หมุนจนคำซ้อนกัน
+  controls.minAzimuthAngle = -0.35; controls.maxAzimuthAngle = 0.35;
+  controls.minPolarAngle = Math.PI / 2 - 0.28; controls.maxPolarAngle = Math.PI / 2 + 0.28;
+  controls.minDistance = FIELD_D * 0.6; controls.maxDistance = FIELD_D * 1.2;
 }
 
 // ================= modes =================
 let mode = "field";
 let branch = null;
-let branchD = 20, center = null, revealAll = false;
-let lines = null, pulses = null, halos = [];
+let center = null, revealAll = false;
+let lines = null, pulses = null;
 
 const rScale = () => Math.max(0.62, Math.min(1, regionHalf(FIELD_D).w / 7));
 function fieldCapacity() {
@@ -625,13 +621,12 @@ function fieldCapacity() {
 }
 
 function showField(dir = 1) {
-  const wasBranch = mode === "branch";
   mode = "field"; branch = null;
   hideSheet();
   clearBranch();
   for (const b of bubbles.filter(b => b.kind === "root" && !b.dying)) killBubble(b, new THREE.Vector3(0, dir * 3, 0));
   $("back").style.display = "none"; $("revealAll").style.display = "none";
-  setHint("แตะฟองสบู่ให้แตกออกเป็นคำศัพท์ 💥 · ลากเพื่อหมุนมุมมอง");
+  setHint("แตะฟองสบู่ให้แตกออกเป็นคำศัพท์ 💥 (ฟองใหญ่ = มีคำเยอะ)");
   const cap = fieldCapacity();
   const pages = Math.max(1, Math.ceil(filtered.length / cap));
   fieldPage = Math.min(fieldPage, pages - 1);
@@ -661,7 +656,7 @@ function showField(dir = 1) {
     b.group.position.copy(b.pos);
     b.group.scale.setScalar(0.001);
   });
-  if (wasBranch) flyCamera(new THREE.Vector3(0, 0, FIELD_D), new THREE.Vector3(), 1.0, () => setControlsFor("field"));
+  if (camera.position.distanceTo(new THREE.Vector3(0, 0, FIELD_D)) > 0.05) flyCamera(new THREE.Vector3(0, 0, FIELD_D), new THREE.Vector3(), 0.9, () => setControlsFor("field"));
   else if (!camTween) setControlsFor("field");
 }
 
@@ -674,8 +669,39 @@ function clearBranch() {
   for (const b of bubbles.filter(b => b.kind !== "root")) disposeBubble(b);
   if (lines) { cluster.remove(lines); lines.geometry.dispose(); lines.material.dispose(); lines = null; }
   if (pulses) { cluster.remove(pulses); pulses.geometry.dispose(); pulses.material.dispose(); pulses = null; }
-  for (const h of halos) { cluster.remove(h); h.geometry.dispose(); h.material.dispose(); }
-  halos = []; center = null;
+  center = null;
+}
+
+// วางคำเป็นวงแหวนแบน ๆ รอบรากศัพท์ — ไม่ทับกัน อ่านง่าย
+const ellipsePerim = (a, b) => Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
+function ellipseRing(Rx, Ry, count, phase) {
+  const N = 720, pts = [], cum = [0];
+  for (let i = 0; i <= N; i++) { const t = Math.PI / 2 - (i / N) * Math.PI * 2 - phase; pts.push([Math.cos(t) * Rx, Math.sin(t) * Ry]); }
+  for (let i = 1; i <= N; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+  const out = []; let j = 0;
+  for (let k = 0; k < count; k++) {
+    const target = (k / count) * cum[N];
+    while (j < N && cum[j + 1] < target) j++;
+    out.push(pts[j]);
+  }
+  return out;
+}
+function planBranch() {
+  const R = regionHalf(FIELD_D), hw = R.w - 0.15, hh = R.h - 0.05;
+  const tryCfg = (rings, r) => {
+    const R0 = Math.max(0.72, r * 1.3), gap = r * 0.32, step = 2 * r + gap;
+    const base = []; let Rk = R0 + r + gap * 1.2;
+    for (let k = 0; k < rings; k++) { base.push(Rk); Rk += step; }
+    const last = base[rings - 1], fx = (hw - r) / last, fy = (hh - r) / last;
+    if (Math.min(fx, fy) < 1) return null;
+    const sx = fx >= fy ? Math.min(fx, 2.5) : 1, sy = fx >= fy ? 1 : Math.min(fy, 2.2);
+    const caps = base.map(b => Math.floor(ellipsePerim(b * sx, b * sy) / step));
+    return { r, R0, base, sx, sy, caps, cap: caps.reduce((a, b) => a + b, 0) };
+  };
+  for (let r = 1.0; r >= 0.749; r -= 0.05) { const c = tryCfg(1, r); if (c && c.cap >= 9) return c; }
+  for (let r = 0.75; r >= 0.499; r -= 0.05) { const c = tryCfg(2, r); if (c) return c; }
+  for (let r = 0.7; r >= 0.299; r -= 0.05) { const c = tryCfg(1, r); if (c) return c; }
+  return { r: 0.3, R0: 0.6, base: [1.2], sx: 1, sy: 1, caps: [8], cap: 8 };
 }
 
 function enterBranch(c, fromWorld = null, keepPage = false) {
@@ -692,49 +718,44 @@ function enterBranch(c, fromWorld = null, keepPage = false) {
   clearBranch();
   cluster.rotation.set(0, 0, 0);
 
-  const small = W < 640;
-  const perPage = small ? 18 : 28;
+  const L = planBranch();
+  const perPage = Math.max(1, Math.min(L.cap, 18));
   const pages = Math.max(1, Math.ceil(kids.length / perPage));
   branch.page = Math.min(branch.page, pages - 1); branch.pages = pages;
   const slice = kids.slice(branch.page * perPage, branch.page * perPage + perPage);
   const n = slice.length;
-  const R0 = 1.3, r = 0.64;
-  const Rc = Math.max(R0 + r + 0.85, Math.sqrt(n * Math.pow(3.1 * r, 2) / (4 * Math.PI)));
-  const regionAspect = W / Math.max(1, H - insetTop - insetBottom);
-  const ax = small ? 1 : Math.min(1.4, Math.max(1, regionAspect));
-  const ay = small ? Math.min(1.4, Math.max(1, 1 / regionAspect)) : 1;
-  branchD = fitDistance((Rc + r) * Math.max(ax, ay) * 0.92);
 
   $("back").style.display = ""; $("revealAll").style.display = "";
   $("info").textContent = `${c} · ${kids.length.toLocaleString()} คำ` + (pages > 1 ? ` · หน้า ${branch.page + 1}/${pages}` : "");
   $("prev").disabled = branch.page === 0; $("next").disabled = pages <= 1;
-  setHint("แตะคำเพื่อดูพินอินและคำแปล · ลากเพื่อหมุน 360° · แตะฟองกลางเพื่อดูความหมายของ " + c);
+  setHint("แตะคำเพื่อดูพินอินและคำแปล · แตะฟองตรงกลางเพื่อดูความหมายของ " + c + (pages > 1 ? " · กด › เพื่อดูคำถัดไป" : ""));
 
   const self = SELF.get(c) || null;
-  center = makeBubble({ text: c, r: R0, kind: "center", word: self, res: 384, parent: cluster, tint: "#ffffff", glow: "rgba(255,255,255,.95)" });
+  center = makeBubble({ text: c, r: L.R0, kind: "center", word: self, res: 384, parent: cluster, tint: "#ffffff", glow: "rgba(255,255,255,.95)" });
   center.home.set(0, 0, 0);
   center.from.copy(fromWorld ? cluster.worldToLocal(fromWorld.clone()) : new THREE.Vector3());
   center.pos.copy(center.from);
   center.group.position.copy(center.pos);
   center.group.scale.setScalar(0.001);
 
-  for (let i = 0; i < 2; i++) {
-    const h = new THREE.Mesh(new THREE.TorusGeometry(R0 * (1.32 + i * 0.16), 0.012, 8, 128),
-      new THREE.MeshBasicMaterial({ color: i ? "#ffa6d8" : "#8ff0ff", transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
-    h.rotation.set(Math.PI / 2 + (i ? 0.5 : -0.35), i ? 0.4 : -0.2, 0);
-    h.userData.spin = i ? -0.35 : 0.5;
-    cluster.add(h); halos.push(h);
+  // แบ่งคำลงวงแหวน (วงในก่อน) แล้ววางห่างเท่า ๆ กันตามเส้นรอบวงรี เริ่มจากด้านบน วนตามเข็มนาฬิกา
+  const counts = [];
+  if (L.base.length === 1 || n <= L.caps[0]) counts.push(n);
+  else {
+    let c0 = Math.min(L.caps[0], Math.round(n * L.caps[0] / (L.caps[0] + L.caps[1])));
+    c0 = Math.max(c0, n - L.caps[1]);
+    counts.push(c0, n - c0);
   }
-
-  const golden = Math.PI * (3 - Math.sqrt(5));
+  const spots = [];
+  counts.forEach((cnt, k) => {
+    for (const p of ellipseRing(L.base[k] * L.sx, L.base[k] * L.sy, cnt, k ? Math.PI / Math.max(1, cnt) : 0)) spots.push(p);
+  });
   slice.forEach((w, i) => {
-    const y = 1 - (i + 0.5) / n * 2, rad = Math.sqrt(1 - y * y), th = i * golden;
-    const p = new THREE.Vector3(Math.cos(th) * rad * ax, y * ay, Math.sin(th) * rad).multiplyScalar(Rc);
-    const L = LEVELS[w[3]];
-    const b = makeBubble({ text: w[0], r, kind: "kid", word: w, res: 320, parent: cluster, tint: L.color, glow: L.color });
-    b.home.copy(p); b.from.set(0, 0, 0); b.pos.set(0, 0, 0);
+    const lv = LEVELS[w[3]];
+    const b = makeBubble({ text: w[0], r: L.r, kind: "kid", word: w, res: 320, parent: cluster, tint: lv.color, glow: lv.color });
+    b.home.set(spots[i][0], spots[i][1], 0); b.from.set(0, 0, 0); b.pos.set(0, 0, 0);
     b.group.position.set(0, 0, 0); b.group.scale.setScalar(0.001);
-    b.delay = 0.35 + i * 0.03;
+    b.delay = 0.3 + i * 0.035;
     b.level = w[3];
     if (revealAll) { b.reveal = true; drawLabel(b); }
   });
@@ -756,7 +777,7 @@ function enterBranch(c, fromWorld = null, keepPage = false) {
   pulses = new THREE.Points(pg, new THREE.PointsMaterial({ size: 0.22, map: DOT, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
   cluster.add(pulses);
 
-  flyCamera(new THREE.Vector3(0, 0, branchD), new THREE.Vector3(), 1.15, () => setControlsFor("branch"));
+  flyCamera(new THREE.Vector3(0, 0, FIELD_D), new THREE.Vector3(), 0.9, () => setControlsFor("field"));
   for (let i = 0; i < Math.min(6, n); i++) blip(520 + i * 90, 0.35 + i * 0.07, 0.035);
 }
 
@@ -778,7 +799,7 @@ function showSheet(w, b) {
   sheetWord = w; renderSheet();
   $("sheet").classList.add("show");
   const sh = $("sheet");
-  if (W < 760) extraTarget = Math.max(0, (parseFloat(getComputedStyle(sh).bottom) || 70) + sh.offsetHeight + 10 - insetBottom);
+  extraTarget = Math.max(0, (parseFloat(getComputedStyle(sh).bottom) || 70) + sh.offsetHeight + 10 - insetBottom);
 }
 function renderSheet() {
   const w = sheetWord; if (!w) return;
@@ -1036,11 +1057,11 @@ function tick() {
     } else {
       const k = Math.min(1, age / 0.75), e = easeBack(k);
       tmpV.copy(b.home);
-      if (k >= 1) tmpV.add(tmpA.set(Math.sin(time * .9 + b.phase) * .06, Math.cos(time * .8 + b.phase * 1.3) * .06, Math.sin(time * .7 + b.phase) * .06));
+      if (k >= 1) tmpV.add(tmpA.set(Math.sin(time * .9 + b.phase) * .04, Math.cos(time * .8 + b.phase * 1.3) * .04, 0));
       b.pos.lerpVectors(b.from, tmpV, e);
       b.s = Math.min(1, k * 1.4);
     }
-    const target = (b.kind === "kid" && b.reveal ? (revealAll && !b.picked ? 1.12 : 1.3) : 1) * (1 + b.hoverK * .12);
+    const target = (b.kind === "kid" && b.reveal ? 1.08 : 1) * (1 + b.hoverK * .06);
     b.sCur += (target - b.sCur) * Math.min(1, dt * 8);
     const grow = b.dying ? 1 + (1 - b.s) * .5 : (b.kind === "root" ? easeBack(Math.min(1, b.s)) : Math.max(0.001, b.s));
     const sc = Math.max(0.001, b.r * b.sCur * grow);
@@ -1060,7 +1081,6 @@ function tick() {
   }
 
   if (lines && center) {
-    if (!pickedB && !down && !camTween) cluster.rotation.y += dt * 0.06;
     const kidsB = bubbles.filter(b => b.kind === "kid");
     const lp = lines.geometry.attributes.position.array, pp = pulses.geometry.attributes.position.array;
     const cS = center.group.scale.x;
@@ -1077,11 +1097,6 @@ function tick() {
     });
     lines.geometry.attributes.position.needsUpdate = true;
     pulses.geometry.attributes.position.needsUpdate = true;
-    for (const h of halos) {
-      h.rotation.z += dt * h.userData.spin;
-      h.material.opacity = Math.min(0.55, h.material.opacity + dt * .6);
-      h.position.copy(center.pos); h.scale.setScalar(Math.max(0.001, center.s));
-    }
   }
 
   for (let i = effects.length - 1; i >= 0; i--) {
